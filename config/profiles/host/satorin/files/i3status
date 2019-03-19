@@ -1,0 +1,66 @@
+general {
+	colors = true
+	color_good = "#11bb11"
+	color_degraded = "#889911"
+	color_bad = "#bb2222"
+	interval = 60
+}
+
+order += "volume master"
+order += "disk /"
+order += "wireless _first_"
+order += "ethernet _first_"
+order += "battery all"
+order += "cpu_usage"
+order += "cpu_temperature 0"
+order += "tztime local"
+
+disk "/" {
+	format = "/ %avail %percentage_used_of_avail"
+	low_threshold = 5
+	threshold_type = "gbytes_avail"
+	prefix_type = "custom"
+}
+
+wireless _first_ {
+	format_up = "%essid (%quality): %ip"
+	format_down = ""
+}
+
+ethernet _first_ {
+	format_up = "ETH %ip"
+	format_down = ""
+}
+
+battery all {
+	format = "%status %percentage %remaining"
+	status_chr = "⚡"
+	status_unk = "BAT?"
+	status_full = "FULL"
+	status_bat = "BAT"
+	low_threshold = 30
+	threshold_type = "percentage"
+}
+
+tztime local {
+	format = "%a %b %d, %I:%M %p "
+}
+
+cpu_usage {
+	format = "CPU %usage"
+	degraded_threshold = 30
+	max_threshold = 75
+	separator = false
+}
+
+cpu_temperature 0 {
+	format = "%degrees °C"
+	path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input"
+	max_threshold = 60
+}
+
+volume master {
+	format = "♪ %volume"
+	format_muted = "♪ muted"
+	mixer = "Master"
+}

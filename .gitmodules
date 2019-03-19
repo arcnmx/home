@@ -1,0 +1,24 @@
+[submodule "channels/home-manager"]
+	path = channels/home-manager
+	url = https://github.com/arcnmx/home-manager.git
+	branch = fork
+[submodule "channels/nur"]
+	path = channels/nur
+	url = https://github.com/nix-community/NUR.git
+	branch = master
+[submodule "channels/nixpkgs"]
+	path = channels/nixpkgs
+	url = https://github.com/NixOS/nixpkgs-channels.git
+	branch = nixos-unstable-small
+[submodule "channels/arc"]
+	path = channels/arc
+	url = https://github.com/arcnmx/nixexprs.git
+	branch = master
+[submodule "channels/mozilla"]
+	path = channels/mozilla
+	url = https://github.com/mozilla/nixpkgs-mozilla.git
+	branch = master
+[submodule "config/profiles/trusted"]
+	path = config/profiles/trusted
+	url = git@github.com:arcnmx/home-trusted.git
+	branch = master

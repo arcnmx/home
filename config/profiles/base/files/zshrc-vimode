@@ -1,0 +1,28 @@
+zle-keymap-select() {
+	zle reset-prompt
+	zle -R
+}
+
+TRAPWINCH() {
+	zle && { zle reset-prompt; zle -R }
+}
+
+zle -N zle-keymap-select
+zle -N edit-command-line
+
+bindkey -v
+
+autoload -Uz edit-command-line
+
+bindkey "^?" backward-delete-char
+bindkey -M vicmd 'V' edit-command-line
+
+# tab completion menu
+bindkey -M menuselect "k" up-line-or-history
+bindkey -M menuselect "j" down-line-or-history
+bindkey -M menuselect "l" forward-char
+bindkey -M menuselect "h" backward-char
+bindkey -M menuselect "^[" undo
+
+# silence bell when pressing escape too much
+bindkey -M vicmd -s "\e" ''

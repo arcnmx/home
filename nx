@@ -1,0 +1,65 @@
+#!/bin/bash
+set -eu
+
+usage() {
+	echo usage: $0 CMD FILE ATTR [ArgName=value]...
+	echo example: $0 run run.nix nixpkgs.hello Some=arg
+}
+
+collect_args() {
+	for arg in "$@"; do
+		if [[ $arg == --* ]]; then
+			break
+		fi
+		shift
+		ARGS+=(--argstr "${arg%=*}" "${arg#*=}")
+	done
+	for arg in "$@"; do
+		ARGS+=("$arg")
+	done
+}
+
+cmd_other() {
+	if [[ $# -lt 2 ]]; then
+		usage
+	fi
+
+	FILE=$1
+	ATTR=$2
+	shift 2
+
+	ARGS=(-f "$FILE" "$ATTR")
+	collect_args "$@"
+	exec nix $CMD "${ARGS[@]}"
+}
+
+cmd_exec() {
+	if [[ $# -lt 2 ]]; then
+		usage
+	fi
+
+	FILE=$1
+	ATTR=$2
+	shift 2
+
+	ARGS=(-f "$FILE" "$ATTR")
+	collect_args "$@"
+	. <(nix eval --raw "${ARGS[@]}")
+}
+
+cmd_switch() {
+	$0 exec switch.nix switch hostName=$(hostname -s) "$@"
+}
+
+main() {
+	CMD=$1
+	shift
+
+	if [[ $(type -t "cmd_$CMD") = function ]]; then
+		"cmd_$CMD" "$@"
+	else
+		cmd_other "$CMD" "$@"
+	fi
+}
+
+main "$@"

@@ -1,0 +1,115 @@
+" vim-like behaviour where removing a line from here makes the setting disappear
+sanitise tridactyllocal tridactylsync
+
+" these just modify userChrome.css, so do it ourselves instead
+" guiset_quiet gui none
+" guiset_quiet tabs always
+" guiset_quiet navbar always
+" guiset_quiet hoverlink right
+" set modeindicator false
+
+colors default
+" colors halloween " oh god what
+" colors dark
+" colors shydactyl
+" colors greenmat
+
+alias fn_noempty jsb -p return JS_ARG
+bind ;y composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | clipboard yank
+bind ;m composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | exclaim_quiet mpv
+bind F composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | tabopen
+" mpv --ontop --keepaspect-window --profile=protocol.http
+
+" Comment toggler for Reddit and Hacker News
+bind ;c hint -c [class*="expand"],[class="togg"]
+
+" GitHub pull request checkout command to clipboard (only works if you're a collaborator or above)
+bind yp composite js document.getElementById("clone-help-step-1").textContent.replace("git checkout -b", "git checkout -B").replace("git pull ", "git fetch ") + "git reset --hard " + document.getElementById("clone-help-step-1").textContent.split(" ")[3].replace("-","/") | yank
+
+" Git{Hub,Lab} git clone via SSH yank
+bind yg composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+
+" I like wikiwand but I don't like the way it changes URLs
+bindurl wikiwand.com yy composite js document.location.href.replace("wikiwand.com/en","wikipedia.org/wiki") | clipboard yank
+
+"set customthemes.custom span.TridactylHint { font-family: monospace !important; background: transparent !important; color: black !important; text-shadow: cyan -1px -1px 0px, cyan -1px 0px 0px, cyan -1px 1px 0px, cyan 1px -1px 0px, cyan 1px 0px 0px, cyan 1px 1px 0px, cyan 0px 1px 0px, cyan 0px -1px 0px !important; }
+"set theme custom
+colors custom
+
+" one tab per window
+" bind --mode=normal F hint -w
+" bind --mode=normal T current_url winopen
+" bind --mode=normal t fillcmdline winopen
+
+" Make gu take you back to subreddit from comments
+bindurl reddit.com gu urlparent 4
+
+bind --mode=normal x tabclose
+
+bind --mode=normal `` tab #
+
+bind --mode=normal j scrollline 5
+bind --mode=normal k scrollline -5
+
+bind --mode=normal K tabprev
+bind --mode=normal J tabnext
+
+autocmd TabEnter .* unfocus
+set allowautofocus false
+
+unbind --mode=ex <C-a>
+
+"js tri.browserBg.runtime.getPlatformInfo().then(os=>{const editorcmd = os.os=="linux" ? "urxvt -e vim" : "auto"; tri.config.set("editorcmd", editorcmd)})
+set editorcmd urxvt -e vim
+
+" jsb browser.runtime.getPlatformInfo().then(os=>{const profiledir = os.os=="win" ? "C:\\Users\\???\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\???.default" : "auto"; tri.config.set("profiledir", profiledir)})
+
+set hintuppercase false
+set hintchars fdsqjklmrezauiopwxcvghtybn
+"set hintfiltermode vimperator-reflow
+"set hintnames numeric
+
+" Make Tridactyl work on more sites at the expense of some security
+set csp clobber
+fixamo_quiet
+
+" Make quickmarks for the sane Tridactyl issue view
+"quickmark t https://github.com/cmcaine/tridactyl/issues?utf8=%E2%9C%93&q=sort%3Aupdated-desc+
+
+autocmd DocStart www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
+
+" kill all existing searchurls
+jsb Object.keys(tri.config.get("searchurls")).forEach(u => tri.config.set("searchurls", u, '""'))
+set searchengine ddg
+set searchurls.g https://encrypted.google.com/search?q=%s
+set searchurls.gh https://github.com/search?q=%s
+set searchurls.w https://en.wikipedia.org/wiki/Special:Search?search=%s
+set searchurls.ddg https://duckduckgo.com/?q=%s
+set searchurls.r https://reddit.com/r/%s
+set searchurls.rs https://doc.rust-lang.org/std/index.html?search=%s
+set searchurls.crates https://crates.io/search?q=%s
+set searchurls.docs https://docs.rs/%s/*
+set searchurls.aur https://aur.archlinux.org/packages/?K=%s
+set searchurls.yt https://www.youtube.com/results?search_query=%s
+
+set putfrom selection
+" set yankto selection
+set yankto both
+set externalclipboardcmd xsel
+
+unbind <S-Insert>
+bind --mode=normal i mode ignore
+bind --mode=ignore <Escape> composite mode normal ; hidecmdline
+
+alias fn_getselection jsb tri.native.clipboard("get", "")
+bind --mode=normal <S-Insert> composite fn_getselection | fillcmdline_notrail open
+bind --mode=ex <S-Insert> composite fn_getselection | text.insert_text
+bind --mode=input <S-Insert> clipboard xselpaste
+bind --mode=insert <S-Insert> clipboard xselpaste
+
+bind --mode=insert <C-e> editor
+bind --mode=input <C-e> editor
+
+seturl play.rust-lang.org allowautofocus true
+
+" vim: set filetype=vim:

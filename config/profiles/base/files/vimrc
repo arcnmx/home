@@ -1,0 +1,81 @@
+" NOTE: use with vim-sensible
+
+runtime! plugin/sensible.vim
+
+" TODO: $XDG_DATA_HOME/vim/viminfo
+set viminfo='100000,<100000,s1000,h,n$XDG_DATA_HOME/vim/viminfo " Get rid of line copy limit
+
+set undodir=$XDG_DATA_HOME/vim/undo
+set directory=$XDG_DATA_HOME/vim/swap//
+set backupdir=$XDG_DATA_HOME/vim/backup
+set runtimepath+=$XDG_CONFIG_HOME/vim/after
+
+set noerrorbells visualbell t_vb= " prevent bell on escape key presses
+
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set laststatus=1
+set colorcolumn=80
+set nobackup
+set showcmd
+set relativenumber
+set cursorline
+set shortmess+=I
+set hlsearch
+set completeopt=menuone,longest
+set timeoutlen=100
+
+set hidden " allow buffer switching without saving
+
+syntax on
+let g:solarized_termtrans=1
+"set background=light " dark or light
+set background=dark " dark or light
+colorscheme solarized
+
+let rust_recommended_style=0
+let g:cargo_makeprg_params="check --color always"
+au BufRead,BufNewFile *.rs compiler cargo
+
+let g:vim_markdown_folding_disabled=1
+
+au BufRead,BufNewFile *.kt setlocal filetype=kotlin
+au BufRead,BufNewFile *.as setlocal filetype=javascript
+
+xmap <M-C> y:call SendViaOSC52(getreg('"'))<cr>
+
+nnoremap <esc><esc> :silent! nohls<cr>
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+nnoremap q <Nop>
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" When editing a file, always jump to the last known cursor position.
+autocmd BufReadPost *
+\ if line("'\"") > 1 && line("'\"") <= line("$") |
+\   exe "normal! g`\"" |
+\ endif
+
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
+
+if !exists(":Now")
+  command Now call setline(line('.'), getline('.') . substitute(system('date -Iseconds'), '[\]\|[[:cntrl:]]', '', 'g'))
+  cnoreabbrev now Now
+endif
+
+command Spaces set expandtab
+command Tabs set noexpandtab
+
+" Avoid E173
+if argc() > 1
+  silent blast " load last buffer
+  silent bfirst " switch back to the first
+endif

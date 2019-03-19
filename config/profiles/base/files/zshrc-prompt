@@ -1,0 +1,131 @@
+# vim:ft=zsh ts=4 sw=4 sts=4
+setopt prompt_subst
+
+parse_git_dirty() {
+	local STATUS=''
+	local FLAGS
+	FLAGS=('--porcelain' '--untracked-files=no' '--ignore-submodules=dirty')
+	if [[ "$(command git config --get oh-my-zsh.hide-dirty)" != "1" ]]; then
+		STATUS=$(command git status ${FLAGS} 2> /dev/null | tail -n1)
+	fi
+	[ -n "$STATUS" ]
+}
+
+prompt_end() {
+	local PROMPT=":;"
+	if [[ "${KEYMAP-}" == "vicmd" ]]; then
+		PROMPT=" :"
+	fi
+	echo -en "%{%f%k%}\n%{%F{white}%B%}$PROMPT%{%b%f%}"
+}
+
+PROMPT_SEGMENT=""
+prompt_segment() {
+	if [[ -n "$PROMPT_SEGMENT" ]]; then
+		echo -n " "
+	fi
+
+	echo -n "$1"
+	PROMPT_SEGMENT=x
+}
+
+prompt_context() {
+	if [[ ($UID -ne 0 && "$USER" != "$DEFAULT_USER") || -n "${SSH_CLIENT-}" ]]; then
+		prompt_segment "%{%F{red}%}$USER%{%f%B%}@%{%b%F{red}%}%m%{%f%}"
+	fi
+}
+
+prompt_git() {
+	local ref dirty mode repo_path
+	repo_path=$(git rev-parse --git-dir 2>/dev/null)
+
+	if [[ -n "$repo_path" ]]; then
+		dirty=$(parse_git_dirty)
+		ref=$(git symbolic-ref HEAD --short 2> /dev/null) || ref="➦ $(git rev-parse --short HEAD 2> /dev/null)"
+
+		if parse_git_dirty; then
+			dirty="yellow"
+		else
+			dirty="green"
+		fi
+
+		if [[ -e "${repo_path}/BISECT_LOG" ]]; then
+			mode=" :: bisect"
+		elif [[ -e "${repo_path}/MERGE_HEAD" ]]; then
+			mode=" :: merge"
+		elif [[ -e "${repo_path}/rebase" || -e "${repo_path}/rebase-apply" || -e "${repo_path}/rebase-merge" ]]; then
+			mode=" :: rebase"
+		fi
+
+		prompt_segment "%{%F{$dirty}%}(git: $ref$mode)%{%f%}"
+	fi
+}
+
+prompt_dir() {
+	prompt_segment "%{%F{blue}%B%}%~%{%b%f%}"
+}
+
+prompt_status() {
+	local symbols
+	symbols=()
+	[[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}!"
+	[[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}#"
+	[[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}&"
+
+	[[ -n "$symbols" ]] && prompt_segment "$symbols%{%f%}"
+}
+
+build_prompt() {
+	RETVAL=$?
+	prompt_status
+	prompt_context
+	prompt_dir
+	prompt_git
+	prompt_end
+}
+
+PROMPT='%{%f%b%k%}$(build_prompt) '
+#RPROMPT='$(date)'
+
+if [[ -n "${ARC_PROMPT_RUN-}" ]]; then
+	HISTFILE=$HOME/.zsh_history_run
+	PROMPT='%{%F{white}%B%}:;%{%b%f%} '
+	__arc_run() {
+		if [[ -n "$BUFFER" ]]; then
+			# add to history if it doesn't start with a space
+			if [[ "$BUFFER" != " "* ]]; then
+				print -s "$BUFFER"
+			fi
+
+			# expand aliases (only operates on current word)
+			# move cursor to first word, skip leading whitespace
+			zle beginning-of-line
+			zle vi-forward-blank-word-end
+			zle _expand_alias
+
+			# run process in bg, check if it exits within a short timeframe
+			if ! (
+				echo
+				unset ARC_PROMPT_RUN
+				eval "exec $BUFFER" &
+				BUFFER_PID=$!
+				sleep 0.1
+				[[ -d /proc/$BUFFER_PID ]]
+			); then
+				# if it does (likely due to error), wait for enter
+				PROMPT="..."
+				BUFFER=" read; exit"
+			else
+				BUFFER=" exit"
+			fi
+		else
+			BUFFER=" exit"
+		fi
+		echo -en "\n"
+		zle reset-prompt
+		zle .accept-line
+	}
+	zle -N accept-line __arc_run
+
+	trap "exit" INT # ^C exits
+fi
