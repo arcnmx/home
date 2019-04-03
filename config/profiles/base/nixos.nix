@@ -71,7 +71,7 @@ in {
         bind.dnsutils
         (if config.home.profiles.gui
           then duc
-          else duc.override { pango = null; cairo = null; })
+          else (duc.overrideAttrs (_: { configureFlags = ["--disable-x11" "--disable-cairo"]; })).override { pango = null; cairo = null; })
       ] ++ (lib.optional config.services.yggdrasil.enable pkgs.yggdrasilctl);
     };
 
