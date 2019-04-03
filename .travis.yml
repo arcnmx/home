@@ -25,10 +25,10 @@ script:
 - |
   (for host in $HOSTNAMES base personal desktop laptop; do
     echo BUILDING home-manager/$host &&
-    nix run -f run.nix home-manager -c home-manager -f home.nix -A $host build || exit $?
+    ./nx home $host build || exit $?
   done)
 - |
   (for host in $HOSTNAMES; do
     echo BUILDING nixos/$host &&
-    ./nx exec switch.nix build hostName=$host || exit $?
+    ./nx switch $host build || exit $?
   done)

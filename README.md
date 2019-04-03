@@ -3,14 +3,11 @@ A combination of system config, dotfiles, and personal Nix package repo/channel/
 ## NixOS
 
 ```bash
-./nx exec switch.nix switch hostName=whatever
-
-# shorthand for deploying to current machine:
-./nx switch
+./nx switch $(hostname -s) switch
 ```
 
 ## Nix
 
 ```bash
-nix run -f run.nix home-manager -c home-manager -f home.nix -A $(hostname -s) switch
+./nx home $(hostname -s) switch
 ```

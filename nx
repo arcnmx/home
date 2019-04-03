@@ -1,55 +1,144 @@
 #!/bin/bash
 set -eu
 
+nix() {
+	exec nix run -f channels/nixpkgs nix -c nix "$@"
+}
+
 usage() {
-	echo usage: $0 CMD FILE ATTR [ArgName=value]...
+	echo usage: $0 CMD FILE [ATTR] [ArgName=value]...
 	echo example: $0 run run.nix nixpkgs.hello Some=arg
 }
 
-collect_args() {
+collect_values() {
+	SHIFT=0
 	for arg in "$@"; do
-		if [[ $arg == --* ]]; then
+		if [[ $arg == -- ]]; then
+			SHIFT=$((SHIFT+1))
+			break
+		elif [[ $arg == -* ]]; then
+			break
+		elif [[ $arg != *=* ]]; then
 			break
 		fi
+		SHIFT=$((SHIFT+1))
 		shift
 		ARGS+=(--argstr "${arg%=*}" "${arg#*=}")
 	done
-	for arg in "$@"; do
-		ARGS+=("$arg")
-	done
+}
+
+collect_args() {
+	collect_values "$@"
+	shift $SHIFT
+
+	ARGS+=("$@")
+}
+
+parse_args() {
+	if [[ $# -lt 1 ]]; then
+		usage
+	fi
+
+	FILE=$1
+	SHIFT=1
+
+	ATTR=
+	if [[ -e $FILE ]]; then
+		ARGS=(-f "$FILE")
+
+		if [[ $# -gt 1 ]]; then
+			ATTR=$2
+			SHIFT=2
+
+			if [[ $ATTR = . ]]; then
+				ATTR=
+			fi
+		fi
+	else
+		ATTR="$FILE"
+		FILE=
+	fi
+
+	if [[ $CMD = run && -z $FILE && $ATTR != *.* ]]; then
+		ATTR="nixpkgs.$ATTR"
+	fi
+
+	if [[ -n $ATTR ]]; then
+		ARGS+=("$ATTR")
+	fi
 }
 
 cmd_other() {
-	if [[ $# -lt 2 ]]; then
-		usage
-	fi
+	parse_args "$@"
+	shift $SHIFT
 
-	FILE=$1
-	ATTR=$2
-	shift 2
-
-	ARGS=(-f "$FILE" "$ATTR")
 	collect_args "$@"
-	exec nix $CMD "${ARGS[@]}"
+
+	nix $CMD "${ARGS[@]}"
+}
+
+cmd_run() {
+	parse_args "$@"
+	shift $SHIFT
+
+	collect_values "$@"
+	shift $SHIFT
+
+	ARGS+=(-c "${ATTR##*.}" "$@")
+
+	nix run "${ARGS[@]}"
+}
+
+cmd_shell() {
+	parse_args "$@"
+	shift $SHIFT
+
+	collect_args "$@"
+
+	nix run "${ARGS[@]}"
 }
 
 cmd_exec() {
-	if [[ $# -lt 2 ]]; then
-		usage
-	fi
+	parse_args "$@"
+	shift $SHIFT
 
-	FILE=$1
-	ATTR=$2
-	shift 2
-
-	ARGS=(-f "$FILE" "$ATTR")
 	collect_args "$@"
+
 	SCRIPT=$(nix eval --raw "${ARGS[@]}")
 	eval "$SCRIPT"
 }
 
+parse_switch_args() {
+	SHIFT=0
+	if [[ $# -gt 0 && ${1-} != switch && ${1-} != build ]]; then
+		ATTR=$1
+		shift
+		SHIFT=1
+	else
+		ATTR=$(hostname -s)
+	fi
+
+	if [[ ${1-} = switch || ${1-} = build ]]; then
+		CMD=$1
+		shift
+		SHIFT=$((SHIFT+1))
+	else
+		CMD=switch
+	fi
+}
+
 cmd_switch() {
-	$0 exec switch.nix switch hostName=$(hostname -s) "$@"
+	parse_switch_args "$@"
+	shift $SHIFT
+
+	$0 exec switch.nix $CMD hostName=$ATTR "$@"
+}
+
+cmd_home() {
+	parse_switch_args "$@"
+	shift $SHIFT
+
+	$0 run run.nix home-manager -f home.nix -A "$ATTR" "$@" $CMD
 }
 
 main() {
