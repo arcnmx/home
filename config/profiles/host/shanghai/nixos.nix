@@ -20,5 +20,60 @@
       #set-default-sink alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
       set-default-source alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-mono
     '';
+
+    boot = {
+      loader = {
+        generationsDir = {
+          copyKernels = true;
+        };
+        systemd-boot.enable = true;
+        efi = {
+          canTouchEfiVariables = false;
+          efiSysMountPoint = "/mnt/efi";
+        };
+      };
+      supportedFilesystems = ["btrfs"];
+    };
+
+    fileSystems = {
+      "/" = {
+        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
+        fsType = "btrfs";
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/root"];
+      };
+      "/home" = {
+        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
+        fsType = "btrfs";
+        options = ["rw" "strictatime" "lazytime" "subvol=/home"];
+      };
+      "/boot" = {
+        device = "/mnt/efi/EFI/nixos";
+        fsType = "none";
+        options = ["bind"];
+      };
+      "/mnt/bigdata" = {
+        device = "/dev/disk/by-uuid/2354ffd4-67b6-49e6-90f1-22cc2a116ff1";
+        fsType = "btrfs";
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "space_cache" "autodefrag" "subvol=/bigdata"];
+      };
+      "/mnt/data" = {
+        device = "/dev/disk/by-uuid/9407fd0a-683b-4839-908d-e65cb9b5fec5";
+        fsType = "btrfs";
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
+      };
+      "/mnt/efi" = {
+        device = "/dev/disk/by-uuid/D460-0EF6";
+        fsType = "vfat";
+        options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
+      };
+      "/mnt/root" = {
+        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
+        fsType = "btrfs";
+        options = ["rw" "strictatime" "lazytime" "subvol=/"];
+      };
+    };
+    swapDevices = [
+      { device = "/dev/disk/by-uuid/4faab83b-164e-444c-b1b6-4a26e7f7e6bf"; }
+    ];
   };
 }

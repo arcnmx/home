@@ -64,6 +64,7 @@
       "/mnt/efi" = {
         device = "/dev/disk/by-uuid/17CA-FD91";
         fsType = "vfat";
+        options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
       };
       "/mnt/old" = {
         device = "/dev/disk/by-uuid/5cb5485c-9417-441c-a96e-6369c0f9530c";
