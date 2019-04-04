@@ -2,7 +2,7 @@
 set -eu
 
 nix() {
-	exec nix run -f channels/nixpkgs nix -c nix "$@"
+	command nix run -f channels/nixpkgs nix -c nix "$@"
 }
 
 usage() {
