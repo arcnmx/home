@@ -116,6 +116,9 @@ in {
     ] ++ (lib.optionals config.home.rust.enable [pkgs.cargo-download pkgs.cargo-expand pkgs.cargo-outdated]);
     xdg.enable = true;
     xdg.configFile = {
+      "vim/after/indent/nix.vim".text = ''
+        setlocal indentkeys=0{,0},0),0],:,0#,!^F,o,O,e,0=then,0=else,0=inherit,*<Return>
+      '';
       "vim/after/indent/yaml.vim".text = ''
         setlocal indentkeys=!^F,o,O,0},0]
         set tabstop=2
@@ -272,8 +275,8 @@ in {
       ];
       settings = {};
       extraConfig = ''
-        ${lib.readFile ./files/vimrc}
-        ${pkgs.substituteAll {
+        source ${./files/vimrc}
+        source ${pkgs.substituteAll {
           src = ./files/vimrc-notmuch;
           inherit (pkgs) msmtp;
         }}
