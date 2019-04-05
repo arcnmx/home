@@ -9,20 +9,8 @@
 
   config = mkIf config.home.profiles.personal {
     home.rust.enable = true;
-    home.file = let
-      blocks_attr = "${pkgs.fetchgit {
-        name = "task-blocks_attr.py";
-        url = https://gist.github.com/wbsch/a2f7264c6302918dfb30.git;
-        rev = "ff5d8f694371a274130ab4a639ce280c31e88a00";
-        sha256 = "0prv5p0p1b0xhx89hjdxphyl4s2ln716mryhpmm8s3mf1d2wpifb";
-        postFetch = ''
-          chmod +x $out/on-modify.blocks_attr.py
-        '';
-      }}/on-modify.blocks_attr.py";
-    in {
-      ".task/hooks/on-add.blocks_attr.py".source = blocks_attr;
-      ".task/hooks/on-launch.blocks_attr.py".source = blocks_attr;
-      ".task/hooks/on-modify.blocks_attr.py".source = blocks_attr;
+    home.file = {
+      ".task/hooks/on-exit.task-blocks".source = pkgs.arc.task-blocks.on-exit;
       ".taskrc".target = ".config/taskrc";
     };
     home.packages = with pkgs; with pkgs.arc; [
