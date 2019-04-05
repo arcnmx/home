@@ -26,3 +26,15 @@ bindkey -M menuselect "^[" undo
 
 # silence bell when pressing escape too much
 bindkey -M vicmd -s "\e" ''
+
+# make W/B/dW/dB delete entire shell arguments
+autoload -U forward-word-match
+autoload -U backward-word-match
+autoload -U select-word-style
+select-word-style shell
+
+zle -N forward-parameter forward-word-match
+zle -N backward-parameter backward-word-match
+
+bindkey -M vicmd "W" forward-parameter
+bindkey -M vicmd "B" backward-parameter

@@ -220,6 +220,9 @@ in {
       initExtra = ''
         ${shellInit}
 
+        bind -m vi-move 'W:shell-forward-word'
+        bind -m vi-move 'B:shell-backward-word'
+
         source ${pkgs.bash-completion}/share/bash-completion/bash_completion
       '';
     };
