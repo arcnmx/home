@@ -113,6 +113,8 @@ in {
       rxvt_unicode.terminfo
 
       lorri
+
+      fzf fd # for fzf-z zsh plugin
     ] ++ (lib.optionals config.home.rust.enable [pkgs.cargo-download pkgs.cargo-expand pkgs.cargo-outdated]);
     xdg.enable = true;
     xdg.configFile = {
@@ -161,6 +163,9 @@ in {
         linker = "${pkgs.pkgsCross.mingw32.buildPackages.gcc}/bin/i686-pc-mingw32-gcc"
         ar = "${pkgs.pkgsCross.mingw32.buildPackages.binutils.bintools}/bin/i686-pc-mingw32-ar"
       '' else "";
+    };
+    xdg.dataFile = {
+      "z/.keep".text = "";
     };
     home.symlink = {
       ".config/cargo/.crates.toml" = {
@@ -244,6 +249,27 @@ in {
         ignoreDups = true;
         expireDuplicatesFirst = true;
       };
+      plugins = [
+        {
+          name = "z";
+          file = "z.sh";
+          src = pkgs.fetchFromGitHub {
+            owner = "rupa";
+            repo = "z";
+            rev = "9d5a3fe0407101e2443499e4b95bca33f7a9a9ca";
+            sha256 = "0aghw6zmd3851xpzgy0jkh25wzs9a255gxlbdr3zw81948qd9wb1";
+          };
+        }
+        {
+          name = "fzf-z";
+          src = pkgs.fetchFromGitHub {
+            owner = "andrewferrier";
+            repo = "fzf-z";
+            rev = "089ba6cacd3876c349cfb6b65dc2c3e68b478fd0";
+            sha256 = "1lvvkz0v4xibq6z3y8lgfkl9ibcx0spr4qzni0n925ar38s20q81";
+          };
+        }
+      ];
       localVariables = {
         READNULLCMD = config.home.sessionVariables.PAGER;
         REPORTTIME = 10;
@@ -254,6 +280,8 @@ in {
         KEYTIMEOUT = 1;
         DEFAULT_USER = "${config.home.username}";
         ZSH_AUTOSUGGEST_USE_ASYNC = 1;
+        _Z_DATA = "${config.xdg.dataHome}/z/data";
+        #_Z_OWNER = "arc";
       };
       initExtra = ''
         ${shellInit}

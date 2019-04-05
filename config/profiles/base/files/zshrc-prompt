@@ -88,7 +88,7 @@ PROMPT='%{%f%b%k%}$(build_prompt) '
 #RPROMPT='$(date)'
 
 if [[ -n "${ARC_PROMPT_RUN-}" ]]; then
-	HISTFILE=$HOME/.zsh_history_run
+	HISTFILE=${HISTFILE}_run
 	PROMPT='%{%F{white}%B%}:;%{%b%f%} '
 	__arc_run() {
 		if [[ -n "$BUFFER" ]]; then
