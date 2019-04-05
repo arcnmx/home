@@ -66,12 +66,6 @@
         fsType = "vfat";
         options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
       };
-      "/mnt/old" = {
-        device = "/dev/disk/by-uuid/5cb5485c-9417-441c-a96e-6369c0f9530c";
-        fsType = "btrfs";
-        options = ["ro"];
-        noCheck = true;
-      };
     };
     swapDevices = [
       { device = "/dev/disk/by-partuuid/a1ec1791-770e-4541-9945-33fc64c4d2cf"; }
