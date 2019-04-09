@@ -275,7 +275,7 @@ in {
         REPORTTIME = 10;
         #TIMEFMT = ''"$'time %J\n%*S kernel, %*U userspace\n%*E elapsed (%P CPU)'"'';
         TIMEFMT = "time %J\n%*S kernel, %*U userspace\n%*E elapsed (%P CPU)";
-        WORDCHARS = "";
+        WORDCHARS = "-_~=&#$%^";
         PROMPT_EOL_MARK = "";
         KEYTIMEOUT = 1;
         DEFAULT_USER = "${config.home.username}";
