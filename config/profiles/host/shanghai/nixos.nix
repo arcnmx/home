@@ -54,12 +54,12 @@
       "/mnt/bigdata" = {
         device = "/dev/disk/by-uuid/2354ffd4-67b6-49e6-90f1-22cc2a116ff1";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "space_cache" "autodefrag" "subvol=/bigdata"];
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "space_cache" "autodefrag" "subvol=/bigdata" "nofail"];
       };
       "/mnt/data" = {
         device = "/dev/disk/by-uuid/9407fd0a-683b-4839-908d-e65cb9b5fec5";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" "nofail"];
       };
       "/mnt/efi" = {
         device = "/dev/disk/by-uuid/D460-0EF6";
@@ -69,7 +69,7 @@
       "/mnt/root" = {
         device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "subvol=/"];
+        options = ["rw" "strictatime" "lazytime" "subvol=/" "nofail"];
       };
     };
     swapDevices = [
