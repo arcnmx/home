@@ -1,7 +1,7 @@
 [submodule "channels/home-manager"]
 	path = channels/home-manager
-	url = https://github.com/arcnmx/home-manager.git
-	branch = fork
+	url = https://github.com/rycee/home-manager.git
+	branch = master
 [submodule "channels/nur"]
 	path = channels/nur
 	url = https://github.com/nix-community/NUR.git

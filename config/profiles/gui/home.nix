@@ -64,7 +64,6 @@
       rxvt_unicode-with-plugins
       luakit-develop
       libreoffice-fresh
-      flashplayer
     ];
 
     home.sessionVariables = {

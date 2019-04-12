@@ -25,6 +25,7 @@ in {
     /*<home-manager/nixos>*/ "${toString channels.paths.home-manager}/nixos"
     /*<arc/modules/nixos>*/ "${toString channels.paths.arc}/modules/nixos"
     profiles/nixos.nix
+    modules/nixos
   ];
 
   nix = {

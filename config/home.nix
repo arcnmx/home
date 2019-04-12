@@ -1,7 +1,15 @@
 { pkgs, lib, config, ... }: let
   channels = import ./channels.nix { };
 in with lib; {
-  imports = [profiles/home.nix "${toString channels.paths.arc}/modules/home"];
+  disabledModules = [
+    (/. + "${toString channels.paths.home-manager}/modules/programs/git.nix")
+  ];
+
+  imports = [
+    modules/home
+    profiles/home.nix
+    "${toString channels.paths.arc}/modules/home"
+  ];
 
   config = {
     xdg.configFile = {
