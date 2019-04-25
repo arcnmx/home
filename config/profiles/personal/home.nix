@@ -13,7 +13,7 @@
       ".task/hooks/on-exit.task-blocks".source = pkgs.arc.task-blocks.on-exit;
       ".taskrc".target = ".config/taskrc";
     };
-    home.packages = with pkgs; with pkgs.arc; [
+    home.packages = with pkgs; [
       pass-otp
       awscli
       ncmpcpp
