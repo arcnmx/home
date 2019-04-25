@@ -106,6 +106,10 @@
         source = ./files/luakit;
         recursive = true;
       };
+      "luakit/rc/nix.lua".source = pkgs.substituteAll {
+        src = ./files/luakit-nix.lua;
+        pass = pkgs.pass-otp;
+      };
       "luakit/pass".source = pkgs.fetchFromGitHub {
         owner = "arcnmx";
         repo = "luakit-pass";

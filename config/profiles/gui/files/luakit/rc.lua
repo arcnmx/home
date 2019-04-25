@@ -16,4 +16,6 @@ require "rc.binds"
 
 require "rc.exec"
 
+require "rc.nix"
+
 -- vim: et:sw=4:ts=8:sts=4:tw=80
