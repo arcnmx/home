@@ -74,6 +74,7 @@ in {
   };
 
   config = lib.mkIf config.home.profiles.base {
+    home.stateVersion = "19.03";
     home.file = {
       # TODO: make a proper module for this
       ".local/share/bash/.keep".text = "";
@@ -208,6 +209,24 @@ in {
         '';
         dict = ''
           ${pkgs.curl}/bin/curl "dict://dict.org/$1:$2"
+        '';
+        # TODO: think this through more, theme configuration needs to be per session
+        theme = ''
+          case "$1" in
+            isDark)
+              [[ $(theme get) = dark ]]
+              ;;
+            get|"")
+              echo ''${TERM_THEME-dark}
+              ;;
+            light|dark)
+              export TERM_THEME=$1
+              ;;
+            *)
+              echo "unknown theme $1" >&2
+              return 1
+              ;;
+          esac
         '';
       };
     };
@@ -359,6 +378,7 @@ in {
       serverAliveInterval = 60;
       extraConfig = ''
         #PubkeyAcceptedKeyTypes=+ssh-dss # do I still need this?
+        SendEnv=TERM_THEME
       '';
     };
 

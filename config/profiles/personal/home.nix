@@ -19,18 +19,46 @@
       ncmpcpp
       ncpamixer
       ledger
-      taskwarrior
       physlock
       travis
       radare2
       jq yq
       #TODO: benc bsync snar-snapper book
     ];
-    home.shell.aliases = {
-      task3s = "task rc.context=3s";
-      taskwork = "task rc.context=work";
-      taskfun = "task rc.context=fun";
-      taskrm = "task rc.confirmation=no delete";
+    home.shell = {
+      functions = {
+        task = ''
+          local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
+          local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
+          mkdir -p "$TASK_DIR" &&
+            ln -sf "${pkgs.taskwarrior}/share/doc/task/rc/$TASK_THEME.theme" "$TASK_DIR/theme" &&
+            (cd "$TASK_DIR" && ${pkgs.taskwarrior}/bin/task "$@")
+        '';
+        tasks = ''
+          #local _TASK_REPORT=next
+          local _TASK_REPORT=
+          if [[ $# -gt 0 ]]; then
+              _TASK_REPORT=$1
+              shift
+          fi
+          local _TASK_OPTIONS=(rc.defaultheight=$LINES rc.defaultwidth=$COLUMNS rc._forcecolor=yes limit:0)
+          {
+              if [[ -z $_TASK_REPORT ]]; then
+                  #task "''${_TASK_OPTIONS[@]}" next "$@"
+                  task "''${_TASK_OPTIONS[@]}" short "$@"
+                  task "''${_TASK_OPTIONS[@]}" upcoming "$@"
+              else
+                  task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
+              fi
+          } 2> /dev/null | less
+        '';
+      };
+      aliases = {
+        task3s = "task rc.context=3s";
+        taskwork = "task rc.context=work";
+        taskfun = "task rc.context=fun";
+        taskrm = "task rc.confirmation=no delete";
+      };
     };
 
     home.sessionVariables = {
@@ -41,6 +69,9 @@
       colorTheme = "solarized-light-256"; # TODO: shell alias to override and switch light/dark theme
       dataLocation = "${config.xdg.dataHome}/task";
       activeContext = "home";
+      extraConfig = ''
+        include ./theme
+      '';
       contexts = {
         home = "(project.not:work and project.not:games and project.not:fun) or +escalate";
         fun = "project:fun";
