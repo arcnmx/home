@@ -16,6 +16,32 @@ let
       Group = "kvm";
     };
   };
+  c1 = ''\e[22;34m'';
+  c2 = ''\e[1;35m'';
+  nixos = [
+    " ${c1}          ::::.    ${c2}':::::     ::::'          "
+    " ${c1}          ':::::    ${c2}':::::.  ::::'           "
+    " ${c1}            :::::     ${c2}'::::.:::::            "
+    " ${c1}      .......:::::..... ${c2}::::::::             "
+    " ${c1}     ::::::::::::::::::. ${c2}::::::    ${c1}::::.     "
+    " ${c1}    ::::::::::::::::::::: ${c2}:::::.  ${c1}.::::'     "
+    " ${c2}           .....           ::::' ${c1}:::::'      "
+    " ${c2}          :::::            '::' ${c1}:::::'       "
+    " ${c2} ........:::::               ' ${c1}:::::::::::.  "
+    " ${c2}:::::::::::::                 ${c1}:::::::::::::  "
+    " ${c2} ::::::::::: ${c1}..              ${c1}:::::           "
+    " ${c2}     .::::: ${c1}.:::            ${c1}:::::            "
+    " ${c2}    .:::::  ${c1}:::::          ${c1}'''''    ${c2}.....    "
+    " ${c2}    :::::   ${c1}':::::.  ${c2}......:::::::::::::'    "
+    " ${c2}     :::     ${c1}::::::. ${c2}':::::::::::::::::'     "
+    " ${c1}            .:::::::: ${c2}'::::::::::            "
+    " ${c1}           .::::''::::.     ${c2}'::::.           "
+    " ${c1}          .::::'   ::::.     ${c2}'::::.          "
+    " ${c1}         .::::      ::::      ${c2}'::::.         "
+  ];
+  makeColorCS = n: value: let
+    positions = [ "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F" ];
+  in "\\e]P${lib.elemAt positions (n - 1)}${value}";
 in {
   options = {
     home.profiles.base = lib.mkEnableOption "home profile: base";
@@ -58,6 +84,17 @@ in {
     time.timeZone = "America/Vancouver";
 
     services.resolved.enable = true;
+    services.mingetty = {
+      greetingLine =
+        lib.concatImapStrings makeColorCS config.i18n.consoleColors +
+        ''\e[H\e[2J'' + # topleft
+        ''\e[9;10]'' + # setterm blank/powersave = 10 minutes
+        "\n" +
+        lib.concatStringsSep "\n" nixos +
+        "\n\n" +
+        ''\e[1;32m>>> NixOS ${config.system.nixos.label} (Linux \r) - \l\e[0m'';
+      helpLine = lib.mkForce "";
+    };
     programs.zsh.promptInit = lib.mkForce "";
     environment = {
       pathsToLink = ["/share/zsh" "/share/bash-completion"];
@@ -76,8 +113,13 @@ in {
     };
 
     boot = {
+      loader.timeout = 1;
+      initrd.preLVMCommands = lib.mkAfter ''
+        printf '\e[2J' >> /dev/console
+      '';
       kernelPackages = pkgs.linuxPackages_latest;
       blacklistedKernelModules = ["pcspkr"];
+      earlyVconsoleSetup = true;
       extraModprobeConfig = ''
         options snd_hda_intel power_save=1 power_save_controller=Y
         options kvm_amd avic=1
