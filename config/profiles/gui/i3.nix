@@ -71,10 +71,10 @@
         border = 1;
       };
       modes.resize = {
-        ${left} = "resize shrink width 10 px or 10 ppt";
-        ${down} = "resize grow height 10 px or 10 ppt";
-        ${up} = "resize shrink height 10 px or 10 ppt";
-        ${right} = "resize grow width 10 px or 10 ppt";
+        ${left} = "resize shrink width 4 px or 4 ppt";
+        ${down} = "resize grow height 4 px or 4 ppt";
+        ${up} = "resize shrink height 4 px or 4 ppt";
+        ${right} = "resize grow width 4 px or 4 ppt";
 
         Return = ''mode "default"'';
         Escape = ''mode "default"'';
