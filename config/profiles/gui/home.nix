@@ -169,6 +169,8 @@
 
         ${pkgs.xcompmgr}/bin/xcompmgr &
         ${pkgs.rxvt_unicode-with-plugins}/bin/urxvtd &
+
+        export LESS=''${LESS://F}
       '';
         #${pkgs.xorg.xrandr}/bin/xrandr > /dev/null 2>&1
     };

@@ -12,6 +12,7 @@
     home.file = {
       ".task/hooks/on-exit.task-blocks".source = pkgs.arc.task-blocks.on-exit;
       ".taskrc".target = ".config/taskrc";
+      ".gnupg/gpg-agent.conf".target = ".config/gnupg/gpg-agent.conf";
     };
     home.packages = with pkgs; [
       pass-otp
@@ -63,6 +64,17 @@
 
     home.sessionVariables = {
       TASKRC = "${config.xdg.configHome}/taskrc";
+    };
+    services.gpg-agent = {
+      enable = true;
+      enableExtraSocket = true;
+      enableScDaemon = false;
+      enableSshSupport = true;
+      extraConfig = ''
+        pinentry-timeout 30
+        allow-loopback-pinentry
+        no-allow-external-cache
+      '';
     };
     programs.taskwarrior = {
       enable = true;

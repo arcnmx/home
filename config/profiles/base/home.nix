@@ -39,6 +39,9 @@
       TERM=linux ${pkgs.utillinux}/bin/setterm -regtabs 4
     fi
   '';
+  shellLogin = ''
+    ! ${pkgs.systemd}/bin/systemctl --user -q is-system-running 2> /dev/null || ${pkgs.systemd}/bin/systemctl --user import-environment TERMINFO_DIRS # gpg-agent/pinentry-curses needs this
+  '';
   zshOpts = [
     "auto_pushd" "pushd_ignore_dups" "pushdminus"
     "rmstarsilent" "nonomatch" "long_list_jobs" "interactivecomments"
@@ -80,6 +83,7 @@ in {
       ".local/share/bash/.keep".text = "";
       ".local/share/zsh/.keep".text = "";
       ".local/share/less/.keep".text = "";
+      ".local/share/gnupg/.keep".text = ""; # TODO: directory needs restricted permissions
       ".local/share/vim/undo/.keep".text = "";
       ".local/share/vim/swap/.keep".text = "";
       ".local/share/vim/backup/.keep".text = "";
@@ -106,6 +110,7 @@ in {
       curl
       rsync
       sshfs
+      gnupg
 
       p7zip
       unzip
@@ -169,6 +174,10 @@ in {
       "z/.keep".text = "";
     };
     home.symlink = {
+      ".gnupg".target = "${config.xdg.dataHome}/gnupg";
+      ".local/share/gnupg/gpg-agent.conf".target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
+      ".local/share/gnupg/gpg.conf".target = "${config.xdg.configHome}/gnupg/gpg.conf";
+      ".local/share/gnupg/sshcontrol".target = "${config.xdg.configHome}/gnupg/sshcontrol";
       ".config/cargo/.crates.toml" = {
         target = "${config.xdg.dataHome}/cargo/.crates.toml";
         create = true;
@@ -192,8 +201,9 @@ in {
       EDITOR = "${config.programs.vim.package}/bin/vim";
 
       PAGER = "${pkgs.less}/bin/less";
-      LESS = "-FRXMfnq";
+      LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
+
       CARGO_HOME = "${config.xdg.configHome}/cargo";
     };
     home.shell = {
@@ -241,6 +251,9 @@ in {
         TIMEFORMAT = "time\n%lS kernel, %lU userspace\n%lR elapsed (%P%% CPU)";
         PS1 = ''"'\[\e[0;31m\]\u\[\e[1;39m\]@\[\e[0;31m\]\h \[\e[1;34m\]\w\n\[\e[1;37m\]:; \[\e[0m\]'"'';
       };
+      profileExtra = ''
+        ${shellLogin}
+      '';
       initExtra = ''
         ${shellInit}
 
@@ -302,6 +315,9 @@ in {
         _Z_DATA = "${config.xdg.dataHome}/z/data";
         #_Z_OWNER = "arc";
       };
+      loginExtra = ''
+        ${shellLogin}
+      '';
       initExtra = ''
         ${shellInit}
         ${zshInit}

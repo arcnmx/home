@@ -103,7 +103,7 @@
         #"--release KP_Multiply" = "exec --no-startup-id ${vm} seat";
 
         # "--release ${mod}+bracketleft" = "exec ${pkgs.physlock}/bin/physlock -dms";
-        "--release ${mod}+bracketleft" = "exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
+        "--release ${mod}+bracketleft" = "exec --no-startup-id ${pkgs.systemd}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
 
         "${mod}+shift+Escape" = "exit";
 
