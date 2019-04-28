@@ -97,6 +97,7 @@ in {
       gitAndTools.gitAnnex
       mosh
       tmux
+      abduco
       openssh
       calc
       socat
@@ -301,8 +302,22 @@ in {
             sha256 = "1lvvkz0v4xibq6z3y8lgfkl9ibcx0spr4qzni0n925ar38s20q81";
           };
         }
+        {
+          name = "zsh-abduco-completion";
+          src = pkgs.fetchFromGitHub {
+            owner = "arcnmx";
+            repo = "zsh-abduco-completion";
+            rev = "d8df9f1343d33504d43836d02f0022c1b2b21c0b";
+            sha256 = "1n40c2dk7hcpf0vjj6yk0d8lvppsk2jb02wb0zwlq5r72p2pydxf";
+          };
+        }
+        (with pkgs.zsh-syntax-highlighting; {
+          name = "zsh-syntax-highlighting";
+          inherit src;
+        })
       ];
       localVariables = {
+        ZSH_HIGHLIGHT_HIGHLIGHTERS = [ "main" "brackets" ];
         READNULLCMD = config.home.sessionVariables.PAGER;
         REPORTTIME = 10;
         #TIMEFMT = ''"$'time %J\n%*S kernel, %*U userspace\n%*E elapsed (%P CPU)'"'';

@@ -95,7 +95,10 @@ in {
         ''\e[1;32m>>> NixOS ${config.system.nixos.label} (Linux \r) - \l\e[0m'';
       helpLine = lib.mkForce "";
     };
-    programs.zsh.promptInit = lib.mkForce "";
+    programs.zsh = {
+      promptInit = lib.mkForce "";
+      enableGlobalCompInit = false;
+    };
     environment = {
       pathsToLink = ["/share/zsh" "/share/bash-completion"];
       systemPackages = with pkgs; [
