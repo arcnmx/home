@@ -28,9 +28,6 @@
     open = "xdg-open";
     clear = "clear && printf '\\e[3J'";
 
-    # this really isn't correct but lorri doesn't have great semantics
-    lorri-init = "echo 'eval \"$(lorri direnv)\"' > .envrc && lorri watch && direnv allow";
-
     ${if config.home.mutableHomeDirectory != null then "up" else null} = "${config.home.mutableHomeDirectory}/update";
     # TODO: darwin: brew update && brew upgrade?
   };

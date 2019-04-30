@@ -28,6 +28,9 @@
     ];
     home.shell = {
       functions = {
+        lorri-init = ''
+          echo 'use ${if config.services.lorri.useNix then "nix" else "lorri"}' > .envrc && direnv allow
+        '';
         task = ''
           local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
           local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
@@ -65,6 +68,7 @@
     home.sessionVariables = {
       TASKRC = "${config.xdg.configHome}/taskrc";
     };
+    services.lorri.enable = true;
     services.gpg-agent = {
       enable = true;
       enableExtraSocket = true;
