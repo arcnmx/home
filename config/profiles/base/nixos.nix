@@ -131,6 +131,7 @@ in {
         "net.ipv6.conf.all.accept_ra_rt_info_max_plen" = 128;
         "net.ipv6.conf.default.accept_ra_rt_info_max_plen" = 128;
       };
+      tmpOnTmpfs = true;
     };
     # TODO: initrd compression
 
