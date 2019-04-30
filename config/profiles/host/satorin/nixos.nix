@@ -22,7 +22,6 @@
     #networking.connman.extraFlags = ["-I" "eth0" "-I" "wlan0"]; # why did I have this there? these don't even exist?
 
     boot = {
-      kernelPackages = lib.mkForce pkgs.linuxPackages_4_19; # ZFS rc broken on 5.0
       kernelParams = ["zfs.zfs_arc_max=${toString (512*1024*1024)}"];
       loader = {
         generationsDir = {
