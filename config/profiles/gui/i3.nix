@@ -27,16 +27,35 @@
     pkill = "${pkgs.procps}/bin/pkill";
     mosh = "${pkgs.mosh}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
+    browser = "${pkgs.luakit-develop}/bin/luakit";
+    bindWorkspace = key: workspace: {
+      "${mod}+${key}" = "workspace number ${workspace}";
+      "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
+      "${mod}+control+${key}" = "exec --no-startup-id ${pkgs.arc.i3workspaceoutput.exec} 'number ${workspace}' current";
+    };
+    bindsym = k: v: "bindsym ${k} ${v}";
+    # NOTE/TODO: modes could be used for additional/uncommon workspace (and other) bindings
+    workspaceBindings =
+      map (v: bindWorkspace v "${v}:${v}") ["1" "2" "3" "4" "5" "6" "7" "8" "9"]
+      ++ [(bindWorkspace "0" "10:10")]
+      ++ lib.imap1 (i: v: bindWorkspace v "${toString (10 + i)}:${v}") ["F1" "F2" "F3" "F4" "F5" "F6" "F7" "F8" "F9" "F10" "F11" "F12"];
+    workspaceBindings' =
+      map (lib.mapAttrsToList bindsym) workspaceBindings;
+    workspaceBindingsStr =
+      lib.concatStringsSep "\n" (lib.flatten workspaceBindings');
     #vm = "${pkgs.arc.vm.exec}";
   in lib.mkIf config.home.profiles.gui {
     enable = true;
     i3gopher.enable = true;
     extraConfig = ''
+      ${workspaceBindingsStr}
+
       workspace_auto_back_and_forth yes
     '';
     config = {
       bars = [
         {
+          workspaceNumbers = false;
           fonts = ["monospace ${config.lib.gui.fontSizeStr 8}"];
           position = "top";
           colors = {
@@ -89,6 +108,8 @@
 
         "${mod}+shift+c" = "kill";
         "${mod}+r" = "exec ${run.exec}";
+
+        "${mod}+apostrophe" = "exec ${browser}";
 
         "${mod}+shift+r" = "reload";
 
@@ -155,39 +176,6 @@
         "${mod}+shift+Down" = "move down";
         "${mod}+shift+Up" = "move up";
         "${mod}+shift+Right" = "move right";
-
-        "${mod}+1" = "workspace 1";
-        "${mod}+2" = "workspace 2";
-        "${mod}+3" = "workspace 3";
-        "${mod}+4" = "workspace 4";
-        "${mod}+5" = "workspace 5";
-        "${mod}+6" = "workspace 6";
-        "${mod}+7" = "workspace 7";
-        "${mod}+8" = "workspace 8";
-        "${mod}+9" = "workspace 9";
-        "${mod}+0" = "workspace 10";
-
-        "${mod}+shift+1" = "move container to workspace 1";
-        "${mod}+shift+2" = "move container to workspace 2";
-        "${mod}+shift+3" = "move container to workspace 3";
-        "${mod}+shift+4" = "move container to workspace 4";
-        "${mod}+shift+5" = "move container to workspace 5";
-        "${mod}+shift+6" = "move container to workspace 6";
-        "${mod}+shift+7" = "move container to workspace 7";
-        "${mod}+shift+8" = "move container to workspace 8";
-        "${mod}+shift+9" = "move container to workspace 9";
-        "${mod}+shift+0" = "move container to workspace 10";
-
-        "${mod}+control+1" = "exec --no-startup-id _i3workspaceoutput 1 current";
-        "${mod}+control+2" = "exec --no-startup-id _i3workspaceoutput 2 current";
-        "${mod}+control+3" = "exec --no-startup-id _i3workspaceoutput 3 current";
-        "${mod}+control+4" = "exec --no-startup-id _i3workspaceoutput 4 current";
-        "${mod}+control+5" = "exec --no-startup-id _i3workspaceoutput 5 current";
-        "${mod}+control+6" = "exec --no-startup-id _i3workspaceoutput 6 current";
-        "${mod}+control+7" = "exec --no-startup-id _i3workspaceoutput 7 current";
-        "${mod}+control+8" = "exec --no-startup-id _i3workspaceoutput 8 current";
-        "${mod}+control+9" = "exec --no-startup-id _i3workspaceoutput 9 current";
-        "${mod}+control+0" = "exec --no-startup-id _i3workspaceoutput 0 current";
 
         "${mod}+b" = "splith";
         "${mod}+v" = "splitv";
