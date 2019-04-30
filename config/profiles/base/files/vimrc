@@ -68,7 +68,7 @@ endif
 
 if !exists(":Now")
   command Now call setline(line('.'), getline('.') . substitute(system('date -Iseconds'), '[\]\|[[:cntrl:]]', '', 'g'))
-  cnoreabbrev now Now
+  cnoreabbrev <expr> now getcmdtype() !=# ':' ? 'now' : 'Now'
 endif
 
 command Spaces set expandtab
