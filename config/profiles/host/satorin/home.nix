@@ -14,6 +14,8 @@
       home.profiles.gui = true;
       home.profiles.hw.xps13 = true;
 
+      programs.yggdrasil-7n.enable = true;
+
       xdg.configFile = {
         "i3status/config".source = ./files/i3status;
         /*"sway/satorin.conf".text = ''
