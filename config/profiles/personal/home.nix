@@ -122,6 +122,10 @@
           type = "string";
           label = "Blocks";
         };
+        blocked = { # blocked: hook
+          type = "string";
+          label = "Blocked";
+        };
       };
       reports = {
         short = {
