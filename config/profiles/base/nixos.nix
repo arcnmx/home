@@ -115,6 +115,13 @@ in {
       ] ++ (lib.optional config.services.yggdrasil.enable pkgs.yggdrasilctl);
     };
 
+    nix = {
+      distributedBuilds = true;
+      extraOptions = ''
+        builders-use-substitutes = true
+      '';
+    };
+
     boot = {
       loader.timeout = 1;
       initrd.preLVMCommands = lib.mkAfter ''

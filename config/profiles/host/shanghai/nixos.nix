@@ -8,6 +8,7 @@
 
     networking.hostId = "a1184652";
 
+    home.nixbld.enable = true;
     services.mosh.portRange = "32600:32700";
     hardware.pulseaudio.extraConfig = lib.mkAfter ''
       #load-module module-mmkbd-evdev
