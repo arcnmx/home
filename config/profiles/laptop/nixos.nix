@@ -33,7 +33,7 @@
       "vm.laptop_mode" = 5;
     };
 
-    # TODO: asix-ax88179 kernel module with b2b128 patch
+    boot.extraModulePackages = [ config.boot.kernelPackages.ax88179_178a ];
 
     environment.systemPackages = with pkgs; [
       acpi
