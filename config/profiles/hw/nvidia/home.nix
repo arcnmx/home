@@ -5,7 +5,7 @@
 
   config = mkIf config.home.profiles.hw.nvidia {
     programs.mpv = {
-      extraConfig = {
+      config = {
         hwdec = "cuda";
 
         profile = "gpu-hq";

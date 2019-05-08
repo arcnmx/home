@@ -73,10 +73,10 @@
     };
     programs.mpv = {
       enable = true;
-      extraConfig = {
-        hwdec = "auto";
+      config = {
+        hwdec = mkDefault "auto";
 
-        vo = "gpu";
+        vo = mkDefault "gpu";
         opengl-waitvsync = "yes";
 
         keep-open = "yes";
