@@ -16,7 +16,10 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set laststatus=1
-set colorcolumn=80
+set colorcolumn=100
+set scrolloff=4
+set linebreak showbreak=↪ " ↳
+set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
 set nobackup
 set showcmd
 set relativenumber
@@ -30,6 +33,7 @@ set hidden " allow buffer switching without saving
 
 syntax on
 let g:solarized_termtrans=1
+let g:solarized_visibility="low"
 "set background=light " dark or light
 set background=dark " dark or light
 colorscheme solarized
@@ -73,6 +77,12 @@ endif
 
 command Spaces set expandtab
 command Tabs set noexpandtab
+
+" see https://github.com/vim/vim/issues/4365, no support for urxvt rgba: colours, nor T_CRC
+if $TERM == "rxvt-unicode-256color"
+  set t_RC= t_RB=
+endif
+
 
 " Avoid E173
 if argc() > 1
