@@ -43,7 +43,7 @@ in {
       "URxvt.matcher.button" = 3;
       "URxvt.colorUL" = "#86a2be";
       "URxvt.keysym.M-f" = "perl:matcher:list";
-      "URxvt.cutchars" = ''\\'"'&()*,;<=>?@[]^{|│├┤}'';
+      "URxvt.cutchars" = ''\\'"'&()*,;<=>?@[]^{|│├┤}·'';
 
       "URxvt.color-themes.themedir" = config.xdg.configHome + "/urxvt/themes";
       "URxvt.color-themes.state-file" = config.xdg.dataHome + "/urxvt/theme";
