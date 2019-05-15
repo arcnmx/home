@@ -1,3 +1,4 @@
+ncmpcpp_directory = ~/.config/ncmpcpp
 mpd_host = @mpdHost@
 data_fetching_delay = no
 playlist_disable_highlight_delay = 0
