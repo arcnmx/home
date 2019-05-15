@@ -8,7 +8,6 @@
   };
 
   config = mkIf config.home.profiles.personal {
-    home.rust.enable = true;
     home.file = {
       ".task/hooks/on-exit.task-blocks".source = pkgs.arc.task-blocks.on-exit;
       ".taskrc".target = ".config/taskrc";

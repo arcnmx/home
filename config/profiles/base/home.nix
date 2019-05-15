@@ -1,9 +1,5 @@
 { config, pkgs, lib, ... } @ args: let
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
-  rustGccGold = pkgs.writeScript "rust-gcc-gold" ''
-    #!${pkgs.bash}/bin/sh
-    exec ${pkgs.gcc} -fuse-ld=gold "$@"
-  '';
   shellAliases = (if pkgs.targetPlatform.isDarwin then {
     ls = "ls -G";
   } else {
@@ -65,7 +61,6 @@
   '';
 in {
   options.home = {
-    rust.enable = lib.mkEnableOption "rust development environment";
     profiles.base = lib.mkEnableOption "home profile: base";
     mutableHomeDirectory = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
@@ -119,7 +114,7 @@ in {
       lorri
 
       fzf fd # for fzf-z zsh plugin
-    ] ++ (lib.optionals config.home.rust.enable [pkgs.cargo-download pkgs.cargo-expand pkgs.cargo-outdated]);
+    ];
     xdg.enable = true;
     xdg.configFile = {
       "vim/after/indent/nix.vim".text = ''
@@ -155,18 +150,6 @@ in {
         set output-meta on
       '';
       "procps/toprc".source = ./files/toprc;
-      "cargo/config".text = if config.home.rust.enable then ''
-        [target.x86_64-unknown-linux-gnu]
-        linker = "${rustGccGold}"
-
-        [target.x86_64-pc-windows-gnu]
-        linker = "${pkgs.pkgsCross.mingwW64.buildPackages.gcc}/bin/x86_64-pc-mingw32-gcc"
-        ar = "${pkgs.pkgsCross.mingwW64.buildPackages.binutils.bintools}/bin/x86_64-pc-mingw32-ar"
-
-        [target.i686-pc-windows-gnu]
-        linker = "${pkgs.pkgsCross.mingw32.buildPackages.gcc}/bin/i686-pc-mingw32-gcc"
-        ar = "${pkgs.pkgsCross.mingw32.buildPackages.binutils.bintools}/bin/i686-pc-mingw32-ar"
-      '' else "";
     };
     xdg.dataFile = {
       "z/.keep".text = "";
