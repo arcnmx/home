@@ -6,9 +6,11 @@
     cp = "cp --reflink=auto --sparse=auto";
     ls = "ls --color=auto";
   }) // {
-    la = "ls -A";
-    ll = "ls -lh";
-    lla = "ll -A";
+    exa = "exa --time-style long-iso -G";
+    ls = "exa";
+    la = "exa -a";
+    ll = "exa -l";
+    lla = "exa -lga";
 
     sys = "systemctl";
     log = "journalctl";
@@ -96,6 +98,7 @@ in {
 
       coreutils
       file
+      exa fd ripgrep hyperfine hexyl tokei
 
       nixos-option
 
@@ -186,6 +189,7 @@ in {
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
       CARGO_HOME = "${config.xdg.configHome}/cargo";
+      TIME_STYLE = "long-iso";
     };
     home.shell = {
       aliases = shellAliases;
