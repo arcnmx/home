@@ -46,6 +46,7 @@ let g:vim_markdown_folding_disabled=1
 
 au BufRead,BufNewFile *.kt setlocal filetype=kotlin
 au BufRead,BufNewFile *.as setlocal filetype=javascript
+au FileType notmuch-compose setlocal colorcolumn=78
 
 xmap <M-C> y:call SendViaOSC52(getreg('"'))<cr>
 
