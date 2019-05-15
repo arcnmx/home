@@ -54,7 +54,14 @@
       feh
       ffmpeg
       epdfview
-      firefox
+      (wrapFirefox.override {
+        config = {
+          enableAdobeFlash = true;
+        };
+      } firefox-bin-unwrapped {
+        browserName = "firefox";
+        extraNativeMessagingHosts = [tridactyl browserpass passff-host];
+      })
       youtube-dl
       mpv
       scrot
