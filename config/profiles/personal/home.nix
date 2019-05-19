@@ -13,6 +13,12 @@
       ".taskrc".target = ".config/taskrc";
       ".gnupg/gpg-agent.conf".target = ".config/gnupg/gpg-agent.conf";
     };
+    home.symlink = {
+      ".electrum" = {
+        target = "${config.xdg.configHome}/electrum/";
+        create = true;
+      };
+    };
     home.packages = with pkgs; [
       pass-otp
       awscli
@@ -22,6 +28,7 @@
       physlock
       travis
       radare2
+      electrum-cli
       jq yq
       #TODO: benc bsync snar-snapper book
     ];
