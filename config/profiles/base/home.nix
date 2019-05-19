@@ -6,9 +6,9 @@
     cp = "cp --reflink=auto --sparse=auto";
     ls = "ls --color=auto";
   }) // {
-    exa = "exa --time-style long-iso -G";
-    ls = "exa";
-    la = "exa -a";
+    exa = "exa --time-style long-iso";
+    ls = "exa -G";
+    la = "exa -Ga";
     ll = "exa -l";
     lla = "exa -lga";
 
