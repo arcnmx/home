@@ -28,6 +28,7 @@
       physlock
       travis
       radare2
+      buku
       electrum-cli
       jq yq
       #TODO: benc bsync snar-snapper book

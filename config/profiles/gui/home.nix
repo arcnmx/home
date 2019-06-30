@@ -1,4 +1,13 @@
-{ config, pkgs, lib, ... } @ args: with lib; {
+{ config, pkgs, lib, ... } @ args: with lib; let
+  firefox-arc = with pkgs; (wrapFirefox.override {
+    config = {
+      enableAdobeFlash = true;
+    };
+  } firefox-bin-unwrapped {
+    browserName = "firefox";
+    extraNativeMessagingHosts = [tridactyl browserpass passff-host bukubrow];
+  });
+in {
   imports = [
     ./xresources.nix
     ./i3.nix
@@ -54,18 +63,11 @@
       feh
       ffmpeg
       epdfview
-      (wrapFirefox.override {
-        config = {
-          enableAdobeFlash = true;
-        };
-      } firefox-bin-unwrapped {
-        browserName = "firefox";
-        extraNativeMessagingHosts = [tridactyl browserpass passff-host];
-      })
+      firefox-arc
       youtube-dl
       mpv
       scrot
-      xclip
+      xsel
       xorg.xinit
       xdg_utils-mimi
       rxvt_unicode-with-plugins
@@ -77,6 +79,7 @@
       # firefox
       MOZ_WEBRENDER = "1";
       MOZ_USE_XINPUT2 = "1";
+      SNAP_NAME = "firefox"; # workaround for https://github.com/mozilla/nixpkgs-mozilla/issues/163
     };
     programs.mpv = {
       enable = true;
@@ -92,6 +95,13 @@
         cache-secs = "2";
       };
     };
+    home.symlink = {
+      ".local/share/mozilla/native-messaging-hosts".target = "${firefox-arc}/lib/mozilla/native-messaging-hosts";
+      ".mozilla" = {
+        target = "${config.xdg.dataHome}/mozilla";
+        create = true;
+      };
+    };
     xdg.configFile = {
       "mimeapps.list".text = ''
         [Default Applications]
@@ -105,9 +115,17 @@
         text/plain=vim.desktop
         application/xml=vim.desktop
       '';
-      "tridactyl" = {
-        source = ./files/tridactyl;
+      "tridactyl/themes" = {
+        source = ./files/tridactyl/themes;
         recursive = true;
+      };
+      "tridactyl/tridactylrc".source = with pkgs; pkgs.substituteAll {
+        src = ./files/tridactyl/tridactylrc;
+        xsel = "${xsel}/bin/xsel";
+        mpv = "${mpv}/bin/mpv";
+        urxvt = "${rxvt_unicode-with-plugins}/bin/urxvtc";
+        vim = "${config.programs.vim.package}/bin/vim";
+        firefox = "${firefox-arc}/bin/firefox";
       };
       "luakit" = {
         source = ./files/luakit;
