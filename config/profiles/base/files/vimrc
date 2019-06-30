@@ -32,11 +32,8 @@ set timeoutlen=100
 set hidden " allow buffer switching without saving
 
 syntax on
-let g:solarized_termtrans=1
-let g:solarized_visibility="low"
 "set background=light " dark or light
 set background=dark " dark or light
-colorscheme solarized
 
 let rust_recommended_style=0
 let g:cargo_makeprg_params="check --color always"

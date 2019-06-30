@@ -191,6 +191,10 @@ in {
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       TIME_STYLE = "long-iso";
     };
+    home.base16-shell = {
+      enable = true;
+      defaultTheme = "monokai";
+    };
     home.shell = {
       aliases = shellAliases;
       functions = {
@@ -334,9 +338,9 @@ in {
         "swift-vim"
         "rust-vim"
         "notmuch-vim"
-        "vim-colors-solarized"
         "vim-nix"
         "vim-osc52"
+        "base16-vim"
       ];
       settings = {};
       extraConfig = ''
