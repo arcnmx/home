@@ -38,18 +38,24 @@ in {
       "URxvt.iso14755" = false;
       "URxvt.fading" = 0;
 
-      "URxvt.perl-ext-common" = "default,matcher,color-themes,clipboard-osc";
+      "URxvt.perl-ext-common" = "default,matcher,color-themes,osc-52";
       "URxvt.url-launcher" = "${pkgs.luakit-develop}/bin/luakit";
       "URxvt.matcher.button" = 3;
       "URxvt.colorUL" = "#86a2be";
       "URxvt.keysym.M-f" = "perl:matcher:list";
-      "URxvt.cutchars" = ''\\'"'&()*,:;<=>?@[]^{|│├┤}·'';
+      "URxvt.cutchars" = ''\\'"'&()*,:;<=>?@[]^{|│├┤}·↪'';
 
       "URxvt.color-themes.themedir" = config.xdg.configHome + "/urxvt/themes";
       "URxvt.color-themes.state-file" = config.xdg.dataHome + "/urxvt/theme";
       "URxvt.color-themes.autosave" = 1;
       "URxvt.color-themes.preprocessor" = "";
       "URxvt.keysym.C-grave" = "perl:color-themes:next";
+
+      # Default Primary: mouse select to copy, Shift-Insert or Middle to paste
+      # Default Clipboard: Ctrl+Alt+C to copy, Ctrl+Alt+V or Alt+Middle to paste
+      "URxvt.keysym.S-M-Insert" = "eval:paste_clipboard"; # Shift-Alt-Insert paste
+      "URxvt.keysym.S-M-C" = "eval:selection_to_clipboard"; # Shift-Alt-C copy
+      "URxvt.keysym.S-M-V" = "eval:paste_clipboard"; # Shift-Alt-V paste
 
       #"URxvt*letterSpace" = -1;
 
