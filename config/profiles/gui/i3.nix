@@ -130,7 +130,7 @@
 
         "${mod}+grave" = "[urgent=latest] focus";
         "${mod}+n" = "[urgent=latest] focus";
-        "${mod}+Tab" = "exec --no-startup-id ${pkgs.i3gopher.exec} --focus-last";
+        "${mod}+Tab" = "exec --no-startup-id ${config.xsession.windowManager.i3.i3gopher.package.exec} --focus-last";
         "${mod}+control+f" = "exec --no-startup-id ${i3-easyfocus} -a || ${i3-easyfocus} -c";
         "${mod}+control+shift+f" = "exec --no-startup-id ${i3-easyfocus} -ar || ${i3-easyfocus} -cr";
         "${mod}+a" = "focus parent";
