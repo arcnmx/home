@@ -189,6 +189,7 @@ in {
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
       CARGO_HOME = "${config.xdg.configHome}/cargo";
+      CARGO_BUILD_PIPELINING = "true";
       TIME_STYLE = "long-iso";
     };
     home.base16-shell = {
