@@ -15,7 +15,7 @@
         fi
       }
     '';
-    buildDrv = "${pkgs.nix}/bin/nix build --no-link ${system.drvPath}";
+    buildDrv = "${pkgs.nix}/bin/nix build --no-link ${builtins.unsafeDiscardStringContext system.drvPath}";
     env = "${pkgs.nix}/bin/nix-env -p /nix/var/nix/profiles/system --set ${system}";
     switch = "NIXOS_INSTALL_BOOTLOADER=1 ${system}/bin/switch-to-configuration switch";
     copy = "${pkgs.nix}/bin/nix copy --substitute --to ssh://${target} ${system}";
