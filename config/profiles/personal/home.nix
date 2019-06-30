@@ -97,9 +97,10 @@
         include ./theme
       '';
       contexts = {
-        home = "(project.not:work and project.not:games and project.not:fun) or +escalate";
+        home = "(project.not:work and project.not:games and project.not:fun and project.not:home.shopping.) or +escalate";
         fun = "project:fun";
         work = "project:work";
+        shop = "project:home.shopping";
         "3s" = "project:games.3scapes";
       };
       aliases = {
@@ -193,11 +194,12 @@
           projects = "yes";
           tags = "yes";
         };
+        reserved.lines = "2";
         recurrence.confirmation = "no";
         bulk = 7;
         nag = "";
 
-        verbose = ["blank" "header" "footnote" "label" "new-id" "new-uuid" "affected" "edit" "special" "project" "unwait" "recur"]; # removed: override, sync
+        verbose = ["header" "footnote" "label" "new-id" "new-uuid" "affected" "edit" "special" "project" "unwait" "recur"]; # removed: blank, override, sync
 
         urgency = {
           blocking.coefficient = "1.0";
@@ -205,6 +207,8 @@
           scheduled.coefficient = "0.5";
 
           user.tag = {
+            commit.coefficient = "10.0";
+            remote.coefficient = "-0.9";
             routine.coefficient = "9.0";
             review.coefficient = "2.0";
             escalate.coefficient = "0.5";
