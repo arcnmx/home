@@ -229,6 +229,14 @@ in {
         '';
       };
     };
+    programs.less = {
+      enable = true;
+      lesskey.extraConfig = ''
+        #command
+        h left-scroll
+        l right-scroll
+      '';
+    };
     programs.bash = {
       enable = true;
       historyFile = "${config.xdg.dataHome}/bash/history";
