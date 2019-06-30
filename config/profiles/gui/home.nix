@@ -44,7 +44,7 @@ in {
           PULSE_PROP="media.role=video" ${pkgs.mpv}/bin/mpv "$@"
         '';
         discord = ''
-          PULSE_PROP="media.role=phone" ${pkgs.discord}/bin/discord "$@" &
+          PULSE_PROP="media.role=phone" ${pkgs.discord}/bin/Discord "$@" &
         '';
         ffr = ''
           ${pkgs.flashplayer-standalone}/bin/flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
