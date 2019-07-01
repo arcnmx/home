@@ -29,7 +29,7 @@
       travis
       radare2
       buku
-      electrum-cli
+      #electrum-cli
       jq yq
       #TODO: benc bsync snar-snapper book
     ];

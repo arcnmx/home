@@ -72,7 +72,8 @@ in {
       xdg_utils-mimi
       rxvt_unicode-with-plugins
       luakit-develop
-      libreoffice-fresh
+      libreoffice
+      #libreoffice-fresh # broken for now ;-;
     ];
 
     home.sessionVariables = {
