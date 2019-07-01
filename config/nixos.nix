@@ -33,8 +33,7 @@ in {
     allowedUsers = ["@builders"];
     trustedUsers = ["root" "@wheel"];
     buildCores = 0;
-    #maxJobs = "auto"; # https://github.com/NixOS/nixpkgs/issues/50623
-    maxJobs = lib.mkDefault 6;
+    maxJobs = lib.mkDefault 6; # "auto"
   };
 
   nixpkgs = {
