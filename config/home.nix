@@ -3,6 +3,7 @@
 in with lib; {
   disabledModules = [
     (/. + "${toString channels.paths.home-manager}/modules/programs/git.nix")
+    (/. + "${toString channels.paths.home-manager}/modules/programs/vim.nix")
   ];
 
   imports = [

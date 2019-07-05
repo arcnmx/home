@@ -1,4 +1,4 @@
-{ cipkgs, ... } @ ci: {
+{ ci }: {
   # https://github.com/arcnmx/ci
 
   allowRoot = (builtins.getEnv "CI_ALLOW_ROOT") != "";

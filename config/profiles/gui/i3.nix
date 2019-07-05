@@ -17,7 +17,7 @@
     down = "j";
     up = "k";
     right = "l";
-    term = "${pkgs.rxvt_unicode-with-plugins}/bin/urxvtc"; # urxvt
+    term = "${pkgs.rxvt_unicode-arc}/bin/urxvtc"; # urxvt
     #term = "${pkgs.xterm}/bin/xterm";
     i3-easyfocus = "${pkgs.i3-easyfocus}/bin/i3-easyfocus";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
@@ -31,7 +31,7 @@
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";
       "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
-      "${mod}+control+${key}" = "exec --no-startup-id ${pkgs.arc.i3workspaceoutput.exec} 'number ${workspace}' current";
+      "${mod}+control+${key}" = "exec --no-startup-id ${pkgs.arc'private.i3workspaceoutput.exec} 'number ${workspace}' current";
     };
     bindsym = k: v: "bindsym ${k} ${v}";
     # NOTE/TODO: modes could be used for additional/uncommon workspace (and other) bindings
@@ -83,7 +83,7 @@
         forceWrapping = true;
       };
       startup = [
-        { command = pkgs.arc.konawall.exec; always = true; notification = false; }
+        { command = pkgs.arc'private.konawall.exec; always = true; notification = false; }
       ];
       window = {
         hideEdgeBorders = "smart";

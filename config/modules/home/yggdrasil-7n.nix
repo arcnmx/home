@@ -7,7 +7,7 @@ in {
 
   config = mkIf cfg.enable {
     home.shell.aliases = {
-      "7ctl" = "${pkgs.arc.yggdrasilctl-7n.exec} -endpoint=unix:///run/yggdrasil-7n.sock";
+      "7ctl" = "${pkgs.arc'private.yggdrasilctl-7n.exec} -endpoint=unix:///run/yggdrasil-7n.sock";
     };
   };
 }

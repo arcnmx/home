@@ -124,7 +124,7 @@ in {
         src = ./files/tridactyl/tridactylrc;
         xsel = "${xsel}/bin/xsel";
         mpv = "${mpv}/bin/mpv";
-        urxvt = "${rxvt_unicode-with-plugins}/bin/urxvtc";
+        urxvt = "${rxvt_unicode-arc}/bin/urxvtc";
         vim = "${config.programs.vim.package}/bin/vim";
         firefox = "${firefox-arc}/bin/firefox";
       };
@@ -194,7 +194,7 @@ in {
         ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option ctrl:nocaps
 
         ${pkgs.xcompmgr}/bin/xcompmgr &
-        ${pkgs.rxvt_unicode-with-plugins}/bin/urxvtd &
+        ${pkgs.rxvt_unicode-arc}/bin/urxvtd &
 
         export LESS=''${LESS://F}
       '';

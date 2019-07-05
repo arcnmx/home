@@ -9,7 +9,9 @@
 
   config = mkIf config.home.profiles.personal {
     home.file = {
-      ".task/hooks/on-exit.task-blocks".source = pkgs.arc.task-blocks.on-exit;
+      ".task/hooks/on-exit.task-blocks".source = pkgs.arc'private.task-blocks.on-exit;
+      ".task/hooks/on-add.task-blocks".source = pkgs.arc'private.task-blocks.on-add;
+      ".task/hooks/on-modify.task-blocks".source = pkgs.arc'private.task-blocks.on-modify;
       ".taskrc".target = ".config/taskrc";
       ".gnupg/gpg-agent.conf".target = ".config/gnupg/gpg-agent.conf";
     };

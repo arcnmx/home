@@ -9,7 +9,7 @@ in {
     };
     package = mkOption {
       type = types.package;
-      default = pkgs.arc.yggdrasil-7n;
+      default = pkgs.arc'private.yggdrasil-7n;
     };
     configFile = mkOption {
       type = types.path;

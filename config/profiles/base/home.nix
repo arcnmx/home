@@ -338,6 +338,7 @@ in {
 
     programs.vim = {
       enable = true;
+      packageConfigurable = pkgs.vim_configurable-pynvim;
       plugins = [
         "vim-cool"
         "vim-ledger"
