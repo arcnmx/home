@@ -1,5 +1,10 @@
 { channelConfig ? {}, channelConfigPath ? null, pkgs ? null, channelPaths ? null } @ args: let
   mergeConfig = a: b: builtins.mapAttrs (name: value: value // (b.${name} or {})) a;
+  channelSource = path: builtins.path {
+    inherit path;
+    name = "source";
+    filter = p: t: baseNameOf p != ".git";
+  };
   channelPaths = args.channelPaths or {
     nixpkgs = ./nixpkgs;
     arc = ./arc;
@@ -7,7 +12,11 @@
     nur = ./nur;
     mozilla = ./mozilla;
   };
-  channelNixPath = import ./path.nix { inherit channelPaths channelConfigPath; pkgs = channels.channels.nixpkgs; };
+  channelNixPath = import ./path.nix {
+    inherit channelConfigPath;
+    pkgs = channels.channels.nixpkgs;
+    channelPaths = builtins.mapAttrs (_: channelSource) channelPaths;
+  };
   channelOverlays = import ./overlays.nix { inherit channelPaths; inherit (channels) channels; };
   channels = import ./channels.nix {
     inherit channelPaths channelConfig channelOverlays;
