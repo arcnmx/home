@@ -120,6 +120,8 @@ in {
       extraOptions = ''
         builders-use-substitutes = true
       '';
+      binaryCaches = [ "https://arc.cachix.org" ];
+      binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
     };
 
     boot = {
