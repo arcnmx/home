@@ -13,6 +13,12 @@ in
   config = mkIf config.home.profiles.gui {
     # TODO: alsa fallback to pulse mixer (see shanghai /etc/asound.conf)
 
+    xdg.portal = {
+      enable = false; # true?
+      #gtkUsePortal = true;
+      #extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    };
+
     fonts = {
       enableDefaultFonts = true;
       enableFontDir = true;
