@@ -7,6 +7,7 @@
     home.profiles.trusted = true;
     home.profiles.gui = true;
     home.profiles.hw.xps13 = true;
+    home.profiles.host.gensokyo = true;
 
     networking.hostId = "451b608e";
 

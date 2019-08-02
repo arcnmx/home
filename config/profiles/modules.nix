@@ -11,6 +11,7 @@
     hw/ryzen
     hw/nvidia
     hw/xps13
+    host/gensokyo
     host/satorin
     host/shanghai
     host/flandre
@@ -19,7 +20,7 @@
     (map (name: name + "/home.nix") importNames)) ++ sharedImports;
   nixosImports = (builtins.filter builtins.pathExists
     (map (name: name + "/nixos.nix") importNames)) ++ sharedImports;
-  sharedImports = [({ nodes, lib, config, ... }: with lib; {
+  sharedImports = [({ nodes, lib, config, options, ... }: with lib; {
     options.home = {
       hostName = mkOption {
         type = types.nullOr types.str;
@@ -64,7 +65,7 @@
         (mkIf (config ? home.nixosConfig.networking.hostName) (mkDefault config.home.nixosConfig.networking.hostName))
         (mkIf (config ? home.nixosHome.hostName) (mkOverride 999 config.home.nixosHome.hostName))
       ]);
-      profiles.host = mkIf (config.home.hostName != null) {
+      profiles.host = lib.optionalAttrs (config.home.hostName != null && options ? home.profiles.host.${config.home.hostName}) {
         ${config.home.hostName} = true;
       };
       profiles.trusted = mkIf (!hasTrusted) (mkForce false);

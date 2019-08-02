@@ -5,6 +5,7 @@
 
   config = mkIf config.home.profiles.host.shanghai {
     home.profiles.trusted = true;
+    home.profiles.host.gensokyo = true;
 
     networking.hostId = "a1184652";
 
