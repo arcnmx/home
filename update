@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 git pull
 ./channels/update
 ./nx switch
