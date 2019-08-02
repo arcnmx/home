@@ -1,9 +1,11 @@
 { network ? "gensokyo", hostName, targetHost ? null } @ args: let
   inherit (import ./import.nix) pkgs;
-  network' = (import ./network.nix { inherit pkgs network; }).network;
-  inherit (network'.${hostName}) system config;
+  network' = (import ./network.nix { inherit pkgs; }).${network};
+  inherit (network'.network.${hostName}) system config;
   #target = if targetHost != null then targetHost else config.deployment.targetHost or "${config.networking.hostName}.${config.networking.domain}";
   target = if targetHost != null then targetHost else config.deployment.targetHost or "${config.network.wan.${hostName}.address}";
+  systemDrv = builtins.unsafeDiscardStringContext system.drvPath;
+  systemExpr = "\"(import ${systemDrv})\"";
   commands = rec {
     prelude = ''
       nix build --no-link ${pkgs.nix} ${pkgs.coreutils} ${pkgs.inetutils}
@@ -15,7 +17,7 @@
         fi
       }
     '';
-    buildDrv = "${pkgs.nix}/bin/nix build --no-link ${builtins.unsafeDiscardStringContext system.drvPath}";
+    buildDrv = "${pkgs.nix}/bin/nix build --no-link ${systemExpr}";
     env = "${pkgs.nix}/bin/nix-env -p /nix/var/nix/profiles/system --set ${system}";
     switch = "NIXOS_INSTALL_BOOTLOADER=1 ${system}/bin/switch-to-configuration switch";
     copy = "${pkgs.nix}/bin/nix copy --substitute --to ssh://${target} ${system}";
@@ -31,8 +33,7 @@ in with commands; {
     (
       set -e
       ${prelude}
-      ${buildDrv}
-      ${pkgs.nix}/bin/nix build -o result-${network}-${hostName} ${system}
+      ${pkgs.nix}/bin/nix build -o result-${network}-${hostName} ${systemExpr}
     )
   '';
   switch = ''#!${pkgs.bash}/bin/sh

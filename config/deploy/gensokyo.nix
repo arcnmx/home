@@ -1,4 +1,4 @@
-{
+{ }: {
   network = {
     enableRollback = true; # just for keeping gcroots around
   };

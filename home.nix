@@ -1,8 +1,8 @@
 let
   network = "gensokyo"; # TODO: supply this somehow, env var maybe
-  inherit (import ./import.nix) pkgs;
+  inherit (import ./. { }) pkgs;
   inherit (pkgs) lib;
-  nodes = (import ./network.nix { inherit pkgs network; }).nodes;
+  nodes = (import ./network.nix { inherit pkgs; }).${network}.nodes;
   hosts = builtins.readDir ./config/profiles/host;
   base = {
     imports = [./config/home.nix];
