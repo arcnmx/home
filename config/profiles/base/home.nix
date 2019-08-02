@@ -422,6 +422,14 @@ in {
           src = ./files/vimrc-notmuch;
           inherit (pkgs) msmtp;
         }}
+
+        " alt-hjkl for moving around word-wrapped lines
+        nnoremap <Esc>h gh
+        nnoremap <Esc>j gj
+        nnoremap <Esc>k gk
+        nnoremap <Esc>l gl
+
+        set cmdheight=2 updatetime=300 shortmess+=c
       '';
     };
 
