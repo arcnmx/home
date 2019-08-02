@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } @ args: let
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
-  shellAliases = (if pkgs.targetPlatform.isDarwin then {
+  shellAliases = (if pkgs.hostPlatform.isDarwin then {
     ls = "ls -G";
   } else {
     cp = "cp --reflink=auto --sparse=auto";
@@ -27,7 +27,6 @@
     clear = "clear && printf '\\e[3J'";
 
     ${if config.home.mutableHomeDirectory != null then "up" else null} = "${config.home.mutableHomeDirectory}/update";
-    # TODO: darwin: brew update && brew upgrade?
   };
   shellInit = ''
     if [[ $TERM = rxvt-unicode* || $TERM = linux ]]; then
@@ -85,10 +84,8 @@ in {
     home.packages = with pkgs; [
       nix
 
-      bash bash-completion
+      bash # bash-completion
       zsh zsh-completions
-      git
-      gitAndTools.gitAnnex
       mosh
       tmux
       abduco
@@ -100,24 +97,18 @@ in {
       file
       exa fd ripgrep hyperfine hexyl tokei
 
-      nixos-option
-
       wget
       curl
       rsync
-      sshfs
-      gnupg
 
       p7zip
       unzip
       zip
 
-      rxvt_unicode.terminfo
-
-      lorri
+      rxvt_unicode-cvs.terminfo
 
       fzf fd # for fzf-z zsh plugin
-    ];
+    ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
     xdg.enable = true;
     xdg.configFile = {
       "vim/after/indent/nix.vim".text = ''
@@ -420,7 +411,6 @@ in {
         "kotlin-vim"
         "swift-vim"
         "rust-vim"
-        "notmuch-vim"
         "vim-nix"
         "vim-osc52"
         "base16-vim"
@@ -437,6 +427,7 @@ in {
 
     programs.git = {
       enable = true;
+      package = if config.home.profiles.personal then pkgs.git else pkgs.gitMinimal;
       aliases = {
         logs = "log --stat --pretty=medium --graph";
       };
@@ -454,7 +445,8 @@ in {
           templateDir = "${pkgs.gitAndTools.hook-chain}";
         };
         rebase = {
-          autosquash = true;
+          autoSquash = true;
+          autoStash = true;
         };
         filter.tabspace = {
           smudge = "${pkgs.coreutils}/bin/unexpand --first-only --tabs=4";
@@ -567,11 +559,5 @@ in {
     };
 
     dconf.enable = lib.mkDefault false; # TODO: is this just broken?
-    services.sshd.authorizedKeys = [
-      config.keychain.keys.satorin-ssh.path.public
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCik1rxKNKDBcIQrFrleGXlz/SwJXmC7TjAHqO3QXe0sIR4/egYhQlKSWLWiV/HviMJ0RNuBMNG6yfNpItNAvkKT9nExxyRFC4PAkYf4mBk6x4Re9hAE9FM9KAe7cFBx/+xD6VxJYGEoKyWejuCE16Tn48G7TEQyxr0bJwO9jL+LKAS+/Za3mx2kyKZNmn7b4Roa9uWeJDFpmzqsOmvxiLpF5sQ4EyKaiifyVUKaPGdoonVKXQMmnzyBP/e553raLYV13bGzPKBq8UnRHKmVbNSotIrGZ/X/PBT/Y8jRRZhba2hhai8ofGtkIhzdPWdTs30qlBrbRa2nEeVEVC6mKzv+gMtb0kiNOxb4ceKUpAntMUr2aCjsF1OTkROOqbLg8nTHAIM9JHFDNZmzDGa7kjtn4c8V4X/beydTAWNDClLG9CWwjG+X+ZpGsuOFX/ke62pcj44tK+qm1XckdX1HyCXrG7R4AeOyqZ8uXla5QoUgsK8qEa1ZFbRgQQtC595DvsQosfnJXrKuDurEeBfl/Ew4ugIHQvHioeAUAxG80WYJHyCfdh1V0a5fB19LEiWDZyy7uUqsuJYG8LWTrpJaM/PTbUaFI4No5vhSCKjmbFalJRhyGMbrhr+x7jnW1JRXS6lkvoDbJlUPLBRg63t6cZeXWCdMcXo1Me9Octc2XSSLQ== arc@shanghai"
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDMBsg/h3ITy/2u1IpTpazEMU+hKaThjC7wDPQzIKvicw6Hf+O7M8uw6DSFXAXhjygLvonhKhlVt6qKzrSJrKZDPewT/hkgFU2Zvj8JwWzSJKg9SYR6v0L1GYF2gB1K/QKNrXDxT0yoov/NDlN1lkVyYM9IMDRXVXx5SkojffMv9YC6NBZfOeaEmkKY3VCg5tePUF5limp9ipBzqjjIitDmNWBV/ID2paV/SIasGMfUFtipO5r8Bg4Wgv5sJPCWE82iYhZdJJkfHr8vn7M7ITMCQ00daSZlu2McCFkff+ZMe/wejX5xxyOXx9xI2yomzN77rMSl45pBp8MnHIigJ0zRiMSHfjpDkwVQiaMdMG6bti7wRbEw6fKWLHcRqnZ3sWMxNLNnSO8WGdAXt6WIPJ2IBSSp/XmDxFu30Ag9soOqprqTLVXzxfdj0vLAPdMRQI2LuVL4wNfXS7FJxiOs9oQFvxdaxmqxRyry3fafl2Z5epdgw3dgu2G7fkvy9NEuoFoZfYyNVFkIsJ/AktyFvr9ajimN1xfuyIlXXmZJRqoMQ8gZY+Qcguug2g9IhjRyVOglQiQp1V/JETtpScOFuD2xpwLTZ2Y3Ij21+XOnrI88Izcox+QAQvAyHGfoPwG5Zwj2A0gT+c9xaAEH+nQOyZ6xp5uY+7cpN/F0Z0XDRBWnvw== arc@shanghai-tan"
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvdvIjXlLTpG2QlMi1kGYfgPXCDIsDM1Ldn4uPO3kz+uEJEgSrqVuKD71VAEZfN93HVZ4BoBTrjXC+jc0nSZjUgccCdo9aSZ87JbdocivNxwXxy9c/0B4+WU9+NB16VpVX+t43xgJxKfV9TW2QOLE0h0MMJizCsyX9rFMF4EOIR3TYe8Mm8x2L6axP4SZ7X+2aEyWg7VcEjzheKWvu+C4/B0c4D1/WtHcTrfy4/2urjvgYEXw5UVz7KOIXR0jIk2cvePOrjppDy8TjJxcm3zkFT4ZYuACWDiqfVZKuqAFI89kZ6fufbbHR1RilfHiehnPyzGj7KgPtwSgbxPJ9yvwX iphonese-prompt"
-    ];
   };
 }
