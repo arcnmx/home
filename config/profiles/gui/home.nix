@@ -81,7 +81,7 @@
           tridactyl-native
           browserpass
           (passff-host.override { pass = pass-arc; })
-          bukubrow
+          #bukubrow
         ];
       };
       profiles = {
