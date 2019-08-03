@@ -90,7 +90,7 @@
           isDefault = true;
           settings = {
             "browser.download.dir" = "${config.home.homeDirectory}/downloads";
-            "services.sync.client.name" = config.home.hostName;
+            ${if config.home.hostName != null then "services.sync.client.name" else null} = config.home.hostName;
             "services.sync.engine.prefs" = false;
             "services.sync.engine.prefs.modified" = false;
             "services.sync.engine.passwords" = false;
@@ -113,6 +113,9 @@
             "browser.urlbar.placeholderName" = "";
             "extensions.privatebrowsing.notification" = false;
             "browser.startup.page" = 3;
+            "devtools.chrome.enabled" = true;
+            #"devtools.debugger.remote-enabled" = true;
+            "devtools.inspector.showUserAgentStyles" = true;
 
             # hiding from mozilla
             "services.sync.prefs.sync.privacy.donottrackheader.value" = false;
@@ -187,7 +190,6 @@
             "xpinstall.signatures.required" = false;
             "general.smoothScroll" = false; # this might not be so bad but...
             "general.warnOnAboutConfig" = false;
-
           };
           containers.identities = [
             { id = 7; name = "Professional"; icon = "briefcase"; color = "red"; }
@@ -259,9 +261,6 @@
       ];
 
       autocmd = {
-        tabEnter = [
-          { urlPattern = ".*"; cmd = "unfocus"; }
-        ];
         docStart = [
           { urlPattern = ''^https:\/\/www\.reddit\.com''; cmd = ''js tri.excmds.urlmodify("-t", "www", "old")''; }
         ];
@@ -286,7 +285,6 @@
         { key = "F"; cmd = ''composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | tabopen''; }
         # mpv --ontop --keepaspect-window --profile=protocol.http
 
-        # TODO: autocontain and containers
         { mode = "hint"; key = "j"; mods = ["alt"]; cmd = "hint.focusBottomHint"; }
         { mode = "hint"; key = "k"; mods = ["alt"]; cmd = "hint.focusTopHint"; }
         { mode = "hint"; key = "h"; mods = ["alt"]; cmd = "hint.focusLeftHint"; }
@@ -318,18 +316,18 @@
 
         { key = "r"; cmd = "reload"; }
         { key = "R"; cmd = "reloadhard"; }
-        { key = "x"; cmd = "tabclose"; }
+        { key = "d"; cmd = "tabclose"; }
 
         { key = "``"; cmd = "tab #"; }
 
         { key = "j"; cmd = "scrollline 6"; }
         { key = "k"; cmd = "scrollline -6"; }
 
-        { key = "K"; cmd = "tabprev"; }
-        { key = "J"; cmd = "tabnext"; }
-        { key = "k"; mods = ["ctrl"]; cmd = "tabmove -1"; }
-        { mode = "insert"; key = "k"; mods = ["ctrl"]; cmd = "tabmove -1"; }
-        { mode = "insert"; key = "j"; mods = ["ctrl"]; cmd = "tabmove +1"; }
+        { mode = ["normal" "input" "insert"]; key = "h"; mods = ["ctrl"]; cmd = "tabprev"; }
+        { mode = ["normal" "input" "insert"]; key = "l"; mods = ["ctrl"]; cmd = "tabnext"; }
+        # TODO: consider C-jk instead of C-hl?
+        { mode = ["normal" "input" "insert"]; key = "k"; mods = ["ctrl"]; cmd = "tabmove -1"; }
+        { mode = ["normal" "input" "insert"]; key = "j"; mods = ["ctrl"]; cmd = "tabmove +1"; }
         { key = "<Space>"; cmd = "scrollpage 0.75"; }
         { mode = "ex"; key = "a"; mods = ["ctrl"]; cmd = null; }
 
@@ -343,7 +341,9 @@
         { key = "N"; cmd = "findnext -1"; }
         { key = ",<Space>"; cmd = "nohlsearch"; }
 
-        { key = "i"; cmd = "mode ignore"; }
+        { key = "gi"; cmd = "focusinput -l"; } # this should be 0 but it never seems to focus anything visible or useful?
+        { key = "i"; cmd = "focusinput -l"; }
+        { key = "I"; cmd = "mode ignore"; }
         { mode = "ignore"; key = "<Escape>"; cmd = "composite mode normal ; hidecmdline"; }
 
         { key = "<Insert>"; mods = ["shift"]; cmd = "composite fn_getsel | fillcmdline_notrail open"; }
@@ -362,7 +362,7 @@
 
         browser = firefox;
 
-        editorcmd = "${urxvt} -e ${vim}";
+        editorcmd = ''${urxvt} -e ${vim} %f -c "normal %lG%cl"'';
 
         nag = false;
         leavegithubalone = false;
