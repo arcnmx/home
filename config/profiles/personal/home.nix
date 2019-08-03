@@ -34,7 +34,7 @@
       travis
       radare2
       buku
-      #electrum-cli
+      electrum-cli
       jq yq
       lorri
       vit
