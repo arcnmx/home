@@ -90,7 +90,7 @@
           isDefault = true;
           settings = {
             "browser.download.dir" = "${config.home.homeDirectory}/downloads";
-            "services.sync.client.name" = config.home.nixosConfig.networking.hostName;
+            "services.sync.client.name" = config.home.hostName;
             "services.sync.engine.prefs" = false;
             "services.sync.engine.prefs.modified" = false;
             "services.sync.engine.passwords" = false;
