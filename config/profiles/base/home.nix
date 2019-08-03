@@ -398,7 +398,11 @@ in {
         kak-lsp
         kak-tree
       ];
-      #extraConfig = "";
+      extraConfig = ''
+        colorscheme tomorrow-night
+      '';
+      # TODO: make a base16 colorscheme compatible with base16-shell?
+      # see https://github.com/Delapouite/base16-kakoune/blob/master/build.js
     };
     programs.vim = {
       enable = true;
