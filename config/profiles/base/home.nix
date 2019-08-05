@@ -492,7 +492,7 @@ in {
       enable = true;
       aggressiveResize = true;
       baseIndex = 1;
-      #escapeTime = 1;
+      escapeTime = 1;
       historyLimit = 50000;
       keyMode = "vi";
       resizeAmount = 4;
