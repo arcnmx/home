@@ -380,6 +380,7 @@
         #hintfiltermode = "vimperator-reflow";
         #hintnames = "numeric";
         modeindicator = true;
+        modeindicatorshowkeys = true;
 
         # Make Tridactyl work on more sites at the expense of some security
         csp = "clobber";
