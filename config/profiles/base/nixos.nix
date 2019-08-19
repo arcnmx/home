@@ -49,6 +49,7 @@ in {
       '';
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
+      package = pkgs.nix-readline;
     };
 
     # TODO: initrd compression
