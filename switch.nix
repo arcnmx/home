@@ -10,7 +10,7 @@
     prelude = ''
       nix build --no-link ${pkgs.nix} ${pkgs.coreutils} ${pkgs.inetutils}
       asRoot() {
-        if [[ $(${pkgs.coreutils}/id -u) -ne 0 ]]; then
+        if [[ $(${pkgs.coreutils}/bin/id -u) -ne 0 ]]; then
           sudo "$@"
         else
           "$@"
