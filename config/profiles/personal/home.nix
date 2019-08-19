@@ -21,8 +21,8 @@
         create = true;
       };
     };
-    home.packages = with pkgs; [
-      gitAndTools.gitAnnex
+    home.packages = with pkgs; with gitAndTools; [
+      gitAnnex git-revise
       nixos-option
       gnupg
       pass-arc
