@@ -144,6 +144,10 @@ in {
         set output-meta on
       '';
       "procps/toprc".source = ./files/toprc;
+      "markdownlint/markdownlintrc".text = builtins.toJSON {
+        "default" = true;
+        "line-length" = false;
+      };
     };
     xdg.dataFile = {
       "z/.keep".text = "";
@@ -153,6 +157,7 @@ in {
       ".local/share/gnupg/gpg-agent.conf".target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
       ".local/share/gnupg/gpg.conf".target = "${config.xdg.configHome}/gnupg/gpg.conf";
       ".local/share/gnupg/sshcontrol".target = "${config.xdg.configHome}/gnupg/sshcontrol";
+      ".markdownlintrc".target = "${config.xdg.configHome}/markdownlint/markdownlintrc";
       ".config/cargo/.crates.toml" = {
         target = "${config.xdg.dataHome}/cargo/.crates.toml";
         create = true;
