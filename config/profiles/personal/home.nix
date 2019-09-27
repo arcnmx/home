@@ -300,7 +300,21 @@
             user_mappings = builtins.toJSON {
               "," = "/buffer #{1}<CR>"; # TODO: start getting used to a different key for this instead?
               "``" = "/input jump_last_buffer_displayed<CR>";
+              "`n" = "/input jump_smart<CR>";
+              "k" = "/input history_previous<CR>";
+              "j" = "/input history_next<CR>";
+              "p" = "a/input clipboard_paste<ICMD><ESC>";
+              "P" = "/input clipboard_paste<CR>";
+              #"u" = "/input undo<CR>";
+              #"\\x01R" = "/input redo<CR>";
+              "\\x01K" = "/buffer move -1<CR>";
+              "\\x01J" = "/buffer move +1<CR>";
             };
+            user_mappings_noremap = builtins.toJSON {
+              "\\x01P" = "p";
+              "/" = "i/";
+            };
+            mode_key_search = "?";
             mode_indicator_cmd_color_bg = base01;
             mode_indicator_cmd_color = base04;
             mode_indicator_insert_color_bg = base01;

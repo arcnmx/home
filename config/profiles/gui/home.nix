@@ -301,7 +301,7 @@
         # Comment toggler for Reddit and Hacker News
         { urlPattern = ''reddit\.com''; key = ";c"; cmd = ''hint -c [class*="expand"],[class="togg"]''; }
 
-        # GitHub pull request checkout command to clipboard (only works if you're a collaborator or above)
+        # GitHub pull request checkout command to clipboard
         { key = "ygp"; cmd = ''composite js /^https?:\/\/github\.com\/([.0-9a-zA-Z_-]*\/[.0-9a-zA-Z_-]*)\/pull\/([0-9]*)/.exec(document.location.href) | js -p `git fetch https://github.com/''${JS_ARG[1]}.git pull/''${JS_ARG[2]}/head:pull-''${JS_ARG[2]} && git checkout pull-''${JS_ARG[2]}` | fn_setsel''; }
 
         # Git{Hub,Lab} git clone via SSH yank (NOTE: for https just... copy the url!)
