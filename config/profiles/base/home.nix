@@ -441,6 +441,38 @@ in {
       '';
     };
 
+    programs.rustfmt = {
+      enable = true;
+      package = lib.mkDefault null;
+      config = {
+        edition = "2018";
+        unstable_features = true;
+        skip_children = true;
+        wrap_comments = true;
+        hard_tabs = true;
+        tab_spaces = 4;
+        max_width = 120;
+        comment_width = 100;
+        condense_wildcard_suffixes = true;
+        format_code_in_doc_comments = true;
+        #format_strings = true;
+        match_arm_blocks = false;
+        #match_block_trailing_comma = true;
+        overflow_delimited_expr = true;
+        merge_imports = true;
+        reorder_impl_items = true;
+        newline_style = "Unix";
+        normalize_comments = true;
+        #normalize_doc_attributes = true; # except when have I ever explicitly used #[doc = ...]?
+        #report_fixme, report_todo
+        #struct_lit_single_line = false;
+        trailing_semicolon = false;
+        use_field_init_shorthand = true;
+        use_try_shorthand = true;
+        #where_single_line = true;
+      };
+    };
+
     programs.git = {
       enable = true;
       package = if config.home.profiles.personal then pkgs.git else pkgs.gitMinimal;

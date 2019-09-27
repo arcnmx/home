@@ -100,6 +100,9 @@
         "notmuch-vim"
       ];
     };
+    programs.rustfmt = {
+      package = pkgs.rustfmt;
+    };
     programs.weechat = {
       enable = true;
       plugins.python = {
