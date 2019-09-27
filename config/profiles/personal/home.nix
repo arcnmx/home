@@ -43,7 +43,14 @@
     home.shell = {
       functions = {
         lorri-init = ''
-          echo 'use ${if config.services.lorri.useNix then "nix" else "lorri"}' > .envrc && direnv allow
+          echo 'use ${if config.services.lorri.useNix then "nix" else "lorri"}' > .envrc
+          for nixfile in $PWD/shell.nix; do # default.nix?
+            if [[ -e $nixfile ]]; then
+              ${config.services.lorri.package}/bin/lorri ping_ $nixfile
+              break
+            fi
+          done
+          direnv allow
         '';
         task = ''
           local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
@@ -69,6 +76,13 @@
                   task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
               fi
           } 2> /dev/null | less
+        '';
+      } // optionalAttrs pkgs.hostPlatform.isLinux {
+        lorri-status = ''
+          ${pkgs.systemd}/bin/systemctl --user status lorri.service
+        '';
+        lorri-log = ''
+          ${pkgs.systemd}/bin/journalctl --user -fu lorri.service
         '';
       };
       aliases = {
