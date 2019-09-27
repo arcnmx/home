@@ -121,12 +121,13 @@ in {
       ntfs3g
       fuse
       config.boot.kernelPackages.cpupower
-      gdb
       strace
     ];
 
     services.usbmuxd.enable = true;
     services.openssh = {
+      passwordAuthentication = true;
+      startWhenNeeded = true;
       forwardX11 = true;
       permitRootLogin = "yes"; # "prohibit-password"
     };

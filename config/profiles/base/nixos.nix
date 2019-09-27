@@ -58,11 +58,12 @@ in {
 
     services.openssh = {
       enable = true;
-      ports = [22];
-      startWhenNeeded = true;
+      ports = lib.mkDefault [22];
+      startWhenNeeded = lib.mkDefault false;
       allowSFTP = true;
       gatewayPorts = "yes";
       challengeResponseAuthentication = false;
+      passwordAuthentication = lib.mkDefault false;
       useDns = false;
       extraConfig = ''
         MaxSessions 100
