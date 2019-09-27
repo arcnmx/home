@@ -438,6 +438,12 @@ in {
         nnoremap <Esc>k gk
         nnoremap <Esc>l gl
 
+        cmap <Esc>h <Left>
+        cmap <Esc>j <Down>
+        cmap <Esc>k <Up>
+        cmap <Esc>l <Right>
+        cmap <Esc>0 <Home>
+
         set cmdheight=2 updatetime=300 shortmess+=c
       '';
     };
