@@ -60,7 +60,7 @@
       xsel
       xorg.xinit
       xdg_utils-mimi
-      rxvt_unicode-with-plugins
+      rxvt_unicode-arc
       luakit-develop
       libreoffice
       #libreoffice-fresh # broken for now ;-;
@@ -85,7 +85,7 @@
           tridactyl-native
           browserpass
           (passff-host.override { pass = pass-arc; })
-          #bukubrow
+          bukubrow
         ];
       };
       profiles = {
