@@ -40,7 +40,7 @@
   ];
   makeColorCS = n: value: let
     positions = [ "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F" ];
-  in "\\e]P${lib.elemAt positions (n - 1)}${value}";
+  in "\\e]P${lib.toHexUpper n}${value}";
 in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
@@ -50,27 +50,6 @@ in {
     i18n = {
       consolePackages = [pkgs.tamzen];
       consoleFont = "Tamzen7x14";
-      consoleColors = let # Solarized dark
-        S_base03 = "002b36";
-        S_base02 = "073642";
-        S_base01 = "586e75";
-        S_base00 = "657b83";
-        S_base0 = "839496";
-        S_base1 = "93a1a1";
-        S_base2 = "eee8d5";
-        S_base3 = "fdf6e3";
-        S_yellow = "b58900";
-        S_orange = "cb4b16";
-        S_red = "dc322f";
-        S_magenta = "d33682";
-        S_violet = "6c71c4";
-        S_blue = "268bd2";
-        S_cyan = "2aa198";
-        S_green = "859900";
-      in [
-        S_base02 S_red S_green S_yellow S_blue S_magenta S_cyan S_base2
-        S_base03 S_orange S_base01 S_base00 S_base0 S_violet S_base1 S_base3
-      ];
       supportedLocales = [
         "ja_JP.UTF-8/UTF-8"
       ];
@@ -93,6 +72,8 @@ in {
       };
     };
 
+    base16.console.enable = true;
+
     hardware.enableAllFirmware = true;
 
     systemd.network.links.b2b128 = {
@@ -107,10 +88,10 @@ in {
     };
 
     services.mingetty = {
-      greetingLine =
-        lib.concatImapStrings makeColorCS config.i18n.consoleColors +
+      greetingPrefix =
         ''\e[H\e[2J'' + # topleft
-        ''\e[9;10]'' + # setterm blank/powersave = 10 minutes
+        ''\e[9;10]''; # setterm blank/powersave = 10 minutes
+      greeting =
         "\n" +
         lib.concatStringsSep "\n" nixos +
         "\n\n" +

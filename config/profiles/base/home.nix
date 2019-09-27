@@ -187,9 +187,10 @@ in {
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       TIME_STYLE = "long-iso";
     };
-    home.base16-shell = {
-      enable = true;
-      defaultTheme = "monokai";
+    base16 = if config.home.nixosConfig != null then {
+      inherit (config.home.nixosConfig.base16) schemes alias;
+    } else import ./base16.nix { inherit config; } // {
+      shell.enable = true;
     };
     home.shell = {
       aliases = shellAliases;

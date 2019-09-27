@@ -52,6 +52,8 @@ in {
       package = pkgs.nix-readline;
     };
 
+    base16 = import ./base16.nix { inherit config; };
+
     # TODO: initrd compression
 
     services.openssh = {
