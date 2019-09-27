@@ -16,7 +16,7 @@
       in import channels (args // { inherit channelPaths; })
     '';
   };
-  channelOverride = { name, dir }: pkgs.symlinkJoin {
+  channelOverride = { name, dir }: pkgs.stdenvNoCC.mkDerivation {
     channelConfigPath = assert channelConfigPath != null; channelConfigPath;
     channels = channelPath;
     paths = [dir];
@@ -25,12 +25,18 @@
     passAsFile = ["template"];
     template = ''
       { pkgs ? null, ... } @args: let
-        channelConfigPath = @channelConfigPath@;
-        channelConfig = if args != {} then { @channelName@ = args; } else {};
+        channelConfigPath = import @channelConfigPath@;
+        channelConfig = channelConfigPath // (if args != {} then {
+          @channelName@ = channelConfigPath.@channelName@ or {} // args;
+        } else {});
         channels = import @channels@ { inherit pkgs channelConfig; };
       in channels.@channelName@
     '';
-    postBuild = ''
+    buildCommand = ''
+      mkdir -p $out
+      for dir in $paths; do
+        ln -s $dir/* $out/
+      done
       rm $out/default.nix
       substituteAll $templatePath $out/default.nix
     '';
