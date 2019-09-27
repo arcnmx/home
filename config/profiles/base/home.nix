@@ -30,7 +30,7 @@
   };
   shellInit = ''
     if [[ $TERM = rxvt-unicode* || $TERM = linux ]]; then
-      TERM=linux ${pkgs.utillinux}/bin/setterm -regtabs 4
+      TERM=linux ${pkgs.utillinux}/bin/setterm -regtabs 2
     fi
   '';
   shellLogin = ''
@@ -335,7 +335,7 @@ in {
     programs.kakoune = {
       enable = true;
       config = {
-        tabStop = 4;
+        tabStop = 2;
         indentWidth = 0; # default = 4, 0 = tabs
         scrollOff = {
           lines = 4;
