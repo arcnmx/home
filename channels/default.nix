@@ -28,6 +28,7 @@ in {
   imports = channelNixPath;
   nixPath = map (ch: "${ch}=${channelNixPath.${ch}}") (builtins.attrNames channelNixPath);
   config = channels.channelConfig;
+  inherit (channels.channels.pkgs) import;
   inherit (channels) channels;
   inherit (channels.channels) pkgs nixpkgs home-manager arc nur;
 }
