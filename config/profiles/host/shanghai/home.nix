@@ -5,6 +5,8 @@
 
   config = mkIf config.home.profiles.host.shanghai {
     home.profiles.trusted = true;
+    home.profiles.personal = true;
+    home.profiles.gui = true;
 
     xdg.configFile."i3status/config".source = ./files/i3status;
 
