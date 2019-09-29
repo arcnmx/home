@@ -35,7 +35,13 @@ syntax on
 "set background=light " dark or light
 set background=dark " dark or light
 
-let rust_recommended_style=0
+let g:EditorConfig_exclude_patterns = ['fugitive://.\*']
+
+let g:rust_recommended_style=0
+let g:rust_fold=1
+let g:rust_conceal=1
+let g:rust_conceal_mod_path=1
+let g:rust_conceal_pub=1
 let g:cargo_makeprg_params="check --color always"
 au BufRead,BufNewFile *.rs compiler cargo
 

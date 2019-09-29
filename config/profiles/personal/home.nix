@@ -112,6 +112,13 @@
     programs.vim = {
       plugins = [
         "notmuch-vim"
+        "editorconfig-vim"
+        "vim-fugitive"
+      ];
+    };
+    programs.kakoune = {
+      plugins = with pkgs.kakPlugins; [
+        kak-tree
       ];
     };
     programs.rustfmt = {

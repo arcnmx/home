@@ -111,6 +111,9 @@ in {
     ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
     xdg.enable = true;
     xdg.configFile = {
+      "vim/after/indent/rust.vim".text = ''
+        setlocal comments=s0:/*!,m:\ ,ex:*/,s0:/*,mb:\ ,ex:*/,:///,://!,://
+      '';
       "vim/after/indent/nix.vim".text = ''
         setlocal indentkeys=0{,0},0),0],:,0#,!^F,o,O,e,0=then,0=else,0=inherit,*<Return>
       '';
@@ -400,8 +403,6 @@ in {
         kakoune-registers
         explore-kak
         fzf-kak
-        kak-lsp
-        kak-tree
       ];
       extraConfig = ''
         colorscheme tomorrow-night
@@ -426,6 +427,8 @@ in {
       ];
       settings = {};
       extraConfig = ''
+        scriptencoding utf-8
+
         source ${./files/vimrc}
         source ${pkgs.substituteAll {
           src = ./files/vimrc-notmuch;
