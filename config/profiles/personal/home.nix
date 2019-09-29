@@ -1,4 +1,6 @@
-{ config, pkgs, lib, ... } @ args: with lib; {
+{ config, pkgs, lib, ... } @ args: with lib; let
+  rnix-lsp = pkgs.rnix-lsp-server; # or pkgs.rnix-lsp for the older/stable version!
+in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
     programs.ncmpcpp.mpdHost = mkOption {
@@ -114,10 +116,36 @@
         "notmuch-vim"
         "editorconfig-vim"
         "vim-fugitive"
+        "coc-nvim"
+        "coc-json"
+        "coc-yaml"
+        #"coc-rls"
+        "coc-rust-analyzer"
+        "coc-git"
+        "coc-yank"
+        #"LanguageClient-neovim"
+        #"deoplete-nvim"
+        "nvim-yarp"
+        "vim-hug-neovim-rpc"
       ];
+      extraConfig = ''
+        source ${./files/vimrc-coc}
+        let g:coc_node_path="${pkgs.nodejs}/bin/node"
+
+        " Completion
+        " let g:deoplete#enable_at_startup = 1
+      '';
     };
     programs.kakoune = {
+      config.hooks = [
+        {
+          name = "WinSetOption";
+          option = "filetype=(rust|yaml|nix|markdown)";
+          commands = "lsp-enable-window";
+        }
+      ];
       plugins = with pkgs.kakPlugins; [
+        kak-lsp
         kak-tree
       ];
     };
@@ -485,6 +513,79 @@
       "ncmpcpp/config".source = pkgs.substituteAll {
         inherit (config.programs.ncmpcpp) mpdHost;
         src = ./files/ncmpcpp-config;
+      };
+      "efm-langserver/config.yaml".text = ''
+        languages:
+          markdown:
+            lint-command: '${pkgs.markdownlint-cli}/bin/markdownlint -s'
+            lint-stdin: true
+            lint-formats:
+            - '%f: %l: %m'
+          vim:
+            lint-command: '${pkgs.vim-vint}/bin/vint -'
+            lint-stdin: true
+          yaml:
+            lint-command: '${pkgs.yamllint}/bin/yamllint -f parsable -'
+            lint-stdin: true
+            lint-formats:
+            - '%f:%l:%c: %m'
+      '';
+      "vim/coc-settings.json".text = builtins.toJSON {
+        languageserver = {
+          efm = {
+            command = "${pkgs.efm-langserver}/bin/efm-langserver";
+            args = [];
+            filetypes = ["vim" /*"yaml"*/ "markdown"]; # consider coc-yaml instead?
+          };
+          nix = {
+            command = "${rnix-lsp}/bin/rnix-lsp";
+            args = [];
+            filetypes = ["nix"];
+            cwd = "./";
+            initializationOptions = {
+            };
+            settings = {
+            };
+          };
+          /*rust = {
+            command = "ra_lsp_server";
+            args = [];
+            filetypes = ["rust"];
+            cwd = "./";
+            initializationOptions = {
+            };
+            settings = {
+            };
+          };*/
+        };
+        "coc.preferences.extensionUpdateCheck" = "never";
+        "coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman";
+        "suggest.timeout" = 500;
+        "suggest.minTriggerInputLength" = 2;
+        "suggest.acceptSuggestionOnCommitCharacter" = true;
+        "suggest.snippetIndicator" = "►";
+        # coc.preferences.formatOnType, coc.preferences.formatOnSaveFiletypes
+        "npm.binPath" = "${pkgs.coreutils}/bin/false"; # whatever it wants npm for, please just don't
+        "suggest.numberSelect" = true;
+        "rust-client.rlsPath" = "rls";
+        "rust-client.disableRustup" = true;
+        "rust-client.updateOnStartup" = false;
+        "rust.wait_to_build" = 800; # ms
+        "rust.unstable_features" = true;
+        #"rust.crate_blacklist" = ["cocoa","gleam","glium","idna","libc","openssl","rustc_serialize","serde","serde_json","typenum","unicode_normalization","unicode_segmentation","winapi"];
+        # rust.sysroot, rust.target, rust.rustflags, rust.unstable_features, rust.build_on_save, rust.target_dir, rust.full_docs
+        # rust.clippy_preference = enum [ off opt-in on ]
+        "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
+        "rust-analyzer.raLspServerPath" = "ra_lsp_server";
+        "rust-analyzer.enableCargoWatchOnStartup" = "disabled";
+        # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
+      };
+      "kak-lsp/kak-lsp.toml".source = pkgs.substituteAll {
+        inherit (pkgs) efm-langserver;
+        inherit rnix-lsp;
+        #inherit (pkgs.nodePackages) vscode-html-languageserver-bin vscode-css-languageserver-bin vscode-json-languageserver;
+        inherit (pkgs) rust-analyzer; # rls?
+        src = ./files/kak-lsp.toml;
       };
     };
 

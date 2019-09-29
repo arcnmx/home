@@ -1,0 +1,41 @@
+snippet_support = true # false?
+
+[server]
+timeout = 600 # seconds
+
+#[language.css]
+#filetypes = ["css"]
+#roots = ["package.json"]
+#command = "@vscode-css-languageserver-bin@/bin/css-languageserver"
+#args = ["--stdio"]
+
+#[language.html]
+#filetypes = ["html"]
+#roots = ["package.json"]
+#command = "@vscode-html-languageserver-bin@/bin/html-languageserver"
+#args = ["--stdio"]
+
+#[language.json]
+#filetypes = ["json"]
+#roots = ["package.json"]
+#command = "@vscode-json-languageserver@/bin/json-languageserver"
+#args = ["--stdio"]
+
+[language.rust]
+filetypes = ["rust"]
+roots = ["Cargo.toml"]
+command = "ra_lsp_server"
+#command = "rls"
+
+[language.nix]
+filetypes = ["nix"]
+roots = ["top-level.nix", "release.nix"] # default.nix?
+command = "@rnix-lsp@/bin/rnix-lsp"
+
+[language.efm]
+filetypes = ["vim", "yaml", "markdown"]
+roots = [
+	"README.md",
+	".markdownlintrc", ".markdownlint.yml", ".markdownlint.yaml", ".markdownlint.json",
+]
+command = "@efm-langserver@/bin/efm-langserver"
