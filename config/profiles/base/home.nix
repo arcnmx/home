@@ -187,9 +187,9 @@ in {
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       TIME_STYLE = "long-iso";
     };
-    base16 = if config.home.nixosConfig != null then {
+    base16 = (if config.home.nixosConfig != null then {
       inherit (config.home.nixosConfig.base16) schemes alias;
-    } else import ./base16.nix { inherit config; } // {
+    } else import ./base16.nix { inherit config; }) // {
       shell.enable = true;
     };
     home.shell = {
