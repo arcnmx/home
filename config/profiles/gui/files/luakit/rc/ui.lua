@@ -61,9 +61,6 @@ require "select"
 require "pass"
 require "paste"
 
-require "adblock"
-require "adblock_chrome"
-
 require "webinspector"
 
 require "formfiller"
