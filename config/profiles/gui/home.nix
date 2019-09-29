@@ -53,7 +53,6 @@
     home.packages = with pkgs; [
       feh
       ffmpeg
-      epdfview
       youtube-dl
       mpv
       scrot
@@ -64,6 +63,10 @@
       luakit-develop
       libreoffice
       #libreoffice-fresh # broken for now ;-;
+    ] ++ optionals config.gtk.enable [
+      evince
+      gnome3.adwaita-icon-theme
+      gnome3.defaultIconTheme
     ];
 
     home.sessionVariables = {
@@ -445,7 +448,7 @@
         image/jpeg=feh.desktop
         image/png=feh.desktop
         image/gif=feh.desktop
-        application/pdf=epdfview.desktop
+        application/pdf=evince.desktop
         text/plain=vim.desktop
         application/xml=vim.desktop
       '';
