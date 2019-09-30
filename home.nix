@@ -17,22 +17,29 @@ let
     imports = [base];
     config.home.hostName = host;
   }) hosts;
-in hostConfigs // rec {
-  inherit base;
+  home-manager-path = (import ./. { }).paths.home-manager + "/home-manager/home-manager.nix";
+  configs = hostConfigs // rec {
+    inherit base;
 
-  personal = {
-    imports = [base];
-    home.profiles.personal = true;
-  };
+    personal = {
+      imports = [base];
+      home.profiles.personal = true;
+    };
 
-  desktop = {
-    imports = [personal];
-    home.profiles.gui = true;
-  };
+    desktop = {
+      imports = [personal];
+      home.profiles.gui = true;
+    };
 
-  laptop = {
-    imports = [personal];
-    home.profiles.gui = true;
-    home.profiles.laptop = true;
+    laptop = {
+      imports = [personal];
+      home.profiles.gui = true;
+      home.profiles.laptop = true;
+    };
   };
+in configs // {
+  home = builtins.mapAttrs (confAttr: _: (import home-manager-path {
+    confPath = ./home.nix;
+    inherit confAttr;
+  }).activationPackage) configs;
 }

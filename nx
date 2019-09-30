@@ -138,7 +138,16 @@ cmd_home() {
 	parse_switch_args "$@"
 	shift $SHIFT
 
-	$0 run run.nix home-manager -f home.nix -A "$ATTR" "$@" $CMD
+	#$0 run run.nix home-manager -f home.nix -A "$ATTR" "$@" $CMD
+	if [[ $CMD = build ]]; then
+		nix build -f 'home.nix' \
+			"home.$ATTR" "$@"
+	else
+		nix build -f 'home.nix' \
+			-o "result-home-$ATTR" \
+			"home.$ATTR" "$@" \
+		&& "./result-home-$ATTR/activate"
+	fi
 }
 
 main() {
