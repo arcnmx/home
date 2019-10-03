@@ -109,6 +109,7 @@
             "browser.ctrlTab.recentlyUsedOrder" = false;
             "privacy.resistFingerprinting.block_mozAddonManager" = true;
             "extensions.webextensions.restrictedDomains" = "";
+            "tridactyl.unfixedamo" = true; # stop trying to change this file :(
             "browser.shell.checkDefaultBrowser" = false;
             "spellchecker.dictionary" = "en-CA";
             "browser.warnOnQuit" = false;
@@ -265,6 +266,7 @@
 
         # kill all existing searchurls
         (mkBefore ''jsb Promise.all(Object.keys(tri.config.get("searchurls")).forEach(u => tri.config.set("searchurls", u, "")))'')
+        "jsb localStorage.fixedamo = true"
       ];
 
       autocmd = {
