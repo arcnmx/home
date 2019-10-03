@@ -14,6 +14,10 @@ in with lib; {
   ];
 
   config = {
+    home.nix = {
+      enable = true;
+      nixPath = mapAttrs (_: toString) channels.imports;
+    };
     xdg.configFile = {
       "nixpkgs/config.nix".source = "${./channels}/nixpkgs.nix";
     };
