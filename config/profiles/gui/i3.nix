@@ -91,8 +91,8 @@
       };
       modes.resize = {
         ${left} = "resize shrink width 4 px or 4 ppt";
-        ${down} = "resize grow height 4 px or 4 ppt";
-        ${up} = "resize shrink height 4 px or 4 ppt";
+        ${down} = "resize shrink height 4 px or 4 ppt";
+        ${up} = "resize grow height 4 px or 4 ppt";
         ${right} = "resize grow width 4 px or 4 ppt";
 
         Return = ''mode "default"'';
