@@ -3,7 +3,11 @@
     home.profiles.host.shanghai = mkEnableOption "hostname: shanghai";
   };
 
-  config = mkIf config.home.profiles.host.shanghai {
+  config = mkMerge [ {
+    keychain.keys.shanghai-ssh = {
+      public = ./files/id_rsa.pub;
+    };
+  } (mkIf config.home.profiles.host.shanghai {
     home.profiles.trusted = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
@@ -57,5 +61,5 @@
       };
       Install.WantedBy = ["timers.target"];
     };
-  };
+  }) ];
 }
