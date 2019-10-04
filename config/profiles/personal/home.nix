@@ -54,6 +54,18 @@ in {
           done
           direnv allow
         '';
+        iclip = ''
+          local ICLIP_DIR=/run/iclip
+          local ICLIP_FILE=$ICLIP_DIR/_clip.txt ICLIP_TMP
+          if [[ $1 = -o ]]; then
+              cat "$ICLIP_DIR/$(ls -rt "$ICLIP_DIR" | tail -n 1)"
+          elif [[ $1 = -d ]]; then
+              rm "$ICLIP_DIR/"*
+          else
+              ICLIP_TMP=$(mktemp --tmpdir iclip.XXXXXXXXXX)
+              cat > "$ICLIP_TMP" && mv "$ICLIP_TMP" "$ICLIP_FILE"
+          fi
+        '';
         task = ''
           local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
           local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
