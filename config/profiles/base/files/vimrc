@@ -87,6 +87,12 @@ if $TERM == "rxvt-unicode-256color"
   set t_RC= t_RB=
 endif
 
+set foldtext=MyFoldText()
+function MyFoldText()
+  let line = getline(v:foldstart)
+  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+  return v:folddashes . sub
+endfunction
 
 " Avoid E173
 if argc() > 1
