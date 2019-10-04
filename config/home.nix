@@ -28,6 +28,7 @@ in with lib; {
 
     _module.args = mkIf (config.home.nixosConfig == null) {
       pkgs = mkForce channels.nixpkgs;
+      pkgs_i686 = mkForce null;
       nodes = { };
     };
   };

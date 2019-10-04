@@ -10,6 +10,7 @@ let
     _module.args = {
       inherit nodes;
       pkgs = lib.mkForce pkgs;
+      pkgs_i686 = lib.mkForce null;
     };
 
     home = {
