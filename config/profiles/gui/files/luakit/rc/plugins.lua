@@ -24,8 +24,9 @@ require "history"
 require "history_chrome"
 require "bookmarks"
 require "bookmarks_chrome"
-require "adblock"
-require "adblock_chrome"
+-- https://github.com/luakit/luakit/issues/804 broken workaround
+--require "adblock"
+--require "adblock_chrome"
 require "completion"
 
 -- require "hide_scrollbars"
