@@ -191,6 +191,8 @@ in {
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
+      TERMINFO_DIRS = "\${TERMINFO_DIRS:-${config.home.homeDirectory}/.nix-profile/share/terminfo:/usr/share/terminfo}";
+
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       CARGO_TARGET_DIR = "${config.xdg.cacheHome}/cargo/target";
       TIME_STYLE = "long-iso";
