@@ -182,6 +182,9 @@ in {
         create = true;
       };
     };
+    home.language = {
+      base = "en_US.UTF-8";
+    };
     home.sessionVariables = {
       INPUTRC = "${config.xdg.configHome}/inputrc";
 
@@ -190,6 +193,8 @@ in {
       PAGER = "${pkgs.less}/bin/less";
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
+
+      #LC_COLLATE = "C";
 
       TERMINFO_DIRS = "\${TERMINFO_DIRS:-${config.home.homeDirectory}/.nix-profile/share/terminfo:/usr/share/terminfo}";
 
