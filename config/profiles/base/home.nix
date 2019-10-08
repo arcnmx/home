@@ -454,6 +454,11 @@ in {
         nnoremap <Esc>k gk
         nnoremap <Esc>l gl
 
+        " trying alternatives to Esc for exiting insert mode
+        inoremap kj <Esc>`^
+        inoremap lkj <Esc>`^:w<CR>
+        inoremap ;lkj <Esc>:wq<CR>
+
         cmap <Esc>h <Left>
         cmap <Esc>j <Down>
         cmap <Esc>k <Up>
