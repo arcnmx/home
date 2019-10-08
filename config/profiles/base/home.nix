@@ -452,6 +452,8 @@ in {
         cmap <Esc>l <Right>
         cmap <Esc>0 <Home>
 
+        imap <C-l> <C-O>:redr!<CR>
+
         set cmdheight=2 updatetime=300 shortmess+=c
       '';
     };
