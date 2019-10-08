@@ -111,7 +111,7 @@ in {
     ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
     home.nix.nixPath.ci = {
       type = "url";
-      path = "https://github.com/arcnmx/ci/archive/modules.tar.gz";
+      path = "https://github.com/arcnmx/ci/archive/master.tar.gz";
     };
     xdg.enable = true;
     xdg.configFile = {
