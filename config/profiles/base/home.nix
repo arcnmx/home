@@ -192,6 +192,7 @@ in {
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
       CARGO_HOME = "${config.xdg.configHome}/cargo";
+      CARGO_TARGET_DIR = "/tmp/cargo-target/global"; # TODO: figure out a better slightly-less-transient place for this
       TIME_STYLE = "long-iso";
     };
     base16 = (if config.home.nixosConfig != null then {
