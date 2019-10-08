@@ -181,6 +181,9 @@ in {
         target = "${config.xdg.cacheHome}/cargo/git/";
         create = true;
       };
+      # need this at least until a new coc-nvim version is released...
+      ".vim".target = "${config.xdg.configHome}/vim/";
+      ".vim/coc-settings.json".target = "${config.xdg.configHome}/vim/coc/coc-settings.json"; # and this too :(
     };
     home.language = {
       base = "en_US.UTF-8";
