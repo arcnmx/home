@@ -1,0 +1,137 @@
+env:
+  CI_ALLOW_ROOT: '1'
+  CI_CONFIG: ./ci.nix
+  CI_PLATFORM: gh-actions
+jobs:
+  ci:
+    name: home
+    runs-on: ubuntu-latest
+    steps:
+    - id: checkout
+      name: git clone
+      uses: actions/checkout@v1
+      with:
+        submodules: false
+    - id: submodules
+      name: git submodule init
+      run: "gh_submodule() {\n  SUBMODULE_COMMIT=$(git submodule status $1 | cut -d\
+        \ ' ' -f 1)\n  curl -fSL https://github.com/$2/archive/${SUBMODULE_COMMIT#-}.tar.gz\
+        \ | tar -xz --strip-components=1 -C $1\n}\n\ngit submodule update --init channels/{arc,home-manager,mozilla,nur}\n\
+        gh_submodule channels/nixpkgs nixos/nixpkgs\n"
+    - id: nix-install
+      name: nix install
+      uses: arcnmx/ci/actions/nix/install@master
+    - id: ci-setup
+      name: nix setup
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        attrs: ci.run.bootstrap
+        quiet: false
+    - id: home-base
+      name: build home/base
+      run: './nx home base build --show-trace
+
+        '
+    - id: home-desktop
+      name: build home/desktop
+      run: './nx home desktop build --show-trace
+
+        '
+    - id: home-laptop
+      name: build home/laptop
+      run: './nx home laptop build --show-trace
+
+        '
+    - id: home-personal
+      name: build home/personal
+      run: './nx home personal build --show-trace
+
+        '
+    - id: home-satorin
+      name: build home/satorin
+      run: './nx home satorin build --show-trace
+
+        '
+    - id: home-shanghai
+      name: build home/shanghai
+      run: './nx home shanghai build --show-trace
+
+        '
+    - id: nixos-satorin
+      name: build nixos/satorin
+      run: './nx switch satorin build --show-trace
+
+        '
+    - id: nixos-shanghai
+      name: build nixos/shanghai
+      run: './nx switch shanghai build --show-trace
+
+        '
+    - id: ci-dirty
+      name: nix test dirty
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        attrs: ci.run.test
+        command: ci-build-dirty
+        quiet: false
+        stdout: ${{ runner.temp }}/ci.build.dirty
+    - id: ci-test
+      name: nix test build
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        attrs: ci.run.test
+        command: ci-build-realise
+        ignore-exit-code: true
+        quiet: false
+        stdin: ${{ runner.temp }}/ci.build.dirty
+    - env:
+        CI_EXIT_CODE: ${{ steps.ci-test.outputs.exit-code }}
+      id: ci-summary
+      name: nix test results
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        attrs: ci.run.test
+        command: ci-build-summarise
+        quiet: false
+        stdin: ${{ runner.temp }}/ci.build.dirty
+        stdout: ${{ runner.temp }}/ci.build.cache
+    - env:
+        CACHIX_SIGNING_KEY: ${{ secrets.CACHIX_SIGNING_KEY }}
+      id: ci-cache
+      if: always()
+      name: nix test cache
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        attrs: ci.run.test
+        command: ci-build-cache
+        quiet: false
+        stdin: ${{ runner.temp }}/ci.build.cache
+  ci-check:
+    name: home check
+    runs-on: ubuntu-latest
+    steps:
+    - id: checkout
+      name: git clone
+      uses: actions/checkout@v1
+      with:
+        submodules: false
+    - id: nix-install
+      name: nix install
+      uses: arcnmx/ci/actions/nix/install@master
+    - id: ci-action-build
+      name: nix build ci.gh-actions.configFile
+      uses: arcnmx/ci/actions/nix/build@master
+      with:
+        attrs: ci.gh-actions.configFile
+        out-link: .ci/workflow.yml
+    - id: ci-action-compare
+      name: gh-actions compare
+      uses: arcnmx/ci/actions/nix/run@master
+      with:
+        args: -u .github/workflows/home.yml .ci/workflow.yml
+        attrs: nixpkgs.diffutils
+        command: diff
+name: home
+'on':
+- push
+- pull_request
