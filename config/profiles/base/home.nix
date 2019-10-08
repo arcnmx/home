@@ -427,8 +427,6 @@ in {
       ];
       settings = {};
       extraConfig = ''
-        scriptencoding utf-8
-
         source ${./files/vimrc}
         source ${pkgs.substituteAll {
           src = ./files/vimrc-notmuch;

@@ -1,4 +1,4 @@
-" NOTE: use with vim-sensible
+scriptencoding utf-8
 
 runtime! plugin/sensible.vim
 
@@ -23,6 +23,7 @@ set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
 set nobackup
 set showcmd
 set relativenumber
+set number
 set cursorline
 set shortmess+=I
 set hlsearch
