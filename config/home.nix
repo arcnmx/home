@@ -21,6 +21,8 @@ in with lib; {
     xdg.configFile = {
       "nixpkgs/config.nix".source = "${./channels}/nixpkgs.nix";
     };
+    manual.manpages.enable = false;
+    news.display = "silent";
 
     home.profiles = {
       base = mkDefault true;

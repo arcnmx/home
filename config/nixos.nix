@@ -55,6 +55,8 @@ in {
     };
   };
 
+  documentation.nixos.enable = false;
+
   users.users = {
     root = {
       shell = pkgs.zsh;
