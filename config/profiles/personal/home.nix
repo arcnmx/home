@@ -142,7 +142,8 @@ in {
       ];
       extraConfig = ''
         source ${./files/vimrc-coc}
-        let g:coc_node_path="${pkgs.nodejs}/bin/node"
+        let g:coc_node_path='${pkgs.nodejs}/bin/node'
+        let g:coc_config_home='$XDG_CONFIG_HOME/vim/coc'
 
         " Completion
         " let g:deoplete#enable_at_startup = 1
@@ -542,7 +543,7 @@ in {
             lint-formats:
             - '%f:%l:%c: %m'
       '';
-      "vim/coc-settings.json".text = builtins.toJSON {
+      "vim/coc/coc-settings.json".text = builtins.toJSON {
         languageserver = {
           efm = {
             command = "${pkgs.efm-langserver}/bin/efm-langserver";

@@ -2,7 +2,6 @@ scriptencoding utf-8
 
 runtime! plugin/sensible.vim
 
-" TODO: $XDG_DATA_HOME/vim/viminfo
 set viminfo='100000,<100000,s1000,h,n$XDG_DATA_HOME/vim/viminfo " Get rid of line copy limit
 
 set undodir=$XDG_DATA_HOME/vim/undo
@@ -36,6 +35,7 @@ syntax on
 "set background=light " dark or light
 set background=dark " dark or light
 
+let g:netrw_home='$XDG_DATA_HOME/vim/netrw'
 let g:EditorConfig_exclude_patterns = ['fugitive://.\*']
 
 let g:rust_recommended_style=0
@@ -43,7 +43,7 @@ let g:rust_fold=1
 let g:rust_conceal=1
 let g:rust_conceal_mod_path=1
 let g:rust_conceal_pub=1
-let g:cargo_makeprg_params="check --color always"
+let g:cargo_makeprg_params='check --color always'
 au BufRead,BufNewFile *.rs compiler cargo
 
 let g:vim_markdown_folding_disabled=1
