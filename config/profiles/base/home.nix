@@ -82,7 +82,7 @@ in {
       ".local/share/vim/backup/.keep".text = "";
     };
     home.packages = with pkgs; [
-      nix
+      nix-readline
 
       bash # bash-completion
       zsh zsh-completions
