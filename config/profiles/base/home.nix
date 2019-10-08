@@ -109,6 +109,10 @@ in {
 
       fzf fd # for fzf-z zsh plugin
     ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
+    home.nix.nixPath.ci = {
+      type = "url";
+      path = "https://github.com/arcnmx/ci/archive/modules.tar.gz";
+    };
     xdg.enable = true;
     xdg.configFile = {
       "vim/after/indent/rust.vim".text = ''
