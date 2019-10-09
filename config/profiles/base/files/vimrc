@@ -11,6 +11,7 @@ set runtimepath+=$XDG_CONFIG_HOME/vim/after
 
 set noerrorbells visualbell t_vb= " prevent bell on escape key presses
 
+set encoding=utf-8
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
