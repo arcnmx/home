@@ -24,7 +24,7 @@ in {
       };
     };
     home.packages = with pkgs; with gitAndTools; [
-      gitAnnex git-revise
+      gitRemoteGcrypt git-revise gitAnnex git-annex-remote-b2
       nixos-option
       gnupg
       pass-arc
