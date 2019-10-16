@@ -25,6 +25,7 @@ in {
     };
     home.packages = with pkgs; with gitAndTools; [
       gitRemoteGcrypt git-revise gitAnnex git-annex-remote-b2
+      hub
       nixos-option
       gnupg
       pass-arc
@@ -39,7 +40,7 @@ in {
       electrum-cli
       jq yq
       lorri
-      vit
+      vit2
       #TODO: benc bsync snar-snapper
     ];
     home.shell = {
