@@ -123,6 +123,21 @@ in {
         no-allow-external-cache
       '';
     };
+    programs.buku = {
+      enable = true;
+      bookmarks = {
+        howoldis = {
+          title = "NixOS Channel Freshness";
+          url = "https://howoldis.herokuapp.com";
+          tags = [ "nix" "nixos" "channels" ];
+        };
+        nixexprs-ci = {
+          title = "nixexprs CI";
+          url = "https://github.com/arcnmx/nixexprs/actions";
+          tags = [ "arc" "ci" "nix" "nixexprs" "actions" ];
+        };
+      };
+    };
     programs.vim = {
       plugins = [
         "notmuch-vim"
