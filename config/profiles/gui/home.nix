@@ -110,6 +110,7 @@
             "privacy.resistFingerprinting.block_mozAddonManager" = true;
             "extensions.webextensions.restrictedDomains" = "";
             "tridactyl.unfixedamo" = true; # stop trying to change this file :(
+            "tridactyl.unfixedamo_removed" = true; # wh-what happened this time?
             "browser.shell.checkDefaultBrowser" = false;
             "spellchecker.dictionary" = "en-CA";
             "browser.warnOnQuit" = false;
@@ -291,7 +292,7 @@
         { key = ";y"; cmd = ''composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | fn_setsel''; }
         { key = ";Y"; cmd = ''composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | fn_setclip''; }
         { key = ";m"; cmd = ''composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | shellescape | exclaim_quiet ${mpv}''; }
-        { key = "F"; cmd = ''composite hint -pipe a[href]:not([display="none"]):not([href=""]) href | tabopen''; }
+        { key = "F"; cmd = ''composite hint -t -c a[href]:not([display="none"]) href''; }
         # mpv --ontop --keepaspect-window --profile=protocol.http
 
         { mode = "hint"; key = "j"; mods = ["alt"]; cmd = "hint.focusBottomHint"; }
@@ -378,7 +379,7 @@
         newtabfocus = "page";
         # until empty newtab focus works...
         newtab = "https://web.tabliss.io/";
-        tabopencontaineraware = true;
+        tabopencontaineraware = false;
         #storageloc = "local";
         hintuppercase = false;
         hintchars = "fdsqjklmrezauiopwxcvghtybn";
