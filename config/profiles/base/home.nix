@@ -235,6 +235,11 @@ in {
               ;;
             light|dark)
               export TERM_THEME=$1
+              if [[ $TERM_THEME = dark ]]; then
+                source ${config.lib.arc.base16.shellScriptForAlias.dark}
+              else
+                source ${config.lib.arc.base16.shellScriptForAlias.light}
+              fi
               ;;
             *)
               echo "unknown theme $1" >&2
