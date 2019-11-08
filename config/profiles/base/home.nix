@@ -109,6 +109,10 @@ in {
       rxvt_unicode-cvs.terminfo
 
       fzf fd # for fzf-z zsh plugin
+
+      (if config.home.profiles.gui
+        then clip.override { enableWayland = false; } # TODO: check config for wayland somehow?
+        else clip.override { enableX11 = false; enableWayland = false; })
     ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
     home.nix.nixPath.ci = {
       type = "url";
