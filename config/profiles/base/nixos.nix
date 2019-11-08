@@ -46,6 +46,8 @@ in {
       distributedBuilds = true;
       extraOptions = ''
         builders-use-substitutes = true
+      '' + lib.optionalString (lib.versionAtLeast builtins.nixVersion "2.4") ''
+        experimental-features = nix-command
       '';
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
