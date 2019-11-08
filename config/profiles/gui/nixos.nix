@@ -26,10 +26,6 @@ in
         enable = true;
         defaultFonts.monospace = ["Hack" "DejaVu Sans Mono"];
         penultimate.enable = true;
-        ultimate = { # TODO: compare?
-          enable = false;
-          substitutions = "combi";
-        };
       };
       fonts = [
         pkgs.noto-fonts
