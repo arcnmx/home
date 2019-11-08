@@ -223,6 +223,11 @@ in {
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       CARGO_TARGET_DIR = "${config.xdg.cacheHome}/cargo/target";
       TIME_STYLE = "long-iso";
+
+      # workaround home-manager bug improperly escaping this
+      TMUX_TMPDIR = lib.mkIf (config.programs.tmux.enable && config.programs.tmux.secureSocket) (lib.mkForce
+        ''''${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}''
+      );
     };
     base16 = (if config.home.nixosConfig != null then {
       inherit (config.home.nixosConfig.base16) schemes alias;
