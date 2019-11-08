@@ -155,7 +155,7 @@ in {
         set keyseq-timeout 1
         set mark-symlinked-directories on
 
-        set completion-prefix-display-length 3
+        set completion-prefix-display-length 8
         set show-all-if-ambiguous on
         set show-all-if-unmodified on
         set visible-stats on
