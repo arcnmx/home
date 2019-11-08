@@ -41,6 +41,7 @@ in {
       jq yq
       lorri
       vit2
+      pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
     home.shell = {
@@ -122,6 +123,8 @@ in {
         pinentry-timeout 30
         allow-loopback-pinentry
         no-allow-external-cache
+      '' + optionalString config.home.profiles.gui ''
+        pinentry-program ${pkgs.pinentry.gtk2}/bin/pinentry
       '';
     };
     programs.buku = {
