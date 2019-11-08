@@ -403,7 +403,7 @@
         "searchurls.ddg" = "https://duckduckgo.com/?q=%s";
         "searchurls.r" = "https://reddit.com/r/%s";
         "searchurls.rs" = "https://doc.rust-lang.org/std/index.html?search=%s";
-        "searchurls.crates" = "https://crates.io/search?q=%s";
+        "searchurls.crates" = "https://lib.rs/search?q=%s";
         "searchurls.docs" = "https://docs.rs/%s/*";
         "searchurls.aur" = "https://aur.archlinux.org/packages/?K=%s";
         "searchurls.yt" = "https://www.youtube.com/results?search_query=%s";

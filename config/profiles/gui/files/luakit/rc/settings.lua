@@ -21,7 +21,7 @@ settings.window.search_engines = {
     ddg = "https://duckduckgo.com/?q=%s",
     r = "https://reddit.com/r/%s",
     rs = "https://doc.rust-lang.org/std/index.html?search=%s",
-    crates = "https://crates.io/search?q=%s",
+    crates = "https://lib.rs/search?q=%s",
     docs = "https://docs.rs/%s/*",
     aur = "https://aur.archlinux.org/packages/?K=%s",
     yt = "https://www.youtube.com/results?search_query=%s",
