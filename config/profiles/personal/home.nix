@@ -90,7 +90,7 @@ in {
               else
                   task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
               fi
-          } 2> /dev/null | less
+          } 2> /dev/null | ''${PAGER-less}
         '';
       } // optionalAttrs pkgs.hostPlatform.isLinux {
         lorri-status = ''

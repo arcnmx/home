@@ -92,6 +92,7 @@ in {
       openssh
       calc
       socat
+      vimpager-latest
 
       coreutils
       file
@@ -127,6 +128,23 @@ in {
         set softtabstop=2
         set shiftwidth=2
         set expandtab
+      '';
+      "vim/vimpagerrc".text = ''
+        set noloadplugins
+
+        if !exists('g:less')
+          let g:less = {}
+        endif
+        if !exists('g:vimpager')
+          let g:vimpager = {}
+        endif
+
+        " let g:less.enabled = 0
+        let g:less.number = 1
+
+        " alternate screen clears on exit :(
+        " TODO: make t_te move up one line to accomodate the double-height prompt? also set cmdheight=2 so a line doesn't get clobbered when doing so
+        set t_ti= t_te=
       '';
       "user-dirs.dirs".text = ''
         XDG_DESKTOP_DIR="$HOME"
@@ -193,7 +211,8 @@ in {
 
       EDITOR = "${config.programs.vim.package}/bin/vim";
 
-      PAGER = "${pkgs.less}/bin/less";
+      #PAGER = "${pkgs.less}/bin/less";
+      PAGER = "${pkgs.vimpager-latest}/bin/vimpager";
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
