@@ -60,7 +60,7 @@ in {
 
     services.openssh = {
       enable = true;
-      ports = lib.mkDefault [22];
+      ports = lib.mkDefault [22]; # TODO: start using a different port for personal and server machines? way too much spam otherwise...
       startWhenNeeded = lib.mkDefault false;
       allowSFTP = true;
       gatewayPorts = "yes";

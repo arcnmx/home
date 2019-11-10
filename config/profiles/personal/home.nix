@@ -254,6 +254,7 @@ in {
       };
       scripts = with pkgs.weechatScripts; [
         go auto_away autoconf autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix
+        # TODO: add emoji script for :emoj<tab> completion
       ];
       autoconfig = with mapAttrs (_: toString) pkgs.base16.shell.shell256; let
         # base16-shell colour names
