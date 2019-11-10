@@ -49,7 +49,13 @@
     zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
     zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
     zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
-    zstyle ':completion:*' matcher-list 'r:|[._-]=** r:|=*' 'l:|=* r:|=*'
+    zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+    #zstyle ':completion:*' matcher-list 'r:|=*' '+ r:|[._-]=** l:|=*'
+    #zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z} r:|=*' '+ r:|[._-]=* l:|=*' # case-insensitive version of above
+    #zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' # ?
+    #fuzzy:
+    #zstyle ':completion:*' matcher-list 'r:[[:ascii:]]||[[:ascii:]]=** r:|=* m:{a-z\-}={A-Z\_}'
+    #zstyle ':completion:*' matcher-list 'r:|?=** m:{a-z\-}={A-Z\_}'
     zstyle ':completion:*:complete:pass:*:*' matcher 'r:|[./_-]=** r:|=*' 'l:|=* r:|=*'
 
     bindkey '^ ' autosuggest-accept
