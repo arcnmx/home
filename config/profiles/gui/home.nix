@@ -387,6 +387,7 @@
         #hintnames = "numeric";
         modeindicator = true;
         modeindicatorshowkeys = true;
+        autocontainmode = "relaxed";
 
         # Make Tridactyl work on more sites at the expense of some security
         csp = "clobber";
