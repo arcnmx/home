@@ -270,6 +270,10 @@ in {
         matrix = {
           network = {
             max_backlog_sync_events = 30;
+            lazy_load_room_users = true; # not sure which way to go on this
+            autoreconnect_delay_max = 60;
+            lag_min_show = 1000;
+            # TODO: typing_notice_conditions and read_markers_conditions
           };
           color = {
             #error_message_bg
@@ -280,6 +284,9 @@ in {
             unconfirmed_message_fg = base03; # 0F?
             #untagged_code_bg
             untagged_code_fg = base0C; # 0F?
+          };
+          look = {
+            bar_item_typing_notice_prefix = "... ";
           };
         };
         buflist = {
