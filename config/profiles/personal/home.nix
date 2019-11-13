@@ -187,17 +187,21 @@ in {
 
         def gmail_nametrans(foldername):
             return (
-                re.sub('^gmail.all_mail$', 'archive',
-                re.sub('^gmail.drafts$', 'drafts',
-                re.sub('^gmail.sent_mail$', 'sent',
-                re.sub('^gmail.starred$', 'flagged',
-                re.sub('^gmail.spam$', 'junk',
-                re.sub('^\[gmail\]', 'gmail',
+                re.sub('^gmail\.all_mail$', 'archive',
+                re.sub('^gmail\.drafts$', 'drafts',
+                re.sub('^gmail\.sent_mail$', 'sent',
+                re.sub('^gmail\.starred$', 'flagged',
+                re.sub('^gmail\.spam$', 'junk',
+                re.sub('^\[gmail\]\.', 'gmail.',
                 basic_nametrans(foldername)
             )))))))
 
         def basic_nametrans(foldername):
-            return re.sub(' ', '_', foldername.lower())
+            return (
+                re.sub(' ', '_',
+                re.sub('/', '.',
+                foldername.lower()
+            )))
       '';
     };
     programs.notmuch = {
