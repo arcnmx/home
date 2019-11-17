@@ -47,13 +47,15 @@ in {
     home.shell = {
       functions = {
         lorri-init = ''
-          echo 'use ${if config.services.lorri.useNix then "nix" else "lorri"}' > .envrc
+          echo 'use ${if config.services.lorri.useNix || !config.services.lorri.enable then "nix" else "lorri"}' > .envrc
+        '' + optionalString config.services.lorri.enable ''
           for nixfile in $PWD/shell.nix; do # default.nix?
             if [[ -e $nixfile ]]; then
               ${config.services.lorri.package}/bin/lorri ping_ $nixfile
               break
             fi
           done
+        '' + ''
           direnv allow
         '';
         iclip = ''
