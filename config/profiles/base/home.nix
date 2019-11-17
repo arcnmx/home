@@ -186,6 +186,10 @@ in {
         "default" = true;
         "line-length" = false;
       };
+      "cargo/config".text = ''
+        [net]
+        git-fetch-with-cli = true
+      '';
     };
     xdg.dataFile = {
       "z/.keep".text = "";
