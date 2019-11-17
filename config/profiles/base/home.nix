@@ -155,6 +155,9 @@ in {
         " alternate screen clears on exit :(
         " TODO: make t_te move up one line to accomodate the double-height prompt? also set cmdheight=2 so a line doesn't get clobbered when doing so
         set t_ti= t_te=
+
+        " I want to select things in X thanks
+        set mouse=
       '';
       "user-dirs.dirs".text = ''
         XDG_DESKTOP_DIR="$HOME"
