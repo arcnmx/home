@@ -32,7 +32,6 @@ in {
       awscli
       ncmpcpp
       ncpamixer
-      ledger
       physlock
       travis
       radare2
