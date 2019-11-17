@@ -124,6 +124,32 @@ in {
       strace
     ];
 
+    services.udev.extraRules = let
+      localGroup = "users";
+      assignLocalGroup = ''GROUP="${localGroup}"'';
+      devBoards = ''
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}"
+        SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic GDB Server", ${assignLocalGroup}, SYMLINK+="ttyBMP"
+        SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic UART Port", ${assignLocalGroup}, SYMLINK+="ttyBMPuart"
+      '';
+      i2c = ''
+        SUBSYSTEM=="i2c-dev", ${assignLocalGroup}, MODE="0660"
+      ''; # for DDC/monitor control
+      gamepads = ''
+        SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", ${assignLocalGroup}
+      '';
+      uinput = ''
+        ACTION=="add", SUBSYSTEM=="misc", KERNEL=="uinput", MODE="0660", ${assignLocalGroup}
+        ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0666", ${assignLocalGroup}
+      '';
+    in ''
+      ${devBoards}
+      ${i2c}
+      ${gamepads}
+      ${uinput}
+    '';
+
     services.usbmuxd.enable = true;
     services.openssh = {
       passwordAuthentication = true;

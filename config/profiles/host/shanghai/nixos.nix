@@ -25,6 +25,10 @@
       set-default-source alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-mono
     '';
 
+    services.udev.extraRules = ''
+      SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+="/bin/sh -c 'for x in /sys/devices/system/cpu/cpufreq/*/scaling_governor; do echo performance > $$x; done'"
+    '';
+
     boot = {
       loader = {
         generationsDir = {
