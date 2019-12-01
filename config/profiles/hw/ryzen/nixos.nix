@@ -9,6 +9,7 @@
     };
     boot.kernelModules = [
       "msr" # for zenstates
+      "kvm-amd"
     ];
     environment.etc = {
       "sensors.d/ryzen".text = ''

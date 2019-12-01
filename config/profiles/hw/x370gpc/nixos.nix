@@ -6,9 +6,11 @@
   config = mkIf config.home.profiles.hw.x370gpc {
     home.profiles.hw.ryzen = true;
 
+    boot.initrd.availableKernelModules = [
+      "nvme" "sd_mod" "xhci_pci" "ahci" "usbhid"
+    ];
     boot.kernelModules = [
       "nct6775"
-      "nvme" "sd_mod" "xhci_pci" "ahci" "usbhid"
     ];
     systemd.network.links.eth = {
       matchConfig = {

@@ -10,6 +10,7 @@
     hw/intel
     hw/ryzen
     hw/nvidia
+    hw/x370gpc
     hw/xps13
     host/gensokyo
     host/satorin

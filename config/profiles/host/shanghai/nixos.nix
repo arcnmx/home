@@ -8,6 +8,7 @@
     home.profiles.host.gensokyo = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
+    home.profiles.hw.x370gpc = true;
 
     networking.hostId = "a1184652";
 
@@ -45,14 +46,9 @@
 
     fileSystems = {
       "/" = {
-        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
+        device = "/dev/disk/by-uuid/4a260bff-eac5-40c9-8c40-00f0557b5923";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/root"];
-      };
-      "/home" = {
-        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
-        fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "subvol=/home"];
+        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
       };
       "/boot" = {
         device = "/mnt/efi/EFI/nixos";
@@ -73,11 +69,6 @@
         device = "/dev/disk/by-uuid/D460-0EF6";
         fsType = "vfat";
         options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
-      };
-      "/mnt/root" = {
-        device = "/dev/disk/by-uuid/0ffac5c5-dbcf-42bf-a79c-4c5fd8557e2d";
-        fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "subvol=/" "nofail"];
       };
     };
     swapDevices = [

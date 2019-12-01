@@ -14,16 +14,16 @@
           dummy = {}; # XXX: force nixos to write out wpa_supplicant.conf, otherwise connman won't work
         };
       };
-      connman = {
-        enable = true;
-        extraFlags = ["--nodnsproxy"];
-        extraConfig = ''
-          AllowHostnameUpdates=false
-          DefaultAutoConnectTechnologies=wifi
-          PreferredTechnologies=wifi,bluetooth
-          SingleConnectedTechnology=false
-        '';
-      };
+    };
+    services.connman = {
+      enable = true;
+      extraFlags = ["--nodnsproxy"];
+      extraConfig = ''
+        AllowHostnameUpdates=false
+        DefaultAutoConnectTechnologies=wifi
+        PreferredTechnologies=wifi,bluetooth
+        SingleConnectedTechnology=false
+      '';
     };
 
     boot.kernel.sysctl = {

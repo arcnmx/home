@@ -2,8 +2,12 @@ A combination of system config, dotfiles, and personal Nix package repo/channel/
 
 ## NixOS
 
+Installation from nixos installer:
+
 ```bash
-./nx switch $(hostname -s) switch
+HOSTNAME=$(hostname -s) # fill in here
+./nx switch $HOSTNAME build &&
+sudo nixos-install --root /mnt --system $PWD/result-gensokyo-$HOSTNAME/
 ```
 
 ## Nix
