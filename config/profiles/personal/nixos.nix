@@ -101,6 +101,7 @@ in {
     };
 
     networking.firewall.enable = false;
+    networking.nameservers = mkDefault [ "1.1.1.1" "1.0.0.1" ];
     #networking.nftables.enable = true;
     # TODO: migrate nftables config
 

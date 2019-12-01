@@ -12,38 +12,43 @@
     boot.kernelModules = [
       "nct6775"
     ];
-    systemd.network.links.eth = {
-      matchConfig = {
-        MACAddress = "4c:cc:6a:f9:3d:ad";
-        Path = "pci-0000:17:00.0";
+    systemd.network = {
+      networks.eno1 = {
+        matchConfig.Name = "eno1";
+        bridge = ["br"];
       };
-      linkConfig = {
-        Name = "eth";
-      };
-    };
-    systemd.network.netdevs.br = {
-      netdevConfig = {
-        Name = "br";
-        Kind = "bridge";
-        MACAddress = "4c:cc:6a:f9:3d:ad";
+      netdevs.br = {
+        netdevConfig = {
+          Name = "br";
+          Kind = "bridge";
+          MACAddress = "4c:cc:6a:f9:3d:ad";
+        };
       };
     };
 
     environment.etc = {
-      "sensors.d/msi-x370-gaming-pro-carbon".text = ''
+      "sensors3.conf".text = ''
         chip "nct6795-isa-0a20"
             label in0 "Vcore"
             label in1 "+5V"
             compute in1 5*@, @/5
             label in2 "AVCC"
-            label in3 "3VCC"
+            set in2_min 3.3 * 0.90
+            set in2_max 3.3 * 1.10
+            label in3 "+3.3V"
+            set in3_min 3.3 * 0.90
+            set in3_max 3.3 * 1.10
             label in4 "+12V"
             compute in4 12*@, @/12
             label in5 "DIMM"
             compute in5 (8+18/19)*@, @/(8+18/19)
             # label in6 "wtf?" # can't find this in hwinfo64?
             label in7 "3VSB"
-            label in8 "VBAT"
+            set in7_min 3.3 * 0.90
+            set in7_max 3.3 * 1.10
+            label in8 "Vbat"
+            set in8_min 3.3 * 0.90
+            set in8_max 3.3 * 1.10
             label in9 "VTT"
             ignore in10 # always zero
             # label in11 "VIN4" # on hwinfo64
@@ -69,7 +74,6 @@
             ignore intrusion0
             ignore intrusion1
             ignore beep_enable
-            # 1700x: compute temp7 @-20,@+20
       '';
     };
 

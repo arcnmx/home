@@ -7,7 +7,7 @@ general {
 }
 
 order += "volume master"
-order += "disk /mnt/root"
+order += "disk /"
 order += "disk /mnt/data"
 order += "disk /mnt/bigdata"
 order += "ethernet br"
@@ -15,7 +15,7 @@ order += "cpu_usage 0"
 order += "cpu_temperature 0"
 order += "tztime local"
 
-disk "/mnt/root" {
+disk "/" {
 	format = "/mnt/root %avail %percentage_used_of_avail"
 	low_threshold = 5
 	threshold_type = "gbytes_avail"

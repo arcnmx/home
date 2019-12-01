@@ -8,12 +8,23 @@
     home.profiles.host.gensokyo = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
+    home.profiles.hw.nvidia = true;
     home.profiles.hw.x370gpc = true;
 
-    networking.hostId = "a1184652";
+    networking = {
+      hostId = "a1184652";
+      useDHCP = false;
+      useNetworkd = true;
+    };
+    systemd.network.networks.br = {
+      matchConfig.Name = "br";
+      gateway = [ "10.1.1.1" ];
+      address = [ "10.1.1.32/24" ];
+    };
 
     home.nixbld.enable = true;
     services.mosh.portRange = "32600:32700";
+    services.openssh.ports = [ 22 32022 ];
     hardware.pulseaudio.extraConfig = lib.mkAfter ''
       #load-module module-mmkbd-evdev
 
@@ -48,7 +59,7 @@
       "/" = {
         device = "/dev/disk/by-uuid/4a260bff-eac5-40c9-8c40-00f0557b5923";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
+        options = ["rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
       };
       "/boot" = {
         device = "/mnt/efi/EFI/nixos";

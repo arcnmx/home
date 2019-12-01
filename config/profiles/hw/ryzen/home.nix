@@ -4,6 +4,6 @@
   };
 
   config = mkIf config.home.profiles.hw.ryzen {
-    home.packages = [pkgs.zenstates];
+    #home.packages = [pkgs.zenstates];
   };
 }

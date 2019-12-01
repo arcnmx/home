@@ -11,6 +11,7 @@
     home.profiles.trusted = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
+    home.profiles.hw.nvidia = true;
     home.profiles.hw.x370gpc = true;
 
     xdg.configFile."i3status/config".source = ./files/i3status;
