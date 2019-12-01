@@ -378,7 +378,7 @@
         leavegithubalone = false;
         newtabfocus = "page";
         # until empty newtab focus works...
-        newtab = "https://web.tabliss.io/";
+        newtab = "http://blank.org";
         tabopencontaineraware = false;
         #storageloc = "local";
         hintuppercase = false;

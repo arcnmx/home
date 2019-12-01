@@ -230,6 +230,8 @@ in {
         source ${./files/vimrc-coc}
         let g:coc_node_path='${pkgs.nodejs}/bin/node'
         let g:coc_config_home='$XDG_CONFIG_HOME/vim/coc'
+        let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
+        let g:notmuch_config_file='~/.config/notmuch/notmuchrc'
 
         " Completion
         " let g:deoplete#enable_at_startup = 1
