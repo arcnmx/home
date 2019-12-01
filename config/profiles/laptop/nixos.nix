@@ -33,8 +33,6 @@
       "vm.laptop_mode" = 5;
     };
 
-    boot.extraModulePackages = [ config.boot.kernelPackages.ax88179_178a ];
-
     environment.systemPackages = with pkgs; [
       acpi
       acpilight
