@@ -1,3 +1,5 @@
+let g:notmuch_show_date_format='%Y/%m/%d  %H:%M'
+let g:notmuch_search_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_folders = [
 \ ['new', 'tag:unread and tag:inbox'],
 \ ['inbox', 'tag:inbox'],
@@ -19,7 +21,3 @@ let g:notmuch_custom_show_maps={
 \ }
 let g:notmuch_save_sent_locally=1
 let g:notmuch_save_sent_mailbox='sent'
-let g:notmuch_sendmail_method='sendmail'
-let g:notmuch_sendmail_param={
-\ 'location': '@msmtp@/bin/msmtp',
-\}

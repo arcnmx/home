@@ -230,11 +230,18 @@ in {
         source ${./files/vimrc-coc}
         let g:coc_node_path='${pkgs.nodejs}/bin/node'
         let g:coc_config_home='$XDG_CONFIG_HOME/vim/coc'
-        let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
-        let g:notmuch_config_file='~/.config/notmuch/notmuchrc'
 
         " Completion
         " let g:deoplete#enable_at_startup = 1
+
+        source ${./files/vimrc-notmuch}
+        let g:notmuch_config_file='${config.xdg.configHome}/notmuch/notmuchrc'
+        let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
+        let g:notmuch_attachment_dir='${config.home.homeDirectory}/downloads'
+        let g:notmuch_view_attachment='xdg-open'
+        let g:notmuch_sendmail_method='sendmail'
+        let g:notmuch_sendmail_location='${pkgs.msmtp}/bin/msmtp'
+        let g:notmuch_open_uri='firefox'
       '';
     };
     programs.kakoune = {
