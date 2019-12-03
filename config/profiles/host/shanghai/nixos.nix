@@ -8,6 +8,7 @@
     home.profiles.host.gensokyo = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
+    home.profiles.vfio = true;
     home.profiles.hw.nvidia = true;
     home.profiles.hw.x370gpc = true;
 

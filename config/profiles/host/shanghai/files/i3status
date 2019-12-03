@@ -16,7 +16,7 @@ order += "cpu_temperature 0"
 order += "tztime local"
 
 disk "/" {
-	format = "/mnt/root %avail %percentage_used_of_avail"
+	format = "/ %avail %percentage_used_of_avail"
 	low_threshold = 5
 	threshold_type = "gbytes_avail"
 	prefix_type = "custom"

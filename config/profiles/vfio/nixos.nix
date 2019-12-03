@@ -4,7 +4,12 @@
   };
 
   config = mkIf config.home.profiles.vfio {
-    boot.initrd.kernelModules = ["vfio" "vfio_iommu_type1" "vfio_pci" "vfio_virqfd"];
+    boot = {
+      initrd.kernelModules = ["vfio" "vfio_iommu_type1" "vfio_pci" "vfio_virqfd"];
+      extraModprobeConfig = ''
+        options kvm ignore_msrs=1
+      '';
+    };
     environment.etc."qemu/bridge.conf".text = "allow br";
     security.pam.loginLimits = [
       {
