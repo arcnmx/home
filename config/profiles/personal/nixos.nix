@@ -163,7 +163,10 @@ in {
       enable = true;
       interval = "05:00";
     };
-    services.resolved.enable = true;
+    services.resolved = {
+      enable = true;
+      dnssec = "false";
+    };
     services.physlock.enable = true;
     security.sudo.extraRules = mkAfter [
       { commands = [ { command = "ALL"; options = ["NOPASSWD"]; } ]; groups = [ "wheel" ]; }
