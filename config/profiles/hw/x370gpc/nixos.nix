@@ -88,8 +88,8 @@
       #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp2_max_hyst=40000
 
       # System/Auxillary
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max" = 75000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max_hyst" = 54000;
+      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max" = 88000;
+      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max_hyst" = 60000;
 
       # rear exhaust
       #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_mode=1
