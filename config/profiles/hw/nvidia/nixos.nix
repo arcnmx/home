@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }: with lib; {
   options = {
     home.profiles.hw.nvidia = mkEnableOption "NVIDIA GPU";
+    home.profileSettings.nvidia = {
+      enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
+    };
   };
 
   config = mkIf config.home.profiles.hw.nvidia {
@@ -19,7 +22,8 @@
     services.xserver.deviceSection = ''
       Driver "nvidia"
       Option "NoLogo" "True"
-      Option "Coolbits" "4"
+      Option "Coolbits" "28"
+    '' + optionalString config.home.profileSettings.nvidia.enableSoftwareI2c ''
       Option "RegistryDwords" "RMUseSwI2c=0x01;RMI2cSpeed=100"
     '';
   };
