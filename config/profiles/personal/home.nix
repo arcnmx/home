@@ -206,7 +206,7 @@ in {
       '';
     };
     programs.notmuch = {
-      new.tags = [ "unread" "new" ];
+      new.tags = [ "new" ];
       search.excludeTags = [ "deleted" "trash" "junk" ];
     };
     programs.vim = {

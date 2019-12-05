@@ -1,23 +1,39 @@
 let g:notmuch_show_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_search_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_folders = [
-\ ['new', 'tag:unread and tag:inbox'],
-\ ['inbox', 'tag:inbox'],
-\ ['unread', 'tag:unread and not tag:inbox'],
+\ ['new', 'tag:unread'],
+\ ['inbox', 'tag:flagged -tag:work'],
+\ ['work', 'tag:work (tag:flagged or tag:unread)'],
+\ ['all work', 'tag:work'],
 \ ['all', 'path:**'],
-\ ['work', 'tag:work'],
 \ ['junk', 'tag:junk'],
+\ ['trash', 'tag:trash'],
 \ ]
 let g:notmuch_folders_count_threads=0
 let g:notmuch_date_format='%y-%m-%d %H:%M'
 let g:notmuch_datetime_format='%y-%m-%d %H:%M'
-let g:notmuch_custom_search_maps={
-\ 'x': 'kill_this_buffer()',
-\ 'd': 'search_tag("+deleted -inbox -unread")',
-\ }
-let g:notmuch_custom_show_maps={
-\ 'x': 'kill_this_buffer()',
-\ 'd': 'search_tag("+deleted -inbox -unread")',
-\ }
 let g:notmuch_save_sent_locally=1
 let g:notmuch_save_sent_mailbox='sent'
+
+let g:notmuch_default_mappings=1
+let g:notmuch_attachment_dir='~/downloads'
+
+function! g:NotmuchExtractAttachment()
+  let l:line = getline('.')
+  ruby vim_puts extract_part(VIM::evaluate('l:line'))
+endfunction
+
+autocmd FileType notmuch-folders,notmuch-search nmap <buffer> =
+\ :call g:NotmuchRefresh()<CR>
+autocmd FileType notmuch-search,notmuch-show nmap <buffer> t
+\ :call g:NotmuchTag('')<CR>
+autocmd FileType notmuch-search,notmuch-show nmap <buffer> a
+\ :call g:NotmuchTag('-flagged -unread')<CR>
+autocmd FileType notmuch-search,notmuch-show nmap <buffer> A
+\ :call g:NotmuchTag('-flagged -unread')<CR>
+autocmd FileType notmuch-search,notmuch-show nmap <buffer> d
+\ :call g:NotmuchTag('+deleted +trash -flagged -unread')<CR>
+autocmd FileType notmuch-search,notmuch-show nmap <buffer> D
+\ :call g:NotmuchPermanentDelete()<CR> " TODO: move to trash instead?
+autocmd FileType notmuch-show nmap <buffer> x
+\ :call g:NotmuchExtractAttachment()<CR>
