@@ -2,8 +2,9 @@ let g:notmuch_show_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_search_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_folders = [
 \ ['new', 'tag:unread'],
-\ ['inbox', 'tag:flagged -tag:work'],
-\ ['work', 'tag:work (tag:flagged or tag:unread)'],
+\ ['inbox', 'tag:flagged -tag:work -tag:later'],
+\ ['later', 'tag:later'],
+\ ['work', 'tag:work (tag:flagged or tag:unread) -tag:later'],
 \ ['all work', 'tag:work'],
 \ ['all', 'path:**'],
 \ ['junk', 'tag:junk'],
@@ -15,7 +16,6 @@ let g:notmuch_datetime_format='%y-%m-%d %H:%M'
 let g:notmuch_save_sent_locally=1
 let g:notmuch_save_sent_mailbox='sent'
 
-let g:notmuch_default_mappings=1
 let g:notmuch_attachment_dir='~/downloads'
 
 function! g:NotmuchExtractAttachment()
@@ -23,17 +23,64 @@ function! g:NotmuchExtractAttachment()
   ruby vim_puts extract_part(VIM::evaluate('l:line'))
 endfunction
 
-autocmd FileType notmuch-folders,notmuch-search nmap <buffer> =
-\ :call g:NotmuchRefresh()<CR>
-autocmd FileType notmuch-search,notmuch-show nmap <buffer> t
-\ :call g:NotmuchTag('')<CR>
-autocmd FileType notmuch-search,notmuch-show nmap <buffer> a
-\ :call g:NotmuchTag('-flagged -unread')<CR>
-autocmd FileType notmuch-search,notmuch-show nmap <buffer> A
-\ :call g:NotmuchTag('-flagged -unread')<CR>
-autocmd FileType notmuch-search,notmuch-show nmap <buffer> d
-\ :call g:NotmuchTag('+deleted +trash -flagged -unread')<CR>
-autocmd FileType notmuch-search,notmuch-show nmap <buffer> D
-\ :call g:NotmuchPermanentDelete()<CR> " TODO: move to trash instead?
-autocmd FileType notmuch-show nmap <buffer> x
-\ :call g:NotmuchExtractAttachment()<CR>
+let g:notmuch_default_mappings=0
+augroup notmuch_arc
+  autocmd!
+
+  autocmd FileType notmuch-folders nmap <buffer> <Enter>
+  \ :call g:NotmuchShowSearch()<CR>
+  autocmd FileType notmuch-search nmap <buffer> <Enter>
+  \ :call g:NotmuchShowThread(1)<CR>
+  autocmd FileType notmuch-search nmap <buffer> <Space>
+  \ :call g:NotmuchShowThread(2)<CR>
+  autocmd FileType notmuch-search
+  \ nnoremap <buffer> G G:call g:NotmuchRenderMore()<CR>
+  autocmd FileType notmuch-folders,notmuch-search nmap <buffer> =
+  \ :call g:NotmuchRefresh()<CR>
+  autocmd BufEnter,WinEnter,BufWinEnter :call g:NotmuchRefresh()<CR>
+
+  autocmd FileType notmuch-folders,notmuch-search nmap <buffer> s
+  \ :call g:NotmuchSearchPrompt()<CR>
+  autocmd FileType notmuch-folders,notmuch-search,notmuch-show nmap <buffer> c
+  \ :call g:NotmuchCompose('')<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> q
+  \ :call g:NotmuchDeleteBuffer()<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> ?
+  \ :call g:NotmuchInfo()<CR>
+  autocmd FileType notmuch-show nmap <buffer> r
+  \ :call g:NotmuchReply()<CR>
+  autocmd FileType notmuch-show nmap <buffer> <S-Tab>
+  \ :call g:NotmuchPrevMessage()<CR>
+  autocmd FileType notmuch-show nmap <buffer> <Tab>
+  \ :call g:NotmuchNextMessage('')<CR>
+  autocmd FileType notmuch-compose nmap <buffer> ,s
+  \ :call g:NotmuchComposeSend()<CR>
+  autocmd FileType notmuch-compose nmap <buffer> ,q
+  \ :call g:NotmuchComposeAbort()<CR>
+
+  autocmd FileType notmuch-show nmap <buffer> <Enter>
+  \ :call g:NotmuchViewMagic()<CR>
+  autocmd FileType notmuch-show nmap <buffer> x
+  \ :call g:NotmuchExtractAttachment()<CR>
+  autocmd FileType notmuch-show nmap <buffer> d
+  \ :call g:NotmuchDumpMbox()<CR>
+  autocmd FileType notmuch-show nmap <buffer> p
+  \ :call g:NotmuchSavePatches()<CR>
+
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> t
+  \ :call g:NotmuchTag('')<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> a
+  \ :call g:NotmuchTag('-flagged -unread')<CR>
+  autocmd FileType notmuch-folders,notmuch-search,notmuch-show nmap <buffer> I
+  \ :call g:NotmuchTag('-unread')<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> A
+  \ :call g:NotmuchTag('-flagged -unread')<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> O
+  \ :call g:NotmuchTag('-unread +later')<CR>
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> d
+  \ :call g:NotmuchTag('+deleted +trash -flagged -unread')<CR>
+
+  " TODO: move to trash instead?
+  autocmd FileType notmuch-search,notmuch-show nmap <buffer> D
+  \ :call g:NotmuchPermanentDelete()<CR>
+augroup END
