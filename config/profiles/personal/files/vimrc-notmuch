@@ -83,4 +83,4 @@ augroup notmuch_arc
   " TODO: move to trash instead?
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> D
   \ :call g:NotmuchPermanentDelete()<CR>
-augroup END
+augroup end

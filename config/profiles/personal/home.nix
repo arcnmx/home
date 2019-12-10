@@ -221,6 +221,7 @@ in {
         "coc-rust-analyzer"
         "coc-git"
         "coc-yank"
+        "echodoc-vim"
         #"LanguageClient-neovim"
         #"deoplete-nvim"
         "nvim-yarp"
@@ -229,10 +230,11 @@ in {
       extraConfig = ''
         source ${./files/vimrc-coc}
         let g:coc_node_path='${pkgs.nodejs}/bin/node'
-        let g:coc_config_home='$XDG_CONFIG_HOME/vim/coc'
+        let g:coc_config_home=$XDG_CONFIG_HOME . '/vim/coc'
 
         " Completion
-        " let g:deoplete#enable_at_startup = 1
+        " let g:deoplete#enable_at_startup=1
+        let g:echodoc#enable_at_startup=0
 
         source ${./files/vimrc-notmuch}
         let g:notmuch_config_file='${config.xdg.configHome}/notmuch/notmuchrc'
@@ -676,13 +678,20 @@ in {
         };
         "coc.preferences.extensionUpdateCheck" = "never";
         "coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman";
-        "suggest.timeout" = 500;
+        "suggest.timeout" = 1000;
+        "suggest.maxPreviewWidth" = 120;
+        "suggest.enablePreview" = true;
+        "suggest.echodocSupport" = true;
         "suggest.minTriggerInputLength" = 2;
         "suggest.acceptSuggestionOnCommitCharacter" = true;
         "suggest.snippetIndicator" = "►";
+        "diagnostic.checkCurrentLine" = true;
+        "suggest.numberSelect" = true;
+        "list.nextKeymap" = "<A-j>";
+        "list.previousKeymap" = "<A-k>";
+        # list.normalMappings, list.insertMappings
         # coc.preferences.formatOnType, coc.preferences.formatOnSaveFiletypes
         "npm.binPath" = "${pkgs.coreutils}/bin/false"; # whatever it wants npm for, please just don't
-        "suggest.numberSelect" = true;
         "rust-client.rlsPath" = "rls";
         "rust-client.disableRustup" = true;
         "rust-client.updateOnStartup" = false;
@@ -694,6 +703,10 @@ in {
         "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
         "rust-analyzer.raLspServerPath" = "ra_lsp_server";
         "rust-analyzer.enableCargoWatchOnStartup" = "disabled";
+        "rust-analyzer.featureFlags" = {
+          "completion.insertion.add-call-parenthesis" = false; # consider using this?
+          "notifications.workspace-loaded" = false;
+        };
         # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
       };
       "kak-lsp/kak-lsp.toml".source = pkgs.substituteAll {

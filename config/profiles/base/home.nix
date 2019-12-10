@@ -216,9 +216,6 @@ in {
         target = "${config.xdg.cacheHome}/cargo/git/";
         create = true;
       };
-      # need this at least until a new coc-nvim version is released...
-      ".vim".target = "${config.xdg.configHome}/vim/";
-      ".config/vim/coc-settings.json".target = "${config.xdg.configHome}/vim/coc/coc-settings.json"; # and this too :(
     };
     home.language = {
       base = "en_US.UTF-8";
@@ -491,21 +488,21 @@ in {
         source ${./files/vimrc}
 
         " alt-hjkl for moving around word-wrapped lines
-        nnoremap <Esc>h gh
-        nnoremap <Esc>j gj
-        nnoremap <Esc>k gk
-        nnoremap <Esc>l gl
+        nnoremap <M-h> gh
+        nnoremap <M-j> gj
+        nnoremap <M-k> gk
+        nnoremap <M-l> gl
 
         " trying alternatives to Esc for exiting insert mode
         inoremap kj <Esc>`^
         inoremap lkj <Esc>`^:w<CR>
         inoremap ;lkj <Esc>:wq<CR>
 
-        cmap <Esc>h <Left>
-        cmap <Esc>j <Down>
-        cmap <Esc>k <Up>
-        cmap <Esc>l <Right>
-        cmap <Esc>0 <Home>
+        cmap <M-h> <Left>
+        cmap <M-j> <Down>
+        cmap <M-k> <Up>
+        cmap <M-l> <Right>
+        cmap <M-0> <Home>
 
         imap <C-l> <C-O>:redr!<CR>
 
