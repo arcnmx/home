@@ -75,7 +75,7 @@ augroup notmuch_arc
   \ :call g:NotmuchTag('-unread')<CR>
   " TODO: bind `A` to untag too?
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> O
-  \ :call g:NotmuchTag('-unread +later')<CR>
+  \ :call g:NotmuchTag('-unread +flagged +later')<CR>
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> d
   \ :call g:NotmuchTag('+deleted +trash -flagged -unread')<CR>
 
