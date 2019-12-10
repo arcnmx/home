@@ -23,6 +23,7 @@ in with lib; {
     };
     manual.manpages.enable = false;
     news.display = "silent";
+    systemd.user.startServices = true;
 
     home.profiles = {
       base = mkDefault true;
