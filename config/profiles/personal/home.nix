@@ -143,6 +143,10 @@ in {
         };
       };
     };
+    services.offlineimap.enable = config.programs.offlineimap.enable;
+    systemd.user.services.offlineimap = mkIf config.services.offlineimap.enable {
+      Service.Nice = "10"; # offlineimap is surprisingly wasteful :(
+    };
     programs.offlineimap = {
       extraConfig.general = {
         maxsyncaccounts = 5;
