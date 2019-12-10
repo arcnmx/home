@@ -612,12 +612,12 @@ in {
         set -g mouse off
 
         bind C-m \
-            set -g mouse on \;\
-            display 'Mouse: ON'
+          set -g mouse on \;\
+          display 'Mouse: ON'
 
         bind m \
-            set -g mouse off \;\
-            display 'Mouse: OFF'
+          set -g mouse off \;\
+          display 'Mouse: OFF'
 
         # y and p
         bind Escape copy-mode
@@ -647,6 +647,10 @@ in {
         unbind %
 
         # moving between windows with vim movement keys
+        bind -r h select-pane -L
+        bind -r l select-pane -R
+        bind -r k select-pane -U
+        bind -r j select-pane -D
         bind -r C-h select-window -t :-
         bind -r C-l select-window -t :+
 
@@ -663,16 +667,14 @@ in {
 
         # status line
         set -g status-justify left
-        set -g status-bg default
+        set -g status-style bg=default
         set -g status-interval 0
 
         setw -g window-status-activity-style ""
         setw -g window-status-format "#[fg=blue,bg=brightblack,bold] #I #[fg=white,bg=black,nobold]#{?window_activity_flag,#[bg=brightcyan]#[bold],}#{?window_bell_flag,#[bg=red]#[bold],} #W "
         setw -g window-status-current-format "#[fg=black,bg=brightwhite,nobold] #I #[fg=black,bg=white,bold] #W "
-        setw -g window-status-current-bg colour0
-        setw -g window-status-current-fg colour11
-        setw -g window-status-bg green
-        setw -g window-status-fg black
+        setw -g window-status-current-style fg=colour11,bg=colour0
+        setw -g window-status-style bg=green,fg=black
 
         setw -g status-left "#[fg=black,bg=default,nobold][#[fg=blue]#S#[fg=black]]#[bg=default] "
         setw -g status-right "#[fg=black,bg=default,nobold][#[fg=blue]#h#[fg=black]]#[bg=default] "
