@@ -8,6 +8,7 @@ in {
       users.users.nixbld = {
         isNormalUser = false;
         extraGroups = ["builders"];
+        useDefaultShell = true;
         openssh.authorizedKeys.keyFiles = [
           config.keychain.keys.nixbld.path.public
         ];
