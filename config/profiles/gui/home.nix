@@ -220,6 +220,7 @@
       enable = true;
       sanitise = {
         local = true;
+        sync = true;
       };
       themes = {
         custom = ''
@@ -379,7 +380,8 @@
         # until empty newtab focus works...
         newtab = "http://blank.org";
         tabopencontaineraware = false;
-        storageloc = "local";
+        #storageloc = "local";
+        storageloc = "sync";
         hintuppercase = false;
         hintchars = "fdsqjklmrezauiopwxcvghtybn";
         #hintfiltermode = "vimperator-reflow";
