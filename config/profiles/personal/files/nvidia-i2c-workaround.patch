@@ -1,0 +1,12 @@
+diff -ruN a/drivers/i2c/i2c-dev.c b/drivers/i2c/i2c-dev.c
+--- a/drivers/i2c/i2c-dev.c	2018-04-01 17:20:27.000000000 -0400
++++ b/drivers/i2c/i2c-dev.c	2018-05-12 05:00:05.514885919 -0400
+@@ -265,7 +265,7 @@
+ 			break;
+ 		}
+ 		/* memdup_user allocates with GFP_KERNEL, so DMA is ok */
+-		msgs[i].flags |= I2C_M_DMA_SAFE;
++		//msgs[i].flags |= I2C_M_DMA_SAFE;
+ 
+ 		/*
+ 		 * If the message length is received from the slave (similar

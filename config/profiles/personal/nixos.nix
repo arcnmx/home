@@ -65,6 +65,23 @@ in {
         options snd_hda_intel power_save=1 power_save_controller=Y
         options kvm_amd avic=1
       '';
+      kernelPatches = mkIf false [
+        {
+          name = "ubuntu-unprivileged-overlayfs";
+          patch = ./files/ubuntu-unprivileged-overlayfs.patch;
+        }
+        {
+          name = "cpu-optimizations";
+          patch = (pkgs.fetchurl {
+            name = "enable_additional_cpu_optimizations.patch";
+            url = "https://github.com/graysky2/kernel_gcc_patch/raw/master/enable_additional_cpu_optimizations_for_gcc_v4.9%2B_kernel_v4.13%2B.patch";
+            sha256 = "14zby0plmc4jn84n5x4rfi0dnx3skgrrfclp261bkxq471286hvp";
+          });
+          # TODO: this needs the associated kernel config option set
+        }
+        # TODO: nvidia-i2c-workaround? (only if nvidia profile)
+        # TODO: move these into arc channel or something so they're standard and cached
+      ];
       kernel.sysctl = {
         "net.ipv6.conf.all.accept_ra_rt_info_max_plen" = 128;
         "net.ipv6.conf.default.accept_ra_rt_info_max_plen" = 128;
