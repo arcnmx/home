@@ -92,7 +92,7 @@ in {
               else
                   task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
               fi
-          } 2> /dev/null | ''${PAGER-less}
+          } 2> /dev/null | less -R # ''${PAGER-less} (my current pager sucks at this)
         '';
       } // optionalAttrs pkgs.hostPlatform.isLinux {
         lorri-status = ''
