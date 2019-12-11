@@ -44,7 +44,7 @@ augroup notmuch_arc
   autocmd FileType notmuch-folders,notmuch-search,notmuch-show nmap <buffer> c
   \ :call g:NotmuchCompose('')<CR>
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> q
-  \ :call g:NotmuchDeleteBuffer()<CR>
+  \ :call g:NotmuchDeleteBuffer()<CR>:call g:NotmuchRefresh()<CR>
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> ?
   \ :call g:NotmuchInfo()<CR>
   autocmd FileType notmuch-show nmap <buffer> r
