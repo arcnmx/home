@@ -29,6 +29,7 @@ in {
       nixos-option
       gnupg
       pass-arc
+      bitwarden-cli arc'private.pass2bitwarden
       awscli
       ncmpcpp
       ncpamixer
