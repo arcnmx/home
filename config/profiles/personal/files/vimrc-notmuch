@@ -3,8 +3,8 @@ let g:notmuch_search_date_format='%Y/%m/%d  %H:%M'
 let g:notmuch_folders = [
 \ ['new', 'tag:unread'],
 \ ['inbox', 'tag:flagged -tag:work -tag:later'],
-\ ['later', 'tag:later tag:flagged'],
-\ ['work', 'tag:work (tag:flagged or tag:unread) -tag:later'],
+\ ['later', 'tag:later and tag:flagged'],
+\ ['work', 'tag:work and (tag:flagged or tag:unread) -tag:later'],
 \ ['all work', 'tag:work'],
 \ ['all', 'path:**'],
 \ ['junk', 'tag:junk'],
