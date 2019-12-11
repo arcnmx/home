@@ -251,6 +251,10 @@ in {
     home.shell = {
       aliases = shellAliases;
       functions = {
+        # helper for use with `nix -I $(nixpkgs unstable)`
+        nixpkgs = ''
+          echo "nixpkgs=https://nixos.org/channels/$1/nixexprs.tar.xz"
+        '';
         cpucount = if pkgs.hostPlatform.isDarwin then ''
           sysctl -n hw.logicalcpu_max
         '' else ''
