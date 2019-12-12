@@ -551,6 +551,7 @@ in {
       package = if config.home.profiles.personal then pkgs.git else pkgs.gitMinimal;
       aliases = {
         logs = "log --stat --pretty=medium --graph";
+        reattr = ''!sh -c "\"git stash push -q; rm .git/index; git checkout HEAD -- \\\"$(git rev-parse --show-toplevel)\\\"; git stash pop || true\""'';
       };
       extraConfig = {
         user = {
