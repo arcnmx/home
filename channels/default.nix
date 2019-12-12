@@ -11,6 +11,7 @@
     home-manager = ./home-manager;
     nur = ./nur;
     mozilla = ./mozilla;
+    rust = ./rust;
   };
   channelNixPath = import ./path.nix {
     inherit channelConfigPath;

@@ -16,7 +16,7 @@ jobs:
       name: git submodule init
       run: "gh_submodule() {\n  SUBMODULE_COMMIT=$(git submodule status $1 | cut -d\
         \ ' ' -f 1)\n  curl -fSL https://github.com/$2/archive/${SUBMODULE_COMMIT#-}.tar.gz\
-        \ | tar -xz --strip-components=1 -C $1\n}\n\ngit submodule update --init channels/{arc,home-manager,mozilla,nur}\n\
+        \ | tar -xz --strip-components=1 -C $1\n}\n\ngit submodule update --init channels/{arc,home-manager,rust,mozilla,nur}\n\
         gh_submodule channels/nixpkgs nixos/nixpkgs\n"
     - id: nix-install
       name: nix install

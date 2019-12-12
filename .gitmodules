@@ -22,3 +22,7 @@
 	path = config/profiles/trusted
 	url = git@github.com:arcnmx/home-trusted.git
 	branch = master
+[submodule "channels/rust"]
+	path = channels/rust
+	url = https://github.com/arcnmx/nixexprs-rust.git
+	branch = master
