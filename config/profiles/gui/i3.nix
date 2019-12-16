@@ -82,9 +82,11 @@
       focus = {
         forceWrapping = true;
       };
-      startup = [
-        { command = pkgs.arc'private.konawall.exec; always = true; notification = false; }
-      ];
+      startup = lib.optional config.services.konawall.enable {
+        command = "${pkgs.systemd}/bin/systemctl --user restart konawall.service";
+        always = true;
+        notification = false;
+      };
       window = {
         hideEdgeBorders = "smart";
         border = 1;

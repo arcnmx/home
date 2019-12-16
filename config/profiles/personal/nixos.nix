@@ -55,7 +55,10 @@ in {
       ];
     };
     boot = {
-      loader.timeout = 1;
+      loader = {
+        timeout = 1;
+        systemd-boot.configurationLimit = 8;
+      };
       initrd.preLVMCommands = lib.mkAfter ''
         printf '\e[2J' >> /dev/console
       '';
