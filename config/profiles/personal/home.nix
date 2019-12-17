@@ -144,7 +144,7 @@ in {
         };
       };
     };
-    services.offlineimap.enable = config.programs.offlineimap.enable;
+    services.offlineimap.enable = false; #config.programs.offlineimap.enable;
     systemd.user.services.offlineimap = mkIf config.services.offlineimap.enable {
       Service.Nice = "10"; # offlineimap is surprisingly wasteful :(
     };
