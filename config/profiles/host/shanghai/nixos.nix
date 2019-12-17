@@ -24,6 +24,7 @@
     };
 
     home.nixbld.enable = true;
+    services.ddclient.enable = true;
     services.mosh = {
       enable = true;
       ports = {
