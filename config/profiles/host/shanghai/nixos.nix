@@ -24,7 +24,13 @@
     };
 
     home.nixbld.enable = true;
-    services.mosh.portRange = "32600:32700";
+    services.mosh = {
+      enable = true;
+      ports = {
+        from = 32600;
+        to = 32700;
+      };
+    };
     services.openssh.ports = [ 22 32022 ];
     hardware.pulseaudio.extraConfig = lib.mkAfter ''
       #load-module module-mmkbd-evdev

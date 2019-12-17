@@ -25,7 +25,7 @@
     xset = "${pkgs.xorg.xset}/bin/xset";
     pactl = "${pkgs.pulseaudio}/bin/pactl";
     pkill = "${pkgs.procps}/bin/pkill";
-    mosh = "${pkgs.mosh}/bin/mosh";
+    mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
     browser = "${pkgs.luakit-develop}/bin/luakit";
     bindWorkspace = key: workspace: {

@@ -92,7 +92,7 @@ in {
 
       bash # bash-completion
       zsh zsh-completions
-      mosh
+      mosh-client
       tmux
       abduco
       openssh
