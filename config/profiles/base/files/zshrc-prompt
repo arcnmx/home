@@ -36,6 +36,10 @@ prompt_context() {
 }
 
 prompt_git() {
+	if [[ ${ZSH_PROMPT_GIT-1} = 0 ]]; then
+		return
+	fi
+
 	local ref dirty mode repo_path
 	repo_path=$(git rev-parse --git-dir 2>/dev/null)
 

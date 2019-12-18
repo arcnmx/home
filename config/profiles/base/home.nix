@@ -566,9 +566,9 @@ in {
         push = {
           default = "simple";
         };
-        init = {
-          templateDir = "${pkgs.gitAndTools.hook-chain}";
-        };
+        #init = {
+        #  templateDir = "${pkgs.gitAndTools.hook-chain}";
+        #};
         rebase = {
           autoSquash = true;
           autoStash = true;

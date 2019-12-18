@@ -151,6 +151,7 @@ in {
     programs.offlineimap = {
       extraConfig.general = {
         maxsyncaccounts = 5;
+        fsync = false;
       };
       pythonFile = let
         foldermapdir = "${config.xdg.dataHome}/offlineimap/folder_map";
