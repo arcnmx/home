@@ -40,7 +40,7 @@ in {
       electrum-cli
       jq yq
       lorri
-      vit2
+      vit
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
