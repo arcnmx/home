@@ -1,4 +1,4 @@
-{ pkgs, config, lib, nodes, ... }:
+{ pkgs, config, lib, nodes, modulesPath, ... }:
 let
   channels = import ./channels.nix { inherit pkgs; };
   user = _: {
@@ -21,6 +21,10 @@ let
   };
 in {
   system.stateVersion = "19.09"; # this setting seems like a mess
+
+  disabledModules = [
+    (modulesPath + "/services/networking/connman.nix")
+  ];
 
   imports = [
     "${toString channels.paths.home-manager}/nixos"

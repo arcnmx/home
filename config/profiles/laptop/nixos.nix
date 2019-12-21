@@ -6,17 +6,11 @@
   config = mkIf config.home.profiles.laptop {
     hardware.bluetooth.enable = true;
 
-    networking = {
-      wireless = {
-        enable = true;
-        networks = {
-          # TODO: fill in this instead of using connman
-          dummy = {}; # XXX: force nixos to write out wpa_supplicant.conf, otherwise connman won't work
-        };
-      };
-    };
+    # TODO: fill in wireless.networks or iwd.networks instead of using connman?
     services.connman = {
       enable = true;
+      enableVPN = false;
+      wifi.backend = "iwd";
       extraFlags = ["--nodnsproxy"];
       extraConfig = ''
         AllowHostnameUpdates=false
