@@ -47,13 +47,14 @@ in {
   };
 
   config = mkIf config.home.profiles.personal {
-    i18n = {
-      consolePackages = [pkgs.tamzen];
-      consoleFont = "Tamzen7x14";
-      supportedLocales = [
-        "ja_JP.UTF-8/UTF-8"
-      ];
+    console = {
+      packages = [pkgs.tamzen];
+      font = "Tamzen7x14";
+      earlySetup = true;
     };
+    i18n.supportedLocales = [
+      "ja_JP.UTF-8/UTF-8"
+    ];
     boot = {
       loader = {
         timeout = 1;
@@ -63,7 +64,6 @@ in {
         printf '\e[2J' >> /dev/console
       '';
       blacklistedKernelModules = ["pcspkr"];
-      earlyVconsoleSetup = true;
       extraModprobeConfig = ''
         options snd_hda_intel power_save=1 power_save_controller=Y
         options kvm_amd avic=1
