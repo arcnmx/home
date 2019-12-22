@@ -513,6 +513,7 @@
       enable = true;
       interval = "20m";
     };
+    home.shell.aliases.konawall = "systemctl --user restart konawall.service";
 
     xsession = {
       enable = true;
