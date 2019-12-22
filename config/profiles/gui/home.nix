@@ -74,7 +74,7 @@
       MOZ_WEBRENDER = "1";
       MOZ_USE_XINPUT2 = "1";
     };
-    programs.weechat.autoconfig = {
+    programs.weechat.config = {
       urlgrab.default.localcmd = "${config.programs.firefox.packageWrapped}/bin/firefox '%s'";
       # TODO: remotecmd?
     };

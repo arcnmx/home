@@ -270,23 +270,24 @@ in {
     };
     programs.weechat = {
       enable = true;
+      homeDirectory = "${config.xdg.dataHome}/weechat";
       plugins.python = {
         enable = true;
         packages = [ "weechat-matrix" ];
       };
       scripts = with pkgs.weechatScripts; [
-        go auto_away autoconf autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix
+        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix
         # TODO: add emoji script for :emoj<tab> completion
       ];
-      autoconfig = with mapAttrs (_: toString) pkgs.base16.shell.shell256; let
+      config = with mapAttrs (_: toString) pkgs.base16.shell.shell256; let
         # base16-shell colour names
       in {
         urlgrab.default.copycmd = "${pkgs.xsel}/bin/xsel -i";
         # TODO: /fset *color* and find the sections you've missed
         fset = {
           color = {
-            fset.color.line_selected_bg1 = base02;
-            fset.color.line_selected_bg2 = base07;
+            line_selected_bg1 = base02;
+            line_selected_bg2 = base07;
           };
         };
         matrix = {
