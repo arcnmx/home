@@ -9,6 +9,5 @@
     ./hm_git.nix
     ./hm_vim.nix
     ./hm_firefox.nix
-    ./yggdrasil-7n.nix
   ];
 }
