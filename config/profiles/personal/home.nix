@@ -40,11 +40,11 @@ in {
       electrum-cli
       jq yq
       lorri
-      vit
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
     home.shell = {
+      aliases.vit = "task vit";
       functions = {
         lorri-init = ''
           echo 'use ${if config.services.lorri.useNix || !config.services.lorri.enable then "nix" else "lorri"}' > .envrc
@@ -71,6 +71,11 @@ in {
           fi
         '';
         task = ''
+          local TASK_EXEC=${pkgs.taskwarrior}/bin/task
+          if [[ ''${1-} = vit ]]; then
+            shift
+            TASK_EXEC=${pkgs.vit}/bin/vit
+          fi
           local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
           local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
           mkdir -p "$TASK_DIR" &&
@@ -89,6 +94,7 @@ in {
               if [[ -z $_TASK_REPORT ]]; then
                   #task "''${_TASK_OPTIONS[@]}" next "$@"
                   task "''${_TASK_OPTIONS[@]}" short "$@"
+                  task "''${_TASK_OPTIONS[@]}" longterm "$@"
                   task "''${_TASK_OPTIONS[@]}" upcoming "$@"
               else
                   task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
@@ -554,7 +560,25 @@ in {
       reports = {
         short = {
           description = "Abbreviated next report";
-          filter = "status:pending limit:page +READY";
+          filter = "status:pending limit:page +READY -longterm";
+          columns = [
+            { label = "ID"; id = "id"; }
+            { label = "Active"; id = "start"; format = "age"; }
+            { label = "Due"; id = "due"; format = "relative"; }
+            { label = "Until"; id = "until"; format = "remaining"; }
+            { label = "Description"; id = "description"; format = "count"; }
+            { label = "Project"; id = "project"; }
+            { label = "Tags"; id = "tags"; }
+            { label = "Deps"; id = "depends"; }
+            { label = "Urg"; id = "urgency"; sort = {
+              priority = 0;
+              order = "descending";
+            }; }
+          ];
+        };
+        longterm = {
+          description = "Long-term tasks";
+          filter = "status:pending limit:page +READY +longterm";
           columns = [
             { label = "ID"; id = "id"; }
             { label = "Active"; id = "start"; format = "age"; }
