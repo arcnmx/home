@@ -569,6 +569,9 @@ in {
         #init = {
         #  templateDir = "${pkgs.gitAndTools.hook-chain}";
         #};
+        annex = {
+          autocommit = false;
+        };
         rebase = {
           autoSquash = true;
           autoStash = true;
