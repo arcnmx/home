@@ -48,6 +48,21 @@
     services.udev.extraRules = ''
       SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+="${pkgs.runtimeShell} -c 'for x in /sys/devices/system/cpu/cpufreq/*/scaling_governor; do echo performance > $$x; done'"
     '';
+    services.xserver.displayManager = {
+      startx.enable = mkForce false;
+      lightdm = {
+        # TODO: switch to lxdm?
+        enable = true;
+      };
+      session = singleton {
+        manage = "desktop";
+        name = "xsession";
+        start = ''
+          ${pkgs.runtimeShell} ~/.xsession &
+          waitPID=$!
+        '';
+      };
+    };
 
     boot = {
       loader = {
