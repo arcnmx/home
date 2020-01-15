@@ -1,6 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib; let
-  rnix-lsp = pkgs.rnix-lsp-server; # or pkgs.rnix-lsp for the older/stable version!
-in {
+{ config, pkgs, lib, ... } @ args: with lib; {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
     programs.ncmpcpp.mpdHost = mkOption {
@@ -687,7 +685,7 @@ in {
             filetypes = ["vim" /*"yaml"*/ "markdown"]; # consider coc-yaml instead?
           };
           nix = {
-            command = "${rnix-lsp}/bin/rnix-lsp";
+            command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
             args = [];
             filetypes = ["nix"];
             cwd = "./";
@@ -741,8 +739,7 @@ in {
         # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
       };
       "kak-lsp/kak-lsp.toml".source = pkgs.substituteAll {
-        inherit (pkgs) efm-langserver;
-        inherit rnix-lsp;
+        inherit (pkgs) efm-langserver rnix-lsp;
         #inherit (pkgs.nodePackages) vscode-html-languageserver-bin vscode-css-languageserver-bin vscode-json-languageserver;
         inherit (pkgs) rust-analyzer; # rls?
         src = ./files/kak-lsp.toml;
