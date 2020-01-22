@@ -1,15 +1,16 @@
 { pkgs, config, lib, nodes, modulesPath, ... }:
 let
   channels = import ./channels.nix { inherit pkgs; };
-  user = _: {
+  user = { lib, ... }: {
     imports = [./home.nix];
 
     nixpkgs = {
       inherit (config.nixpkgs) config overlays system;
     };
+    home.nix.nixPath = lib.mapAttrs (_: path: lib.mkForce { path = toString path; }) channels.imports;
     _module.args = {
       inherit nodes;
-      pkgs = lib.mkForce pkgs;
+      pkgs = lib.mkForce channels.pkgs;
       pkgs_i686 = lib.mkForce null;
     };
 

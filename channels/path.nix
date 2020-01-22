@@ -29,7 +29,10 @@
         channelConfig = channelConfigPath // (if args != {} then {
           @channelName@ = channelConfigPath.@channelName@ or {} // args;
         } else {});
-        channels = import @channels@ { inherit pkgs channelConfig; };
+        channels = import @channels@ {
+          ''${if args ? pkgs then "pkgs" else null} = pkgs;
+          inherit channelConfig;
+        };
       in channels.@channelName@
     '';
     buildCommand = ''
