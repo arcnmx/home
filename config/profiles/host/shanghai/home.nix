@@ -22,7 +22,7 @@
       paswitch = ''
         case $1 in
           speakers)
-            ${pkgs.paswitch.exec} alsa_output.pci-0000_20_00.3.analog-stereo
+            ${pkgs.paswitch.exec} alsa_output.pci-0000_2a_00.4.analog-stereo
             ;;
           headphones)
             ${pkgs.paswitch.exec} alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
