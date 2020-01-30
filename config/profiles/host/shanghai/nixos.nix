@@ -48,23 +48,55 @@
     services.udev.extraRules = ''
       SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+="${pkgs.runtimeShell} -c 'for x in /sys/devices/system/cpu/cpufreq/*/scaling_governor; do echo performance > $$x; done'"
     '';
-    services.xserver.displayManager = {
-      startx.enable = mkForce false;
-      lightdm = {
-        # TODO: switch to lxdm?
-        enable = true;
+    services.xserver = {
+      displayManager = {
+        startx.enable = mkForce false;
+        lightdm = {
+          # TODO: switch to lxdm?
+          enable = true;
+        };
+        session = singleton {
+          manage = "desktop";
+          name = "xsession";
+          start = ''
+            ${pkgs.runtimeShell} ~/.xsession &
+            waitPID=$!
+          '';
+        };
       };
-      session = singleton {
-        manage = "desktop";
-        name = "xsession";
-        start = ''
-          ${pkgs.runtimeShell} ~/.xsession &
-          waitPID=$!
-        '';
-      };
+      deviceSection = ''
+        BusID "PCI:40:0:0" # NOTE: this is decimal, be careful! IDs are typically shown in hex
+        Option "Monitor-HDMI-0" "Monitor[0]" # LG
+        Option "Monitor-DVI-D-0" "Monitor[1]" # BenQ (DVI -> HDMI)
+        Option "Monitor-DP-1" "Monitor[2]" # Acer (DP -> HDMI)
+      '';
+      monitorSection = ''
+        Option "Primary" "true"
+        Option "DPMS" "true"
+      '';
+      screenSection = ''
+        Option "MetaModes" "${let
+          offset = 1440 / 3;
+          h = 2160 + offset;
+        in concatStringsSep ", " [
+          "DVI-D-0: 2560x1440 +0+${toString (h - 1440)}"
+          "HDMI-0: 3840x2160 +2560+0"
+          "DP-1: 1920x1080 +${toString (2560 + 3840)}+${toString (h - 1080)}"
+        ]}"
+      '';
+      extraConfig = ''
+        Section "Monitor"
+          Identifier "Monitor[1]"
+          Option "DPMS" "true"
+        EndSection
+        Section "Monitor"
+          Identifier "Monitor[2]"
+          Option "DPMS" "true"
+        EndSection
+      '';
     };
 
-    boot = {
+    boot = mkMerge [ {
       loader = {
         generationsDir = {
           copyKernels = true;
@@ -76,7 +108,20 @@
         };
       };
       supportedFilesystems = ["btrfs"];
-    };
+    } (let
+      vfio-pci-ids = [
+        # "10de:1c81" "10de:0fb9" # GTX 1050
+        "10de:1e07" "10de:10f7" "10de:1ad6" "10de:1ad7" # RTX 2080 Ti
+      ];
+    in mkIf config.home.profiles.vfio {
+      # TODO: extraModprobeConfig does not seem to be placed in initrd, see: https://github.com/NixOS/nixpkgs/issues/25456
+      #extraModprobeConfig = mkIf config.home.profiles.vfio ''
+      #  options vfio-pci ids=${concatStringsSep "," vfio-pci-ids}
+      #'';
+      kernelParams = [
+        "vfio-pci.ids=${concatStringsSep "," vfio-pci-ids}"
+      ];
+    }) ];
 
     fileSystems = {
       "/" = {
