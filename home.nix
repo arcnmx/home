@@ -1,5 +1,5 @@
 let
-  inherit (builtins.import ./import.nix) import;
+  #inherit (builtins.import ./import.nix) import;
   network = "gensokyo"; # TODO: supply this somehow, env var maybe
   inherit (import ./. { }) pkgs;
   inherit (pkgs) lib;

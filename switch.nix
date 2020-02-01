@@ -1,5 +1,5 @@
 { network ? "gensokyo", hostName, targetHost ? null } @ args: let
-  inherit (builtins.import ./import.nix) import;
+  #inherit (builtins.import ./import.nix) import;
   inherit (import ./import.nix) pkgs;
   network' = (import ./network.nix { inherit pkgs; }).${network};
   inherit (network'.network.${hostName}) system config;
