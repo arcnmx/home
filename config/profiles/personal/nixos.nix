@@ -172,6 +172,13 @@ in {
       ${uinput}
     '';
 
+    users = {
+      users.arc.extraGroups = [ "uinput" "input" ];
+      groups = {
+        uinput = { };
+      };
+    };
+
     services.usbmuxd.enable = true;
     services.openssh = {
       passwordAuthentication = true;

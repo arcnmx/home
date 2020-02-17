@@ -59,7 +59,7 @@
       xsel
       xorg.xinit
       xdg_utils-mimi
-      rxvt_unicode-arc
+      rxvt-unicode-arc
       luakit-develop
       libreoffice
       #libreoffice-fresh # broken for now ;-;
@@ -213,7 +213,7 @@
       src = ./files/tridactyl/tridactylrc;
       xsel = "${pkgs.xsel}/bin/xsel";
       mpv = "${pkgs.mpv}/bin/mpv";
-      urxvt = "${pkgs.rxvt_unicode-arc}/bin/urxvt";
+      urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
       vim = "${config.programs.vim.package}/bin/vim";
       firefox = "${config.programs.firefox.packageWrapped}/bin/firefox";
     in {
@@ -524,7 +524,7 @@
         ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option ctrl:nocaps
 
         ${pkgs.xcompmgr}/bin/xcompmgr &
-        ${pkgs.rxvt_unicode-arc}/bin/urxvtd &
+        ${pkgs.rxvt-unicode-arc}/bin/urxvtd &
 
         export LESS=''${LESS://F}
       '';

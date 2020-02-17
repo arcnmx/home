@@ -112,7 +112,7 @@ in {
       unzip
       zip
 
-      rxvt_unicode-cvs.terminfo
+      rxvt-unicode-cvs-unwrapped.terminfo
 
       fzf fd # for fzf-z zsh plugin
 

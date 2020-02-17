@@ -69,9 +69,12 @@ in {
     arc = {
       isNormalUser = true;
       initialPassword = "hello";
-      extraGroups = ["wheel" "builders" "kvm" "uinput"];
+      extraGroups = [ "wheel" "builders" "kvm" ];
       shell = pkgs.zsh;
     };
+  };
+  users.groups = {
+    builders = { };
   };
   programs.zsh.enable = true; # what does this do exactly?
 

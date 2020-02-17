@@ -17,7 +17,7 @@
     down = "j";
     up = "k";
     right = "l";
-    term = "${pkgs.rxvt_unicode-arc}/bin/urxvtc"; # urxvt
+    term = "${pkgs.rxvt-unicode-arc}/bin/urxvtc"; # urxvt
     #term = "${pkgs.xterm}/bin/xterm";
     i3-easyfocus = "${pkgs.i3-easyfocus}/bin/i3-easyfocus";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
