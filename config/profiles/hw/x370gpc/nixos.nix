@@ -78,150 +78,152 @@
     };
 
     # fancontrol
-    boot.kernel.sysctl = {
+    boot.kernel.sysctl = let
+      nct = ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon2";
+    in {
       # motherboard
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp1_max" = 40000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp1_max_hyst" = 36000;
+      "${nct}.temp1_max" = 40000;
+      "${nct}.temp1_max_hyst" = 36000;
 
       # cpu (can't do this, max/hyst are shared with temp3)
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp2_max=50000
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp2_max_hyst=40000
+      #${nct}.temp2_max=50000
+      #${nct}.temp2_max_hyst=40000
 
       # System/Auxillary
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max" = 88000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.temp3_max_hyst" = 60000;
+      "${nct}.temp3_max" = 88000;
+      "${nct}.temp3_max_hyst" = 60000;
 
       # rear exhaust
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point1_temp" = 35000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point1_pwm" = 88;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point2_temp" = 38000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point2_pwm" = 104;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point3_temp" = 47000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point3_pwm" = 144;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point4_temp" = 49000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point4_pwm" = 224;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point5_temp" = 52000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_step_up_time" = 150;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm1_step_down_time" = 150;
+      #${nct}.pwm1_mode=1
+      "${nct}.pwm1_temp_sel" = 2;
+      "${nct}.pwm1_enable" = 5;
+      "${nct}.pwm1_auto_point1_temp" = 35000;
+      "${nct}.pwm1_auto_point1_pwm" = 88;
+      "${nct}.pwm1_auto_point2_temp" = 38000;
+      "${nct}.pwm1_auto_point2_pwm" = 104;
+      "${nct}.pwm1_auto_point3_temp" = 47000;
+      "${nct}.pwm1_auto_point3_pwm" = 144;
+      "${nct}.pwm1_auto_point4_temp" = 49000;
+      "${nct}.pwm1_auto_point4_pwm" = 224;
+      "${nct}.pwm1_auto_point5_temp" = 52000;
+      "${nct}.pwm1_auto_point5_pwm" = 255;
+      "${nct}.pwm1_step_up_time" = 150;
+      "${nct}.pwm1_step_down_time" = 150;
 
       # cpu fan
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point1_temp" = 34000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point1_pwm" = 0;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point2_temp" = 34500;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point2_pwm" = 128;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point3_temp" = 47000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point3_pwm" = 160;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point4_temp" = 49000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point4_pwm" = 224;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point5_temp" = 52000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_step_up_time" = 50;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm2_step_down_time" = 50;
+      #${nct}.pwm2_mode=1
+      "${nct}.pwm2_temp_sel" = 2;
+      "${nct}.pwm2_enable" = 5;
+      "${nct}.pwm2_auto_point1_temp" = 34000;
+      "${nct}.pwm2_auto_point1_pwm" = 0;
+      "${nct}.pwm2_auto_point2_temp" = 34500;
+      "${nct}.pwm2_auto_point2_pwm" = 128;
+      "${nct}.pwm2_auto_point3_temp" = 47000;
+      "${nct}.pwm2_auto_point3_pwm" = 160;
+      "${nct}.pwm2_auto_point4_temp" = 49000;
+      "${nct}.pwm2_auto_point4_pwm" = 224;
+      "${nct}.pwm2_auto_point5_temp" = 52000;
+      "${nct}.pwm2_auto_point5_pwm" = 255;
+      "${nct}.pwm2_step_up_time" = 50;
+      "${nct}.pwm2_step_down_time" = 50;
 
       # top exhaust
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point1_temp" = 36000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point1_pwm" = 0;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point2_temp" = 39000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point2_pwm" = 136;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point3_temp" = 48000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point3_pwm" = 144;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point4_temp" = 50000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point4_pwm" = 176;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point5_temp" = 53000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_step_up_time" = 100;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm3_step_down_time" = 100;
+      #${nct}.pwm3_mode=1
+      "${nct}.pwm3_temp_sel" = 2;
+      "${nct}.pwm3_enable" = 5;
+      "${nct}.pwm3_auto_point1_temp" = 36000;
+      "${nct}.pwm3_auto_point1_pwm" = 0;
+      "${nct}.pwm3_auto_point2_temp" = 39000;
+      "${nct}.pwm3_auto_point2_pwm" = 136;
+      "${nct}.pwm3_auto_point3_temp" = 48000;
+      "${nct}.pwm3_auto_point3_pwm" = 144;
+      "${nct}.pwm3_auto_point4_temp" = 50000;
+      "${nct}.pwm3_auto_point4_pwm" = 176;
+      "${nct}.pwm3_auto_point5_temp" = 53000;
+      "${nct}.pwm3_auto_point5_pwm" = 255;
+      "${nct}.pwm3_step_up_time" = 100;
+      "${nct}.pwm3_step_down_time" = 100;
 
       # front 1
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point1_temp" = 35000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point1_pwm" = 104;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point2_temp" = 38000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point2_pwm" = 176;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point3_temp" = 47000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point3_pwm" = 192;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point4_temp" = 49000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point4_pwm" = 224;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point5_temp" = 52000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_step_up_time" = 100;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm4_step_down_time" = 100;
+      #${nct}.pwm4_mode=1
+      "${nct}.pwm4_temp_sel" = 2;
+      "${nct}.pwm4_enable" = 5;
+      "${nct}.pwm4_auto_point1_temp" = 35000;
+      "${nct}.pwm4_auto_point1_pwm" = 104;
+      "${nct}.pwm4_auto_point2_temp" = 38000;
+      "${nct}.pwm4_auto_point2_pwm" = 176;
+      "${nct}.pwm4_auto_point3_temp" = 47000;
+      "${nct}.pwm4_auto_point3_pwm" = 192;
+      "${nct}.pwm4_auto_point4_temp" = 49000;
+      "${nct}.pwm4_auto_point4_pwm" = 224;
+      "${nct}.pwm4_auto_point5_temp" = 52000;
+      "${nct}.pwm4_auto_point5_pwm" = 255;
+      "${nct}.pwm4_step_up_time" = 100;
+      "${nct}.pwm4_step_down_time" = 100;
 
       # top intake
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point1_temp" = 36000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point1_pwm" = 104;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point2_temp" = 39000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point2_pwm" = 144;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point3_temp" = 48000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point3_pwm" = 176;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point4_temp" = 50000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point4_pwm" = 208;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point5_temp" = 53000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_step_up_time" = 100;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm5_step_down_time" = 100;
+      #${nct}.pwm5_mode=1
+      "${nct}.pwm5_temp_sel" = 2;
+      "${nct}.pwm5_enable" = 5;
+      "${nct}.pwm5_auto_point1_temp" = 36000;
+      "${nct}.pwm5_auto_point1_pwm" = 104;
+      "${nct}.pwm5_auto_point2_temp" = 39000;
+      "${nct}.pwm5_auto_point2_pwm" = 144;
+      "${nct}.pwm5_auto_point3_temp" = 48000;
+      "${nct}.pwm5_auto_point3_pwm" = 176;
+      "${nct}.pwm5_auto_point4_temp" = 50000;
+      "${nct}.pwm5_auto_point4_pwm" = 208;
+      "${nct}.pwm5_auto_point5_temp" = 53000;
+      "${nct}.pwm5_auto_point5_pwm" = 255;
+      "${nct}.pwm5_step_up_time" = 100;
+      "${nct}.pwm5_step_down_time" = 100;
 
       # front 2
-      #.//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_mode=1
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_temp_sel" = 2;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_enable" = 5;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point1_temp" = 35000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point1_pwm" = 104;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point2_temp" = 38000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point2_pwm" = 176;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point3_temp" = 47000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point3_pwm" = 192;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point4_temp" = 49000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point4_pwm" = 224;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point5_temp" = 52000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_auto_point5_pwm" = 255;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_step_up_time" = 100;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.pwm6_step_down_time" = 100;
+      #${nct}.pwm6_mode=1
+      "${nct}.pwm6_temp_sel" = 2;
+      "${nct}.pwm6_enable" = 5;
+      "${nct}.pwm6_auto_point1_temp" = 35000;
+      "${nct}.pwm6_auto_point1_pwm" = 104;
+      "${nct}.pwm6_auto_point2_temp" = 38000;
+      "${nct}.pwm6_auto_point2_pwm" = 176;
+      "${nct}.pwm6_auto_point3_temp" = 47000;
+      "${nct}.pwm6_auto_point3_pwm" = 192;
+      "${nct}.pwm6_auto_point4_temp" = 49000;
+      "${nct}.pwm6_auto_point4_pwm" = 224;
+      "${nct}.pwm6_auto_point5_temp" = 52000;
+      "${nct}.pwm6_auto_point5_pwm" = 255;
+      "${nct}.pwm6_step_up_time" = 100;
+      "${nct}.pwm6_step_down_time" = 100;
 
       # Vcore
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in0_max" = 1500;
+      "${nct}.in0_max" = 1500;
       # 5V (/5)
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in1_min" = 975;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in1_max" = 1025;
+      "${nct}.in1_min" = 975;
+      "${nct}.in1_max" = 1025;
       # AVCC
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in2_min" = 3300;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in2_max" = 3500;
+      "${nct}.in2_min" = 3300;
+      "${nct}.in2_max" = 3500;
       # 3VCC
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in3_min" = 3270;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in3_max" = 3400;
+      "${nct}.in3_min" = 3270;
+      "${nct}.in3_max" = 3400;
       # 12V (/12)
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in4_min" = 1000;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in4_max" = 1050;
+      "${nct}.in4_min" = 1000;
+      "${nct}.in4_max" = 1050;
       # DIMM
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in5_min" = 130;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in5_max" = 168;
+      "${nct}.in5_min" = 130;
+      "${nct}.in5_max" = 168;
       # 3VSB
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in7_min" = 3400;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in7_max" = 3500;
+      "${nct}.in7_min" = 3400;
+      "${nct}.in7_max" = 3500;
       # VBAT
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in8_min" = 3350;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in8_max" = 3400;
+      "${nct}.in8_min" = 3350;
+      "${nct}.in8_max" = 3400;
       # VTT
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in9_min" = 1800;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in9_max" = 1900;
+      "${nct}.in9_min" = 1800;
+      "${nct}.in9_max" = 1900;
       # NB
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in12_min" = 900;
-      ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon0.in12_max" = 1200;
+      "${nct}.in12_min" = 900;
+      "${nct}.in12_max" = 1200;
     };
   };
 }
