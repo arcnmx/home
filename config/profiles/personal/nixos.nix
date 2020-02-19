@@ -150,7 +150,8 @@ in {
       localGroup = "users";
       assignLocalGroup = ''GROUP="${localGroup}"'';
       devBoards = ''
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="2047" ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic GDB Server", ${assignLocalGroup}, SYMLINK+="ttyBMP"
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic UART Port", ${assignLocalGroup}, SYMLINK+="ttyBMPuart"
       '';
