@@ -83,7 +83,6 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 augroup coc_au
 	au!
-	au FileType rust setlocal foldmethod=manual " https://github.com/neoclide/coc.nvim/issues/1048
 	au FileType rust :EchoDocEnable
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')

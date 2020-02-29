@@ -731,7 +731,7 @@
         # rust.clippy_preference = enum [ off opt-in on ]
         "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
         "rust-analyzer.raLspServerPath" = "ra_lsp_server";
-        "rust-analyzer.cargo-watch.enable" = false;
+        "rust-analyzer.cargo-watch.enable" = true; # TODO: want some way to toggle this on-demand?
         "rust-analyzer.featureFlags" = {
           "completion.insertion.add-call-parenthesis" = false; # consider using this?
           "notifications.workspace-loaded" = false;
