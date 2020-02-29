@@ -576,6 +576,9 @@ in {
           autoSquash = true;
           autoStash = true;
         };
+        merge = {
+          conflictstyle = "diff3";
+        };
         filter.tabspace = {
           smudge = "${pkgs.coreutils}/bin/unexpand --first-only --tabs=4";
           clean = "${pkgs.coreutils}/bin/expand -i --tabs=4";
