@@ -4,14 +4,9 @@ let
   user = { lib, ... }: {
     imports = [./home.nix];
 
-    nixpkgs = {
-      inherit (config.nixpkgs) config overlays system;
-    };
-    home.nix.nixPath = lib.mapAttrs (_: path: lib.mkForce { path = toString path; }) channels.imports;
+    home.nix.nixPath = lib.mapAttrs (_: path: lib.mkForce (toString path)) channels.imports;
     _module.args = {
       inherit nodes;
-      pkgs = lib.mkForce channels.pkgs;
-      pkgs_i686 = lib.mkForce null;
     };
 
     home = {
@@ -46,16 +41,19 @@ in {
     inherit (channels.config.nixpkgs) config overlays;
   };
 
-  home-manager.useUserPackages = true;
-  home-manager.users = {
-    arc = user;
-    root = { lib, ... }: {
-      imports = [user];
+  home-manager = {
+    useUserPackages = true;
+    useGlobalPkgs = true;
+    users = {
+      arc = user;
+      root = { lib, ... }: {
+        imports = [user];
 
-      config.home.profiles = with lib; {
-        personal = mkForce false;
-        gui = mkForce false;
-        laptop = mkForce false;
+        config.home.profiles = with lib; {
+          personal = mkForce false;
+          gui = mkForce false;
+          laptop = mkForce false;
+        };
       };
     };
   };

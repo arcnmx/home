@@ -26,3 +26,6 @@
 	path = channels/rust
 	url = https://github.com/arcnmx/nixexprs-rust.git
 	branch = master
+[submodule "channels/tf"]
+	path = channels/tf
+	url = https://github.com/arcnmx/tf-nix.git
