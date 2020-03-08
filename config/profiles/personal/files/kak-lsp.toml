@@ -24,7 +24,7 @@ timeout = 600 # seconds
 [language.rust]
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
-command = "ra_lsp_server"
+command = "rust-analyzer"
 #command = "rls"
 
 [language.nix]
