@@ -145,7 +145,7 @@ in
 
       load-module module-native-protocol-unix
 
-      load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1
+      load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;10.0.0.0/8
       #load-module module-zeroconf-publish
 
       ### Load the RTP receiver module (also configured via paprefs)
