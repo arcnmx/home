@@ -70,32 +70,36 @@
       };
       deviceSection = ''
         BusID "PCI:40:0:0" # NOTE: this is decimal, be careful! IDs are typically shown in hex
-        Option "Monitor-HDMI-0" "Monitor[0]" # LG
-        Option "Monitor-DVI-D-0" "Monitor[1]" # BenQ (DVI -> HDMI)
+        Option "Monitor-DVI-D-0" "Monitor[0]" # LG
+        Option "Monitor-HDMI-0" "Monitor[1]" # BenQ (DVI -> HDMI)
         Option "Monitor-DP-1" "Monitor[2]" # Acer (DP -> HDMI)
+      '';
+      screenSection = ''
+        Option "MetaModes" "${let
+          #offset = 1440 / 3;
+          offset = 0;
+          h = 2160 + offset;
+        in concatStringsSep ", " [
+          "HDMI-0: 2560x1440 +0+${toString (h - 1440)}"
+          "DVI-D-0: 3840x2160 +2560+0"
+          "DP-1: 1920x1080 +${toString (2560 + 3840)}+${toString (h - 1080)}"
+        ]}"
       '';
       monitorSection = ''
         Option "Primary" "true"
         Option "DPMS" "true"
-      '';
-      screenSection = ''
-        Option "MetaModes" "${let
-          offset = 1440 / 3;
-          h = 2160 + offset;
-        in concatStringsSep ", " [
-          "DVI-D-0: 2560x1440 +0+${toString (h - 1440)}"
-          "HDMI-0: 3840x2160 +2560+0"
-          "DP-1: 1920x1080 +${toString (2560 + 3840)}+${toString (h - 1080)}"
-        ]}"
+        Option "DPI" "96 x 96"
       '';
       extraConfig = ''
         Section "Monitor"
           Identifier "Monitor[1]"
           Option "DPMS" "true"
+          Option "DPI" "96 x 96"
         EndSection
         Section "Monitor"
           Identifier "Monitor[2]"
           Option "DPMS" "true"
+          Option "DPI" "96 x 96"
         EndSection
       '';
     };
