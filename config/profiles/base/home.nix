@@ -619,6 +619,7 @@ in {
       historyLimit = 50000;
       keyMode = "vi";
       resizeAmount = 4;
+      customPaneNavigationAndResize = true;
       shortcut = "a";
       terminal = "screen-256color";
       tmuxp.enable = true;
