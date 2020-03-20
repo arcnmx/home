@@ -730,7 +730,7 @@
         # rust.sysroot, rust.target, rust.rustflags, rust.unstable_features, rust.build_on_save, rust.target_dir, rust.full_docs
         # rust.clippy_preference = enum [ off opt-in on ]
         "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
-        "rust-analyzer.raLspServerPath" = "rust-analyzer";
+        "rust-analyzer.serverPath" = "rust-analyzer";
         "rust-analyzer.cargo-watch.enable" = true; # TODO: want some way to toggle this on-demand?
         "rust-analyzer.featureFlags" = {
           "completion.insertion.add-call-parenthesis" = false; # consider using this?
