@@ -433,7 +433,7 @@
 
         keep-open = "yes";
 
-        cache-default = "500000";
+        #cache-default = "500000"; # TODO: this doesn't exist anymore?
         cache-secs = "2";
       };
     };
