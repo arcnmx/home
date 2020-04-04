@@ -24,6 +24,7 @@
 
     boot = {
       kernelParams = ["zfs.zfs_arc_max=${toString (512*1024*1024)}"];
+      kernelPackages = pkgs.linuxPackages_5_5; # TODO: ZFS on Linux currently broken on 5.6
       loader = {
         generationsDir = {
           copyKernels = true;
