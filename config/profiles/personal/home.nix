@@ -731,11 +731,12 @@
         # rust.clippy_preference = enum [ off opt-in on ]
         "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
         "rust-analyzer.serverPath" = "rust-analyzer";
+        "rust-analyzer.notifications.cargoTomlNotFound" = false;
+        "rust-analyzer.notifications.workspaceLoaded" = false;
+        "rust-analyzer.procMacro.enable" = true;
+        "rust-analyzer.cargo.loadOutDirsFromCheck" = true;
         "rust-analyzer.cargo-watch.enable" = true; # TODO: want some way to toggle this on-demand?
-        "rust-analyzer.featureFlags" = {
-          "completion.insertion.add-call-parenthesis" = false; # consider using this?
-          "notifications.workspace-loaded" = false;
-        };
+        "rust-analyzer.completion.addCallParenthesis" = false; # consider using this?
         # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
       };
       "kak-lsp/kak-lsp.toml".source = pkgs.substituteAll {
