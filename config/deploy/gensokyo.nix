@@ -1,21 +1,19 @@
-{ }: {
-  network = {
-    enableRollback = true; # just for keeping gcroots around
-  };
+{ ... }: {
+  config.network.nodes = {
+    satorin = { config, ... }: {
+      imports = [../nixos.nix];
 
-  satorin = { config, ... }: {
-    imports = [../nixos.nix];
-
-    networking = {
-      hostName = "satorin";
+      networking = {
+        hostName = "satorin";
+      };
     };
-  };
 
-  shanghai = { config, ... }: {
-    imports = [../nixos.nix];
+    shanghai = { config, ... }: {
+      imports = [../nixos.nix];
 
-    networking = {
-      hostName = "shanghai";
+      networking = {
+        hostName = "shanghai";
+      };
     };
   };
 }

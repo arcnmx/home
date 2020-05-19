@@ -29,42 +29,42 @@ jobs:
         quiet: false
     - id: home-base
       name: build home/base
-      run: './nx home base build --show-trace
+      run: 'nix build -Lf. home.profiles.base.deploy.home --show-trace
 
         '
     - id: home-desktop
       name: build home/desktop
-      run: './nx home desktop build --show-trace
+      run: 'nix build -Lf. home.profiles.desktop.deploy.home --show-trace
 
         '
     - id: home-laptop
       name: build home/laptop
-      run: './nx home laptop build --show-trace
+      run: 'nix build -Lf. home.profiles.laptop.deploy.home --show-trace
 
         '
     - id: home-personal
       name: build home/personal
-      run: './nx home personal build --show-trace
+      run: 'nix build -Lf. home.profiles.personal.deploy.home --show-trace
 
         '
     - id: home-satorin
       name: build home/satorin
-      run: './nx home satorin build --show-trace
+      run: 'nix build -Lf. home.profiles.satorin.deploy.home --show-trace
 
         '
     - id: home-shanghai
       name: build home/shanghai
-      run: './nx home shanghai build --show-trace
+      run: 'nix build -Lf. home.profiles.shanghai.deploy.home --show-trace
 
         '
     - id: nixos-satorin
       name: build nixos/satorin
-      run: './nx switch satorin build --show-trace
+      run: 'nix build -Lf. network.nodes.satorin.deploy.system --show-trace
 
         '
     - id: nixos-shanghai
       name: build nixos/shanghai
-      run: './nx switch shanghai build --show-trace
+      run: 'nix build -Lf. network.nodes.shanghai.deploy.system --show-trace
 
         '
     - id: ci-dirty

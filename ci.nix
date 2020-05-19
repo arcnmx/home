@@ -11,12 +11,12 @@
   in mapAttrs' (k: nameValuePair "nixos-${k}") (genAttrs hostnames (host: {
     name = "build nixos/${host}";
     run = ''
-      ./nx switch ${host} build --show-trace
+      nix build -Lf. network.nodes.${host}.deploy.system --show-trace
     '';
-  })) // mapAttrs' (k: nameValuePair "home-${k}") (genAttrs profiles (host: {
-    name = "build home/${host}";
+  })) // mapAttrs' (k: nameValuePair "home-${k}") (genAttrs profiles (profile: {
+    name = "build home/${profile}";
     run = ''
-      ./nx home ${host} build --show-trace
+      nix build -Lf. home.profiles.${profile}.deploy.home --show-trace
     '';
   })) // {
     submodules = {
