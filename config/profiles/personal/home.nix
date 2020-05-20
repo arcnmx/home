@@ -74,12 +74,10 @@
             shift
             TASK_EXEC=${pkgs.vit}/bin/vit
           fi
-          local TASK_THEME=$(theme isDark && echo solarized-dark-256 || echo solarized-light-256)
           local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
           mkdir -p "$TASK_DIR" &&
-            ln -sf "${pkgs.taskwarrior}/share/doc/task/rc/$TASK_THEME.theme" "$TASK_DIR/theme" &&
             (cd "$TASK_DIR" && ${pkgs.taskwarrior}/bin/task "$@")
-        '';
+        ''; # NOTE: link theme to $TASK_DIR/theme and `include ./theme` - can be conditional on $(theme isDark)
         tasks = ''
           #local _TASK_REPORT=next
           local _TASK_REPORT=
@@ -507,13 +505,17 @@
         };
       };
     };
-    programs.taskwarrior = {
+    programs.taskwarrior = let
+      theme = import ./taskwarrior-theme.nix {
+        inherit lib;
+        colours = pkgs.base16.shell.shell256;
+      };
+    in {
       enable = true;
-      colorTheme = "solarized-light-256"; # TODO: shell alias to override and switch light/dark theme
       dataLocation = "${config.xdg.dataHome}/task";
       activeContext = "home";
       extraConfig = ''
-        include ./theme
+        include ${theme}
       '';
       contexts = {
         home = "(project.not:work and project.not:games and project.not:fun and project.not:home.shopping.) or +escalate";
