@@ -87,3 +87,40 @@ augroup coc_au
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
+
+" https://vi.stackexchange.com/questions/21924/how-can-i-hide-and-scroll-popup-window-in-coc-nvim-in-vim/21927#21927
+" https://github.com/neoclide/coc.nvim/issues/1160
+
+nnoremap <expr> <M-d> <SID>scroll_cursor_popup(1) ? '<esc>' : '<c-d>'
+nnoremap <expr> <M-u> <SID>scroll_cursor_popup(0) ? '<esc>' : '<c-u>'
+
+function! s:find_cursor_popup(...)
+  let radius = get(a:000, 0, 2)
+  let srow = screenrow()
+  let scol = screencol()
+
+  " it's necessary to test entire rect, as some popup might be quite small
+  for r in range(srow - radius, srow + radius)
+    for c in range(scol - radius, scol + radius)
+      let winid = popup_locate(r, c)
+      if winid != 0
+        return winid
+      endif
+    endfor
+  endfor
+
+  return 0
+endfunction
+
+function! s:scroll_cursor_popup(down)
+  let winid = <SID>find_cursor_popup()
+  if winid == 0
+    return 0
+  endif
+
+  let pp = popup_getpos(winid)
+  call popup_setoptions( winid,
+        \ {'firstline' : pp.firstline + ( a:down ? 1 : -1 ) } )
+
+  return 1
+endfunction
