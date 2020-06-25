@@ -82,8 +82,8 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 augroup coc_au
-	au!
-	au FileType rust :EchoDocEnable
+  au!
+  au FileType rust EchoDocEnable
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
