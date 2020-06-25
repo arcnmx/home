@@ -31,5 +31,5 @@ in {
   config = channels.channelConfig;
   inherit (channels.channels.pkgs) import;
   inherit (channels) channels;
-  inherit (channels.channels) pkgs nixpkgs home-manager arc nur;
+  inherit (channels.channels) pkgs nixpkgs home-manager arc nur rust;
 }
