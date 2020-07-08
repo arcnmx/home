@@ -1,5 +1,6 @@
-{ ... }: {
+{ modulesPath, ... }: {
   disabledModules = [
+    (modulesPath + "/services/networking/connman.nix")
     "services/networking/connman.nix"
   ];
 
@@ -7,5 +8,7 @@
     ./deploy-switch.nix
     ./nixbld.nix
     ./connman.nix
+    ./home.nix
+    ../compat.nix
   ];
 }

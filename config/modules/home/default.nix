@@ -12,5 +12,7 @@
     ./hm_vim.nix
     ./hm_firefox.nix
     ./deploy-home.nix
+    ./home.nix
+    ../compat.nix
   ];
 }

@@ -1,44 +1,27 @@
 { pkgs, config, lib, nodes, modulesPath, ... }:
 let
-  channels = import ./channels.nix { inherit pkgs; };
-  user = { lib, ... }: {
-    imports = [./home.nix];
-
-    home.nix.nixPath = lib.mapAttrs (_: path: lib.mkForce (toString path)) channels.imports;
-    _module.args = {
-      inherit nodes;
-    };
+  nixosConfig = config;
+  user = { config, ... }: {
+    imports = nixosConfig.home.extraModules ++ [
+      ./home.nix
+    ];
 
     home = {
-      nixosConfig = config;
-
-      profiles = config.home.profiles;
+      profiles = config.home.nixosConfig.home.profiles;
     };
   };
 in {
   system.stateVersion = "19.09"; # this setting seems like a mess
 
-  disabledModules = [
-    (modulesPath + "/services/networking/connman.nix")
-  ];
-
   imports = [
-    "${toString channels.paths.home-manager}/nixos"
-    "${toString channels.paths.arc}/modules/nixos"
     profiles/nixos.nix
-    modules/nixos
   ];
 
   nix = {
-    inherit (channels) nixPath;
     allowedUsers = ["@builders"];
     trustedUsers = ["root" "@wheel"];
     buildCores = 0;
     maxJobs = lib.mkDefault 6; # "auto"
-  };
-
-  nixpkgs = {
-    inherit (channels.config.nixpkgs) config overlays;
   };
 
   home-manager = {
