@@ -27,5 +27,5 @@
 in config // lib.optionalAttrs (hostname != null) {
   inherit host;
 } // {
-  deploy = lib.optionalAttrs (hostname != null) host.deploy.run.switch // lib.mapAttrs (_: host: host.deploy.run.deploy) config.network.nodes;
+  switch = lib.optionalAttrs (hostname != null) host.deploy.run.switch // lib.mapAttrs (_: host: host.deploy.run.deploy) config.network.nodes;
 } // channels
