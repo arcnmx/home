@@ -151,7 +151,8 @@ in {
       assignLocalGroup = ''GROUP="${localGroup}"'';
       devBoards = ''
         SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}
-        SUBSYSTEM=="usb", ATTR{idVendor}=="2047" ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="2047", ${assignLocalGroup}
+        SUBSYSTEM=="tty", ATTRS{interface}=="MSP Tools Driver", ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic GDB Server", ${assignLocalGroup}, SYMLINK+="ttyBMP"
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic UART Port", ${assignLocalGroup}, SYMLINK+="ttyBMPuart"
       '';
@@ -163,8 +164,7 @@ in {
         SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", ${assignLocalGroup}
       '';
       uinput = ''
-        ACTION=="add", SUBSYSTEM=="misc", KERNEL=="uinput", MODE="0660", ${assignLocalGroup}
-        ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0666", ${assignLocalGroup}
+        ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0660", ${assignLocalGroup}
       '';
     in ''
       ${devBoards}
@@ -172,11 +172,15 @@ in {
       ${gamepads}
       ${uinput}
     '';
+    services.udev.packages = [
+      pkgs.android-udev-rules
+    ];
 
     users = {
-      users.arc.extraGroups = [ "uinput" "input" ];
+      users.arc.extraGroups = [ "uinput" "input" "adbusers" ];
       groups = {
         uinput = { };
+        adbusers = { };
       };
     };
 
