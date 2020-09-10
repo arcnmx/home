@@ -27,7 +27,10 @@ volume_color = 250
 state_line_color = cyan
 state_flags_color = cyan
 statusbar_color = yellow
-active_column_color = white
+# active_column_color = white # WARNING: Variable 'active_column_color' is deprecated and will be removed in 0.9 (replaced by current_item_inactive_column_prefix and current_item_inactive_column_suffix).
+current_item_inactive_column_prefix = "$(white)$r"
+current_item_inactive_column_suffix = "$/r$(end)"
+
 progressbar_color = black
 progressbar_elapsed_color = blue
 

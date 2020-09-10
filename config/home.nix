@@ -2,6 +2,7 @@
   channels = import ./channels.nix { };
 in with lib; {
   disabledModules = [
+    (/. + "${toString channels.paths.home-manager}/modules/services/mpd.nix")
     (/. + "${toString channels.paths.home-manager}/modules/programs/git.nix")
     (/. + "${toString channels.paths.home-manager}/modules/programs/vim.nix")
     (/. + "${toString channels.paths.home-manager}/modules/programs/firefox.nix")

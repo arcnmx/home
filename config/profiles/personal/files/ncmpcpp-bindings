@@ -72,6 +72,8 @@ def_key "a"
 	add_item_to_playlist
 def_key "+"
 	add
+def_key "-"
+	load
 def_key "D"
 	clear_playlist
 def_key "D"
