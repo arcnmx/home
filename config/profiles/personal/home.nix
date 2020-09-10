@@ -536,7 +536,7 @@
               "\\x01P" = "p";
               "/" = "i/";
             };
-            mode_key_search = "?";
+            user_search_mapping = "?";
             mode_indicator_cmd_color_bg = base01;
             mode_indicator_cmd_color = base04;
             mode_indicator_insert_color_bg = base01;
