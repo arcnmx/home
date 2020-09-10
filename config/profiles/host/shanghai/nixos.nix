@@ -64,7 +64,31 @@
       SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="*BTJR442300QQ480BGN*", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
     '';
-    services.xserver = {
+    services.xserver = let
+      benq = {
+        #output = "HDMI-0"; # DVI -> HDMI
+        output = "DP-0";
+        w = 2560;
+        h = 1440;
+        x = 0;
+        y = lg.h - benq.h;
+      };
+      lg = {
+        output = "DVI-D-0"; # DVI -> HDMI
+        w = 3840;
+        h = 2160;
+        x = benq.w;
+        y = 0;
+      };
+      acer = {
+        #output = "DP-1"; # DP -> HDMI
+        output = "HDMI-0"; # HDMI
+        w = 1920;
+        h = 1080;
+        x = benq.w + lg.w;
+        y = lg.h - acer.h;
+      };
+    in {
       displayManager = {
         startx.enable = mkForce false;
         lightdm = {
@@ -81,21 +105,17 @@
         };
       };
       deviceSection = ''
-        BusID "PCI:40:0:0" # NOTE: this is decimal, be careful! IDs are typically shown in hex
-        Option "Monitor-DVI-D-0" "Monitor[0]" # LG
-        Option "Monitor-HDMI-0" "Monitor[1]" # BenQ (DVI -> HDMI)
-        Option "Monitor-DP-1" "Monitor[2]" # Acer (DP -> HDMI)
+        # NOTE: this is decimal, be careful! IDs are typically shown in hex
+        BusID "PCI:39:0:0" # primary GPU
+        #BusID "PCI:40:0:0" # secondary GPU
+        Option "Monitor-${lg.output}" "Monitor[0]"
+        Option "Monitor-${benq.output}" "Monitor[1]"
+        #Option "Monitor-${acer.output}" "Monitor[2]"
       '';
       screenSection = ''
-        Option "MetaModes" "${let
-          #offset = 1440 / 3;
-          offset = 0;
-          h = 2160 + offset;
-        in concatStringsSep ", " [
-          "HDMI-0: 2560x1440 +0+${toString (h - 1440)}"
-          "DVI-D-0: 3840x2160 +2560+0"
-          "DP-1: 1920x1080 +${toString (2560 + 3840)}+${toString (h - 1080)}"
-        ]}"
+        Option "MetaModes" "${concatMapStringsSep ", " (mon:
+          "${mon.output}: ${toString mon.w}x${toString mon.h} +${toString mon.x}+${toString mon.y}"
+        ) [ benq lg /*acer*/ ]}"
       '';
       monitorSection = ''
         Option "Primary" "true"
@@ -108,11 +128,11 @@
           Option "DPMS" "true"
           Option "DPI" "96 x 96"
         EndSection
-        Section "Monitor"
-          Identifier "Monitor[2]"
-          Option "DPMS" "true"
-          Option "DPI" "96 x 96"
-        EndSection
+        #Section "Monitor"
+        #  Identifier "Monitor[2]"
+        #  Option "DPMS" "true"
+        #  Option "DPI" "96 x 96"
+        #EndSection
       '';
     };
 
