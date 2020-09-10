@@ -308,7 +308,7 @@
           commands = "lsp-enable-window";
         }
       ];
-      plugins = with pkgs.kakPlugins; [
+      pluginsExt = with pkgs.kakPlugins; [
         kak-lsp
         kak-tree
       ];

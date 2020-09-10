@@ -460,7 +460,7 @@ in {
           }*/
         ];
       };
-      plugins = with pkgs.kakPlugins; [
+      pluginsExt = with pkgs.kakPlugins; [
         kak-crosshairs
         kakoune-registers
         explore-kak
