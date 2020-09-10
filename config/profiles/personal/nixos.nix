@@ -177,10 +177,11 @@ in {
     ];
 
     users = {
-      users.arc.extraGroups = [ "uinput" "input" "adbusers" ];
+      users.arc.extraGroups = [ "uinput" "plugdev" "input" "adbusers" ];
       groups = {
         uinput = { };
         adbusers = { };
+        plugdev = { };
       };
     };
 

@@ -33,6 +33,12 @@
       };
     };
     services.openssh.ports = [ 22 32022 ];
+    hardware.openrazer = {
+      enable = true;
+      devicesOffOnScreensaver = false;
+      mouseBatteryNotifier = false;
+      #syncEffectsEnabled = false;
+    };
     hardware.pulseaudio.extraConfig = lib.mkAfter ''
       #load-module module-mmkbd-evdev
 
