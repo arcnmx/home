@@ -39,16 +39,22 @@
       mouseBatteryNotifier = false;
       #syncEffectsEnabled = false;
     };
-    hardware.pulseaudio.extraConfig = lib.mkAfter ''
+    hardware.pulseaudio.extraConfig = let
+      usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
+    in ''
       #load-module module-mmkbd-evdev
 
-      load-module module-virtual-surround-sink sink_name=vsurround sink_master=alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo hrir=/etc/pulse/hrir_kemar/hrir-kemar.wav
+      load-module module-alsa-sink sink_name=onboard device=surround40:CARD=Generic,DEV=0 format=s32 rate=48000 channels=4 channel_map=front-left,front-right,rear-left,rear-right tsched=1 fixed_latency_range=0 fragment_size=1024 fragments=16
+      load-module module-alsa-source source_name=mic device=front:CARD=Generic,DEV=0 format=s32 rate=96000 tsched=1
 
-      set-default-sink alsa_output.pci-0000_20_00.3.analog-stereo
-      #set-default-source alsa_input.pci-0000_20_00.3.analog-stereo # broken alsa driver
+      load-module module-remap-sink sink_name=speakers master=onboard channels=2 channel_map=left,front-right master_channel_map=rear-left,rear-right remix=no sink_properties=device.description=Speakers
+      load-module module-remap-sink sink_name=headphones master=onboard channels=2 channel_map=left,front-right master_channel_map=front-left,front-right remix=no sink_properties=device.description=Headphones
+      load-module module-virtual-surround-sink sink_name=vsurround sink_master=headphones hrir=${./files/hrir-kemar.wav} sink_properties="device.description='Headphones VSurround'"
 
-      #set-default-sink alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
-      set-default-source alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-mono
+      load-module module-echo-cancel source_master=mic sink_master=headphones source_name=mic_headphones sink_name=mic_headphones_sink use_volume_sharing=1 use_master_format=1 channels=1 aec_method=webrtc aec_args="analog_gain_control=0 digital_gain_control=1 noise_suppression=1 high_pass_filter=1 extended_filter=1 experimental_agc=1 intelligibility_enhancer=0 agc_start_volume=150"
+      load-module module-echo-cancel source_master=mic sink_master=speakers source_name=mic_speakers sink_name=mic_speakers_sink use_volume_sharing=1 use_master_format=1 channels=1 aec_method=webrtc aec_args="analog_gain_control=0 digital_gain_control=1 noise_suppression=1 high_pass_filter=0 extended_filter=1 experimental_agc=1 agc_start_volume=200"
+
+      set-default-source mic
     '';
 
     services.udev.extraRules = ''

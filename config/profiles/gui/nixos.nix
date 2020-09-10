@@ -125,17 +125,16 @@ in
       exit-idle-time = 5;
       load-default-script-file = "yes";
       #default-script-file = "/etc/pulse/autoload.pa";
-      resample-method = "src-sinc-best-quality";
+      resample-method = "speex-float-5";
       avoid-resampling = "true";
       flat-volumes = "no";
-      default-sample-format = "s16le";
-      default-sample-rate = 44100;
-      alternate-sample-rate = 48000;
+      default-sample-format = "s32le";
+      default-sample-rate = 48000;
+      alternate-sample-rate = 44100;
       default-sample-channels = 2;
-      default-channel-map = "front-left,front-right";
     };
     hardware.pulseaudio.configFile = builtins.toFile "default.pa" "";
-    hardware.pulseaudio.extraConfig = ''
+    hardware.pulseaudio.extraConfig = mkMerge [ (mkBefore ''
       .fail
 
       load-module module-device-restore
@@ -145,16 +144,7 @@ in
       load-module module-augment-properties
 
       load-module module-switch-on-port-available
-
-      ### Load audio drivers statically if necessary
-      #load-module module-alsa-sink
-      #load-module module-alsa-source device=hw:1,0
-
-      #load-module module-alsa-sink device=front:CARD=Generic,DEV=0
-      #set-default-sink alsa_output.front_CARD_Generic_DEV_0
-
-      load-module module-udev-detect
-
+    '') (mkAfter ''
       #load-module module-bluetooth-policy
       #load-module module-bluetooth-discover
 
@@ -171,6 +161,8 @@ in
       #load-module module-rtp-send source=rtp.monitor
 
       #load-module module-gconf
+
+      load-module module-udev-detect
 
       load-module module-default-device-restore
 
@@ -192,7 +184,7 @@ in
       load-module module-filter-heuristics
       load-module module-filter-apply
 
-      load-sample x11-bell /usr/share/sounds/freedesktop/stereo/message.oga
+      load-sample x11-bell ${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga
       load-module module-x11-bell sample=x11-bell display=:0
 
       # Allow any user in X11 to access pulse
@@ -204,6 +196,6 @@ in
       load-module module-role-ducking
 
       # TODO: https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Enable_Echo.2FNoise-Cancellation
-    '';
+    '') ];
   };
 }

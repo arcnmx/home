@@ -16,26 +16,9 @@
 
     xdg.configFile."i3status/config".source = ./files/i3status;
 
-    home.packages = [ ]; # TODO: this
+    home.packages = [ pkgs.paswitch ];
     services.konawall.tags = ["score:>=200" "width:>=1600" "rating:safe"];
     home.shell.functions = {
-      paswitch = ''
-        case $1 in
-          speakers)
-            ${pkgs.paswitch.exec} alsa_output.pci-0000_2a_00.4.analog-stereo
-            ;;
-          headphones)
-            ${pkgs.paswitch.exec} alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
-            ;;
-          "")
-            echo "paswitch {speakers|headphones|SINK_NAME}" >&2
-            return 1
-            ;;
-          *)
-            ${pkgs.paswitch.exec} "$@"
-            ;;
-        esac
-      '';
       _paswitch_sinks = ''
         ${pkgs.pulseaudio}/bin/pactl list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
       '';
