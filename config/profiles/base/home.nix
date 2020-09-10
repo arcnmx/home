@@ -552,6 +552,7 @@ in {
       aliases = {
         logs = "log --stat --pretty=medium --graph";
         reattr = ''!sh -c "\"git stash push -q; rm .git/index; git checkout HEAD -- \\\"$(git rev-parse --show-toplevel)\\\"; git stash pop || true\""'';
+        fixup = ''!sh -c "\"git commit --fixup HEAD && git rebase -i HEAD~2\""'';
       };
       ignores = [
         ".envrc"
