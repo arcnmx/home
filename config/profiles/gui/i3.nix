@@ -105,8 +105,8 @@
         "${mod}+z" = ''mode "resize"'';
 
         "${mod}+Return" = "exec ${term}";
-        "${mod}+control+Return" = "exec ${term} -e ${ssh} shanghai";
-        "${mod}+shift+Return" = "exec ${term} -e ${mosh} shanghai";
+        "${mod}+control+Return" = lib.mkDefault "exec ${term} -e ${ssh} shanghai";
+        "${mod}+shift+Return" = lib.mkDefault "exec ${term} -e ${mosh} shanghai";
 
         "${mod}+shift+c" = "kill";
         "${mod}+r" = "exec ${run.exec}";
@@ -131,14 +131,13 @@
         "${mod}+shift+Escape" = "exit";
 
         "${mod}+grave" = "[urgent=latest] focus";
-        "${mod}+n" = "[urgent=latest] focus";
         "${mod}+Tab" = "exec --no-startup-id ${config.xsession.windowManager.i3.i3gopher.package.exec} --focus-last";
         "${mod}+control+f" = "exec --no-startup-id ${i3-easyfocus} -a || ${i3-easyfocus} -c";
         "${mod}+control+shift+f" = "exec --no-startup-id ${i3-easyfocus} -ar || ${i3-easyfocus} -cr";
         "${mod}+a" = "focus parent";
         "${mod}+q" = "focus child";
-        #"${mod}+n" = "focus next";
-        #"${mod}+m" = "focus prev";
+        "${mod}+n" = "focus next";
+        "${mod}+m" = "focus prev";
 
         "${mod}+control+${left}" = "focus output left";
         "${mod}+control+${down}" = "focus output down";
@@ -154,6 +153,8 @@
         "${mod}+Down" = "focus down";
         "${mod}+Up" = "focus up";
         "${mod}+Right" = "focus right";
+
+        "${mod}+comma" = "workspace back_and_forth";
 
         "${mod}+shift+control+${left}" = "move container to output left";
         "${mod}+shift+control+${down}" = "move container to output down";
