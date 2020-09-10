@@ -61,8 +61,7 @@
       xdg_utils-mimi
       rxvt-unicode-arc
       luakit-develop
-      libreoffice
-      #libreoffice-fresh # broken for now ;-;
+      libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
     ] ++ optionals config.gtk.enable [
       evince
       gnome3.adwaita-icon-theme
