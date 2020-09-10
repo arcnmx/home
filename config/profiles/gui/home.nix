@@ -433,8 +433,7 @@
 
         keep-open = "yes";
 
-        #cache-default = "500000"; # TODO: this doesn't exist anymore?
-        cache-secs = "2";
+        cache-secs = 10 * 60 * 60; # 10 hours, the default - in practice this is capped by demuxer-max-bytes
       };
     };
     home.symlink = {

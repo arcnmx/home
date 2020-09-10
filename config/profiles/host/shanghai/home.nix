@@ -29,6 +29,13 @@
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';
+    programs.mpv = {
+      config = {
+        # may as well use the excess RAM for something
+        demuxer-max-bytes = "2000MiB";
+        demuxer-max-back-bytes = "250MiB";
+      };
+    };
 
     systemd.user.services.getquote = {
       Unit = {
