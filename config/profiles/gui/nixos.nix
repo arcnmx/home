@@ -25,7 +25,6 @@ in
       fontconfig = {
         enable = true;
         defaultFonts.monospace = ["Hack" "DejaVu Sans Mono"];
-        penultimate.enable = true;
       };
       fonts = [
         pkgs.noto-fonts
