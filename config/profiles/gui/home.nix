@@ -85,8 +85,6 @@
         browserName = "firefox";
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
-          browserpass
-          (passff-host.override { pass = pass-arc; })
           bukubrow
         ];
       };
