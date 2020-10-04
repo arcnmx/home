@@ -152,6 +152,7 @@ in {
       devBoards = ''
         SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}
         SUBSYSTEM=="usb", ATTR{idVendor}=="2047", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="03eb", ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="MSP Tools Driver", ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic GDB Server", ${assignLocalGroup}, SYMLINK+="ttyBMP"
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic UART Port", ${assignLocalGroup}, SYMLINK+="ttyBMPuart"
@@ -159,9 +160,12 @@ in {
       i2c = ''
         SUBSYSTEM=="i2c-dev", ${assignLocalGroup}, MODE="0660"
       ''; # for DDC/monitor control
-      gamepads = ''
+      inputs = ''
+        # Gamepads
         SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", ${assignLocalGroup}
         SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", ${assignLocalGroup}
+        # Moonlander: https://github.com/zsa/wally/wiki/Live-training-on-Linux
+        SUBSYSTEM=="usb", ATTR{idVendor}=="3297", ATTR{idProduct}=="1969", GROUP="plugdev"
       '';
       uinput = ''
         ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0660", ${assignLocalGroup}
@@ -169,7 +173,7 @@ in {
     in ''
       ${devBoards}
       ${i2c}
-      ${gamepads}
+      ${inputs}
       ${uinput}
     '';
     services.udev.packages = [

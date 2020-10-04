@@ -511,7 +511,10 @@
       enable = true;
       interval = "20m";
     };
-    home.shell.aliases.konawall = "systemctl --user restart konawall.service";
+    home.shell.aliases = {
+      konawall = "systemctl --user restart konawall.service";
+      oryx = "nix run nixpkgs.google-chrome -c google-chrome-stable https://configure.ergodox-ez.com/train";
+    };
 
     xsession = {
       enable = true;
