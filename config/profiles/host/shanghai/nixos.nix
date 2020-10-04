@@ -66,8 +66,8 @@
     '';
     services.xserver = let
       benq = {
-        #output = "HDMI-0"; # DVI -> HDMI
-        output = "DP-0";
+        output = "HDMI-0"; # DVI -> HDMI
+        #output = "DP-0";
         w = 2560;
         h = 1440;
         x = 0;
@@ -81,8 +81,7 @@
         y = 0;
       };
       acer = {
-        #output = "DP-1"; # DP -> HDMI
-        output = "HDMI-0"; # HDMI
+        output = "DP-1"; # DP -> HDMI
         w = 1920;
         h = 1080;
         x = benq.w + lg.w;
@@ -106,16 +105,16 @@
       };
       deviceSection = ''
         # NOTE: this is decimal, be careful! IDs are typically shown in hex
-        BusID "PCI:39:0:0" # primary GPU
-        #BusID "PCI:40:0:0" # secondary GPU
+        #BusID "PCI:39:0:0" # primary GPU
+        BusID "PCI:40:0:0" # secondary GPU
         Option "Monitor-${lg.output}" "Monitor[0]"
         Option "Monitor-${benq.output}" "Monitor[1]"
-        #Option "Monitor-${acer.output}" "Monitor[2]"
+        Option "Monitor-${acer.output}" "Monitor[2]"
       '';
       screenSection = ''
         Option "MetaModes" "${concatMapStringsSep ", " (mon:
           "${mon.output}: ${toString mon.w}x${toString mon.h} +${toString mon.x}+${toString mon.y}"
-        ) [ benq lg /*acer*/ ]}"
+        ) [ benq lg acer ]}"
       '';
       monitorSection = ''
         Option "Primary" "true"
@@ -128,11 +127,11 @@
           Option "DPMS" "true"
           Option "DPI" "96 x 96"
         EndSection
-        #Section "Monitor"
-        #  Identifier "Monitor[2]"
-        #  Option "DPMS" "true"
-        #  Option "DPI" "96 x 96"
-        #EndSection
+        Section "Monitor"
+          Identifier "Monitor[2]"
+          Option "DPMS" "true"
+          Option "DPI" "96 x 96"
+        EndSection
       '';
     };
 
@@ -152,6 +151,7 @@
       vfio-pci-ids = [
         # "10de:1c81" "10de:0fb9" # GTX 1050
         "10de:1e07" "10de:10f7" "10de:1ad6" "10de:1ad7" # RTX 2080 Ti
+        "10de:1f82" "10de:10fa" # GTX 1660
       ];
     in mkIf config.home.profiles.vfio {
       # TODO: extraModprobeConfig does not seem to be placed in initrd, see: https://github.com/NixOS/nixpkgs/issues/25456
