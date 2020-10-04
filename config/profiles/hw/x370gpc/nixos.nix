@@ -94,7 +94,7 @@
       "${nct}.temp3_max_hyst" = 60000;
 
       # rear exhaust
-      #${nct}.pwm1_mode=1
+      #${nct}.pwm1_enable=1
       "${nct}.pwm1_temp_sel" = 2;
       "${nct}.pwm1_enable" = 5;
       "${nct}.pwm1_auto_point1_temp" = 35000;
@@ -111,7 +111,7 @@
       "${nct}.pwm1_step_down_time" = 150;
 
       # cpu fan
-      #${nct}.pwm2_mode=1
+      #${nct}.pwm2_enable=1
       "${nct}.pwm2_temp_sel" = 2;
       "${nct}.pwm2_enable" = 5;
       "${nct}.pwm2_auto_point1_temp" = 34000;
@@ -128,7 +128,7 @@
       "${nct}.pwm2_step_down_time" = 50;
 
       # top exhaust
-      #${nct}.pwm3_mode=1
+      #${nct}.pwm3_enable=1
       "${nct}.pwm3_temp_sel" = 2;
       "${nct}.pwm3_enable" = 5;
       "${nct}.pwm3_auto_point1_temp" = 36000;
@@ -144,29 +144,30 @@
       "${nct}.pwm3_step_up_time" = 100;
       "${nct}.pwm3_step_down_time" = 100;
 
-      # front 1
-      #${nct}.pwm4_mode=1
-      "${nct}.pwm4_temp_sel" = 2;
-      "${nct}.pwm4_enable" = 5;
-      "${nct}.pwm4_auto_point1_temp" = 35000;
-      "${nct}.pwm4_auto_point1_pwm" = 104;
-      "${nct}.pwm4_auto_point2_temp" = 38000;
-      "${nct}.pwm4_auto_point2_pwm" = 176;
-      "${nct}.pwm4_auto_point3_temp" = 47000;
-      "${nct}.pwm4_auto_point3_pwm" = 192;
-      "${nct}.pwm4_auto_point4_temp" = 49000;
-      "${nct}.pwm4_auto_point4_pwm" = 224;
-      "${nct}.pwm4_auto_point5_temp" = 52000;
-      "${nct}.pwm4_auto_point5_pwm" = 255;
-      "${nct}.pwm4_step_up_time" = 100;
-      "${nct}.pwm4_step_down_time" = 100;
+      # front 1 (bottom)
+      "${nct}.pwm4_enable" = 1;
+      "${nct}.pwm4" = 0; # fan is acting up :(
+      #"${nct}.pwm4_temp_sel" = 2;
+      #"${nct}.pwm4_enable" = 5;
+      #"${nct}.pwm4_auto_point1_temp" = 35000;
+      #"${nct}.pwm4_auto_point1_pwm" = 104;
+      #"${nct}.pwm4_auto_point2_temp" = 38000;
+      #"${nct}.pwm4_auto_point2_pwm" = 176;
+      #"${nct}.pwm4_auto_point3_temp" = 47000;
+      #"${nct}.pwm4_auto_point3_pwm" = 192;
+      #"${nct}.pwm4_auto_point4_temp" = 49000;
+      #"${nct}.pwm4_auto_point4_pwm" = 224;
+      #"${nct}.pwm4_auto_point5_temp" = 52000;
+      #"${nct}.pwm4_auto_point5_pwm" = 255;
+      #"${nct}.pwm4_step_up_time" = 100;
+      #"${nct}.pwm4_step_down_time" = 100;
 
       # top intake
-      #${nct}.pwm5_mode=1
+      #${nct}.pwm5_enable=1
       "${nct}.pwm5_temp_sel" = 2;
       "${nct}.pwm5_enable" = 5;
       "${nct}.pwm5_auto_point1_temp" = 36000;
-      "${nct}.pwm5_auto_point1_pwm" = 104;
+      "${nct}.pwm5_auto_point1_pwm" = 0; # 104, but ugh fan makes a little noise..?
       "${nct}.pwm5_auto_point2_temp" = 39000;
       "${nct}.pwm5_auto_point2_pwm" = 144;
       "${nct}.pwm5_auto_point3_temp" = 48000;
@@ -178,12 +179,12 @@
       "${nct}.pwm5_step_up_time" = 100;
       "${nct}.pwm5_step_down_time" = 100;
 
-      # front 2
-      #${nct}.pwm6_mode=1
+      # front 2 (top)
+      #${nct}.pwm6_enable=1
       "${nct}.pwm6_temp_sel" = 2;
       "${nct}.pwm6_enable" = 5;
       "${nct}.pwm6_auto_point1_temp" = 35000;
-      "${nct}.pwm6_auto_point1_pwm" = 104;
+      "${nct}.pwm6_auto_point1_pwm" = 0; # 104, but ugh fan makes a little noise..?
       "${nct}.pwm6_auto_point2_temp" = 38000;
       "${nct}.pwm6_auto_point2_pwm" = 176;
       "${nct}.pwm6_auto_point3_temp" = 47000;
