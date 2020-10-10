@@ -6,9 +6,10 @@
 
   imports = [
     ./deploy-switch.nix
+    ./deploy-personal.nix
+    ./deploy-tf.nix
     ./nixbld.nix
     ./connman.nix
     ./home.nix
-    ../compat.nix
   ];
 }

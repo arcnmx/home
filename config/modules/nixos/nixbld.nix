@@ -10,13 +10,10 @@ in {
         extraGroups = ["builders"];
         useDefaultShell = true;
         openssh.authorizedKeys.keyFiles = [
-          config.keychain.keys.nixbld.path.public
+          ./nixbld.pub
         ];
       };
       nix.trustedUsers = ["nixbld"]; # TODO: this shouldn't strictly be necessary? (https://github.com/NixOS/nix/issues/2789)
     })
-    {
-      keychain.keys.nixbld.public = ./nixbld.pub;
-    }
   ];
 }

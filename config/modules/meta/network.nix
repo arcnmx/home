@@ -66,17 +66,13 @@
       extraModules = [
         "${toString config.channels.paths.home-manager}/nixos"
         "${toString config.channels.paths.arc}/modules/nixos"
+        "${toString config.channels.paths.tf}/modules/nixos"
+        "${toString config.channels.paths.tf}/modules/run.nix"
       ];
       specialArgs = {
         inherit (config.network) nodes;
         meta = config;
       };
     };
-    yggdrasil = mapAttrs (name: node: {
-      address = node.services.yggdrasil.address;
-    }) config.network.nodes;
-    wan = mapAttrs (name: node: {
-      address = "${node.networking.hostName}.${node.networking.domain}";
-    }) config.network.nodes;
   };
 }

@@ -17,5 +17,6 @@
     home.profiles = {
       base = mkDefault true;
     };
+    secrets.external = true;
   };
 }

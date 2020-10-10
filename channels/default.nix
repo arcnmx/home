@@ -12,6 +12,7 @@
     nur = ./nur;
     mozilla = ./mozilla;
     rust = ./rust;
+    tf = ./tf;
   };
   channelNixPath = import ./path.nix {
     inherit channelConfigPath;

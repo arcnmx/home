@@ -37,6 +37,7 @@
     extraModules = [
       ../home
       "${toString config.channels.paths.arc}/modules/home"
+      "${toString config.channels.paths.tf}/modules/home"
       ({
         # TODO: this better
         disabledModules = [

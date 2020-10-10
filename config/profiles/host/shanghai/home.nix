@@ -4,9 +4,6 @@
   };
 
   config = mkMerge [ {
-    keychain.keys.shanghai-ssh = {
-      public = ./files/id_rsa.pub;
-    };
   } (mkIf config.home.profiles.host.shanghai {
     home.profiles.trusted = true;
     home.profiles.personal = true;

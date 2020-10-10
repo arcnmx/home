@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }: with lib; let
+{ meta, name, pkgs, lib, config, ... }: with lib; let
   cfg = config.deploy;
 in {
   options.deploy = {
@@ -6,58 +6,81 @@ in {
       type = types.unspecified;
       readOnly = true;
     };
-    targetHost = mkOption {
-      type = types.str;
-      default = config.network.wan.${config.networking.hostName}.address;
-    };
-    run = {
-      switch = mkOption {
-        type = types.unspecified;
-        readOnly = true;
+    network = let
+      networkType = kind: types.submodule ({ ... }: {
+        options = {
+          ipv4 = mkOption {
+            type = types.nullOr types.str;
+          };
+          ipv6 = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+          };
+        };
+        config = {
+          ipv4 = mkIf (kind == "wan") (mkOptionDefault null);
+          ipv6 = mkIf (config.deploy.network.ipv6.prefix.${kind} != null)
+            (mkDefault "${config.deploy.network.ipv6.prefix.${kind}}:${config.deploy.network.ipv6.postfix.${kind}}");
+        };
+      });
+    in {
+      ipv6 = {
+        postfix = {
+          local = mkOption {
+            type = types.str;
+          };
+          wan = mkOption {
+            type = types.str;
+            description = "SLAAC";
+            default = config.deploy.network.ipv6.postfix.local;
+          };
+        };
+        prefix = {
+          local = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+          };
+          wan = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+          };
+        };
       };
-      deploy = mkOption {
-        type = types.unspecified;
-        readOnly = true;
+      local = mkOption {
+        type = networkType "local";
+        default = { };
+      };
+      wan = mkOption {
+        type = networkType "wan";
+        default = { };
+      };
+    };
+    targetName = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+    local = {
+      isRemote = mkOption {
+        type = types.bool;
+        default = config.networking.hostName != meta.deploy.local.hostName;
       };
     };
   };
-  config.deploy = {
-    system = config.system.build.toplevel;
-    run = with pkgs; {
-      switch = nixRunWrapper {
-        package = writeShellScriptBin "switch" ''
-          set -eu
-          export NIXOS_INSTALL_BOOTLOADER=1
-
-          asRoot() {
-            if [[ $(${pkgs.coreutils}/bin/id -u) -ne 0 ]]; then
-              sudo "$@"
-            else
-              "$@"
-            fi
-          }
-
-          if [[ $(${pkgs.inetutils}/bin/hostname -s) != ${config.networking.hostName} ]]; then
-            echo "switch must run on ${config.networking.hostName}" >&2
-            exit 1
-          fi
-
-          asRoot ${pkgs.nix}/bin/nix-env -p /nix/var/nix/profiles/system --set ${cfg.system}
-          asRoot ${cfg.system}/bin/switch-to-configuration switch
-        '';
-      };
-      deploy = nixRunWrapper {
-        package = writeShellScriptBin "deploy" ''
-          set -eu
-
-          if [[ $(${pkgs.inetutils}/bin/hostname -s) = ${config.networking.hostName} ]]; then
-            ${cfg.run.switch}/bin/switch
-          else
-            ${pkgs.nix}/bin/nix copy --substitute --to ssh://${config.deploy.targetHost} ${cfg.run.switch}
-            ${pkgs.openssh}/bin/ssh ${config.deploy.targetHost} ${cfg.run.switch}/bin/switch
-          fi
-        '';
+  config = {
+    deploy = {
+      system = config.system.build.toplevel;
+      targetName = mkIf (meta.deploy.targets ? ${name}) (mkDefault name);
+      tf.deploy = {
+        isRoot = meta.deploy.local.isRoot;
+        systems.${name} = {
+          nixosConfig = config;
+          isRemote = cfg.local.isRemote;
+          connection = {
+            host = mkDefault config.networking.hostName;
+          };
+        };
       };
     };
+    _module.args.target = mapNullable (targetName: meta.deploy.targets.${targetName}) cfg.targetName;
   };
 }

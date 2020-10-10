@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: with lib; {
+{ tf, config, pkgs, lib, ... }: with lib; {
   options = {
     home.profiles.host.shanghai = mkEnableOption "hostname: shanghai";
   };
@@ -17,10 +17,20 @@
       useDHCP = false;
       useNetworkd = true;
     };
+    deploy.network.local.ipv4 = "10.1.1.32";
     systemd.network.networks.br = {
       matchConfig.Name = "br";
       gateway = [ "10.1.1.1" ];
-      address = [ "10.1.1.32/24" ];
+      address = [ "${config.deploy.network.local.ipv4}/24" ];
+    };
+    deploy.tf = {
+      dns.records = {
+        hourai = {
+          inherit (tf.dns.records.local_a) tld;
+          domain = "hourai";
+          a.address = "10.1.1.36";
+        };
+      };
     };
 
     home.nixbld.enable = true;

@@ -11,6 +11,7 @@
 
     networking.hostId = "451b608e";
 
+    deploy.network.local.ipv4 = "10.1.1.64";
     systemd.network.links.wlan = {
       matchConfig = {
         MACAddress = "00:15:00:ec:c6:51";

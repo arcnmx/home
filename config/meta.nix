@@ -1,8 +1,9 @@
 { lib, config, ... }: with lib; {
-  imports = [
-    ./deploy/gensokyo.nix
-  ];
+  imports = (import ./profiles/modules.nix { }).metaImports;
   config = {
+    deploy = {
+      dataDir = ../state;
+    };
     home.profiles = {
       base = {
         imports = [

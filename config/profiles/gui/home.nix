@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib; {
+{ meta, config, pkgs, lib, ... } @ args: with lib; {
   imports = [
     ./xresources.nix
     ./i3.nix
@@ -26,7 +26,7 @@
     home.shell = {
       functions = {
         mradio = mkIf config.home.profiles.trusted ''
-          PULSE_PROP="media.role=music" ${pkgs.mpv}/bin/mpv --cache=no --cache-backbuffer=0 --cache-seek-min=0 --cache-secs=1 http://${config.network.yggdrasil.shanghai.address}:32101
+          PULSE_PROP="media.role=music" ${pkgs.mpv}/bin/mpv --cache=no --cache-backbuffer=0 --cache-seek-min=0 --cache-secs=1 http://shanghai:32101
         '';
         mpa = ''
           PULSE_PROP="media.role=music" ${pkgs.mpv}/bin/mpv --no-video "$@"

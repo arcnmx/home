@@ -47,6 +47,7 @@ in {
   };
 
   config = mkIf config.home.profiles.personal {
+    deploy.personal.enable = true;
     console = {
       packages = [pkgs.tamzen];
       font = "Tamzen7x14";

@@ -21,6 +21,8 @@
     (map (name: name + "/home.nix") importNames)) ++ sharedImports;
   nixosImports = (builtins.filter builtins.pathExists
     (map (name: name + "/nixos.nix") importNames)) ++ sharedImports;
+  metaImports = (builtins.filter builtins.pathExists
+    (map (name: name + "/meta.nix") importNames));
   sharedImports = [({ lib, config, options, ... }: with lib; {
     options.home = {
       profiles.${if !hasTrusted then "trusted" else null} = mkEnableOption "trusted profile unavailable";
@@ -34,5 +36,5 @@
     };
   })];
 in {
-  inherit homeImports nixosImports;
+  inherit homeImports nixosImports metaImports;
 }

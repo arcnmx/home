@@ -4,11 +4,6 @@
   };
 
   config = mkMerge [
-    {
-      keychain.keys.satorin-ssh = {
-        public = ./files/id_rsa.pub;
-      };
-    }
     (mkIf config.home.profiles.host.satorin {
       home.profiles.trusted = true;
       home.profiles.gui = true;

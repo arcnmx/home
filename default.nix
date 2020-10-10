@@ -2,7 +2,7 @@
   channels = import ./import.nix;
   inherit (channels) pkgs;
   inherit (pkgs) lib;
-  hostname = if builtins.getEnv "HOME_HOSTNAME" != "" then builtins.getEnv "HOME_HOSTNAME" else null;
+  hostname = config.deploy.local.hostName;
   metaConfig = { ... }: {
     config = {
       inherit channels;
@@ -27,5 +27,5 @@
 in config // lib.optionalAttrs (hostname != null) {
   inherit host;
 } // {
-  switch = lib.optionalAttrs (hostname != null) host.deploy.run.switch // lib.mapAttrs (_: host: host.deploy.run.deploy) config.network.nodes;
+  switch = lib.optionalAttrs (hostname != null) host.run.switch // lib.mapAttrs (_: host: host.run.deploy) config.network.nodes;
 } // channels
