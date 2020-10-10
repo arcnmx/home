@@ -9,7 +9,10 @@
     home.profiles.hw.xps13 = true;
     home.profiles.host.gensokyo = true;
 
-    networking.hostId = "451b608e";
+    networking = {
+      hostId = "451b608e";
+      nftables.ruleset = mkAfter (builtins.readFile ./files/nftables.conf);
+    };
 
     deploy.network.local.ipv4 = "10.1.1.64";
     systemd.network.links.wlan = {

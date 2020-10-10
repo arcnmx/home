@@ -16,6 +16,7 @@
       hostId = "a1184652";
       useDHCP = false;
       useNetworkd = true;
+      nftables.ruleset = mkAfter (builtins.readFile ./files/nftables.conf);
     };
     deploy.network.local.ipv4 = "10.1.1.32";
     systemd.network.networks.br = {

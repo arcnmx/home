@@ -121,10 +121,20 @@ in {
       helpLine = lib.mkForce "";
     };
 
-    networking.firewall.enable = false;
-    networking.nameservers = mkDefault [ "1.1.1.1" "1.0.0.1" ];
-    #networking.nftables.enable = true;
-    # TODO: migrate nftables config
+    networking = {
+      firewall.enable = false;
+      nameservers = mkDefault [ "1.1.1.1" "1.0.0.1" ];
+      nftables = {
+        enable = true;
+        ruleset = mkMerge [
+          (mkBefore (builtins.readFile ./files/nftables.conf))
+          (mkIf config.services.yggdrasil.enable ''
+            define yggdrasil_peer_listen_tcp = ${last (splitString ":" (head config.services.yggdrasil.listen))}
+            ${builtins.readFile ./files/nftables-yggdrasil.conf}
+          '')
+        ];
+      };
+    };
 
     # allow wheel to do things without password
     security.polkit.extraConfig = ''
