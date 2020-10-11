@@ -1,4 +1,5 @@
 { config, pkgs, lib, ... } @ args: let
+  inherit (config.lib.file) mkOutOfStoreSymlink;
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
   shellAliases = (if pkgs.hostPlatform.isDarwin then {
     ls = "ls -G";
@@ -78,15 +79,19 @@ in {
   config = lib.mkIf config.home.profiles.base {
     home.stateVersion = "19.03";
     home.file = {
-      # TODO: make a proper module for this
-      ".local/share/bash/.keep".text = "";
-      ".local/share/zsh/.keep".text = "";
-      ".local/share/less/.keep".text = "";
-      ".local/share/gnupg/.keep".text = ""; # TODO: directory needs restricted permissions
-      ".local/share/vim/undo/.keep".text = "";
-      ".local/share/vim/swap/.keep".text = "";
-      ".local/share/vim/backup/.keep".text = "";
-    };
+      ".gnupg".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/gnupg";
+      ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {
+        target = "${config.xdg.configHome}/gnupg/gpg.conf";
+      };
+      ".gnupg/gpg-agent.conf" = lib.mkIf config.services.gpg-agent.enable {
+        target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
+      };
+      ".markdownlintrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/markdownlint/markdownlintrc";
+    } // lib.genAttrs [ "cargo/registry" "cargo/git" "cargo/bin" ] (path: {
+      # ensure empty cache directories are created
+      text = "";
+      target = "${config.xdg.cacheHome}/${path}/.keep";
+    });
     home.packages = with pkgs; [
       nix-readline
 
@@ -190,32 +195,23 @@ in {
         [net]
         git-fetch-with-cli = true
       '';
+      "cargo/.crates.toml".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/cargo/.crates.toml";
+      "cargo/bin".source = mkOutOfStoreSymlink "${config.xdg.cacheHome}/cargo/bin/";
+      "cargo/registry".source = mkOutOfStoreSymlink "${config.xdg.cacheHome}/cargo/registry/";
+      "cargo/git".source = mkOutOfStoreSymlink "${config.xdg.cacheHome}/cargo/git/";
     };
     xdg.dataFile = {
       "z/.keep".text = "";
-    };
-    home.symlink = {
-      ".gnupg".target = "${config.xdg.dataHome}/gnupg";
-      ".local/share/gnupg/gpg-agent.conf".target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
-      ".local/share/gnupg/gpg.conf".target = "${config.xdg.configHome}/gnupg/gpg.conf";
-      ".local/share/gnupg/sshcontrol".target = "${config.xdg.configHome}/gnupg/sshcontrol";
-      ".markdownlintrc".target = "${config.xdg.configHome}/markdownlint/markdownlintrc";
-      ".config/cargo/.crates.toml" = {
-        target = "${config.xdg.dataHome}/cargo/.crates.toml";
-        create = true;
-      };
-      ".config/cargo/bin" = {
-        target = "${config.xdg.cacheHome}/cargo/bin/";
-        create = true;
-      };
-      ".config/cargo/registry" = {
-        target = "${config.xdg.cacheHome}/cargo/registry/";
-        create = true;
-      };
-      ".config/cargo/git" = {
-        target = "${config.xdg.cacheHome}/cargo/git/";
-        create = true;
-      };
+      "bash/.keep".text = "";
+      "zsh/.keep".text = "";
+      "less/.keep".text = "";
+      "gnupg/.keep".text = ""; # TODO: directory needs restricted permissions
+      "vim/undo/.keep".text = "";
+      "vim/swap/.keep".text = "";
+      "vim/backup/.keep".text = "";
+      "gnupg/gpg-agent.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg-agent.conf";
+      "gnupg/gpg.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg.conf";
+      "gnupg/sshcontrol".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/sshcontrol";
     };
     home.language = {
       base = "en_US.UTF-8";

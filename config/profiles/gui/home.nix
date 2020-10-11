@@ -1,4 +1,22 @@
-{ meta, config, pkgs, lib, ... } @ args: with lib; {
+{ meta, config, pkgs, lib, ... } @ args: with lib; let
+  inherit (config.lib.file) mkOutOfStoreSymlink;
+  firefoxFiles = let
+    pathConds = {
+      "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}" = config.programs.firefox.extensions != [];
+      "profiles.ini" = config.programs.firefox.profiles != {};
+    } // foldAttrList (mapAttrsToList (_: profile: {
+      "${profile.path}/chrome/userChrome.css" = profile.userChrome != "";
+      "${profile.path}/chrome/userChrome.xml" = profile.userChromeBindings != [];
+      "${profile.path}/user.js" = profile.settings != {} || profile.extraConfig != "";
+      "${profile.path}/containers.json" = profile.containers.identities != [];
+    }) config.programs.firefox.profiles);
+    paths = mapAttrs' (k: cond: nameValuePair ".mozilla/firefox/${k}" (mkIf cond {
+      target = "${config.xdg.dataHome}/mozilla/firefox/${k}";
+    })) pathConds;
+  in {
+    ".mozilla".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/mozilla";
+  } // paths;
+in {
   imports = [
     ./xresources.nix
     ./i3.nix
@@ -13,7 +31,7 @@
   };
 
   config = mkIf config.home.profiles.gui {
-    home.file = {
+    home.file = mkMerge [ {
       ".xinitrc" = {
         executable = true;
         text = ''
@@ -22,7 +40,7 @@
           . ~/.xsession
         '';
       };
-    };
+    } (mkIf config.programs.firefox.enable firefoxFiles) ];
     home.shell = {
       functions = {
         mradio = mkIf config.home.profiles.trusted ''
@@ -433,12 +451,8 @@
         cache-secs = 10 * 60 * 60; # 10 hours, the default - in practice this is capped by demuxer-max-bytes
       };
     };
-    home.symlink = {
-      ".local/share/mozilla/native-messaging-hosts".target = "${config.programs.firefox.packageWrapped}/lib/mozilla/native-messaging-hosts";
-      ".mozilla" = {
-        target = "${config.xdg.dataHome}/mozilla";
-        create = true;
-      };
+    xdg.dataFile = {
+      "mozilla/native-messaging-hosts".source = mkOutOfStoreSymlink "${config.programs.firefox.packageWrapped}/lib/mozilla/native-messaging-hosts";
     };
     xdg.configFile = {
       "mimeapps.list".text = ''

@@ -1,4 +1,6 @@
-{ config, pkgs, lib, ... } @ args: with lib; {
+{ config, pkgs, lib, ... } @ args: with lib; let
+  inherit (config.lib.file) mkOutOfStoreSymlink;
+in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
     programs.ncmpcpp.mpdHost = mkOption {
@@ -12,14 +14,11 @@
       ".task/hooks/on-exit.task-blocks".source = pkgs.arc'private.task-blocks.on-exit;
       ".task/hooks/on-add.task-blocks".source = pkgs.arc'private.task-blocks.on-add;
       ".task/hooks/on-modify.task-blocks".source = pkgs.arc'private.task-blocks.on-modify;
-      ".taskrc".target = ".config/taskrc";
-      ".gnupg/gpg-agent.conf".target = ".config/gnupg/gpg-agent.conf";
+      ".taskrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/taskrc";
+      ".electrum".source = mkOutOfStoreSymlink "${config.xdg.configHome}/electrum/";
     };
-    home.symlink = {
-      ".electrum" = {
-        target = "${config.xdg.configHome}/electrum/";
-        create = true;
-      };
+    xdg.configFile = {
+      taskrc.text = config.home.file.".taskrc".text;
     };
     home.packages = with pkgs; with gitAndTools; [
       gitRemoteGcrypt git-revise gitAnnex git-annex-remote-b2
@@ -704,6 +703,7 @@
     };
 
     xdg.configFile = {
+      "electrum/.keep".text = "";
       "ncmpcpp/bindings".source = ./files/ncmpcpp-bindings;
       "ncmpcpp/config".source = pkgs.substituteAll {
         inherit (config.programs.ncmpcpp) mpdHost;
