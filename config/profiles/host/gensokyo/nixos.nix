@@ -69,6 +69,14 @@ in {
             length = 64;
           };
         };
+        matrix-appservice-irc-passkey = mkIf config.services.matrix-synapse.bridges.irc.enable {
+          provider = "tls";
+          type = "private_key";
+          inputs = {
+            algorithm = "RSA";
+            rsa_bits = 2048;
+          };
+        };
       };
     };
     services = mkMerge [ {
@@ -365,6 +373,10 @@ in {
       };
       ${taskserver.public.fqdn} = mkIf config.services.taskserver.enable {
         owner = mkForce config.services.taskserver.user;
+      };
+      matrix-appservice-irc-passkey = mkIf config.services.matrix-synapse.bridges.irc.enable {
+        owner = config.services.matrix-synapse.bridges.irc.user;
+        source = tf.resources.matrix-appservice-irc-passkey.refAttr "filename";
       };
     } (mapListToAttrs (fqdn: nameValuePair fqdn.name {
       owner = config.services.nginx.user;
