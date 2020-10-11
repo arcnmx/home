@@ -178,6 +178,7 @@ in {
           databaseUrl = mkIf config.services.postgresql.enable "postgresql://bitwarden_rs@/bitwarden_rs";
         };
       };
+      taskserver.organisations.arc.users = singleton "arc";
       #gitolite.adminPubkey = config.secrets.files.ssh_key.getAttr "public_key_openssh";
       nginx.virtualHosts = with meta.deploy.domains; let
         extraParameters = [ "reuseport" "deferred" ];

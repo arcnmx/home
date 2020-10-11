@@ -11,7 +11,7 @@ in {
       taskserver = {
         public = with acme.certs.${domains.taskserver.public.fqdn}; {
           pem = out.importFullchainPem;
-          keyName = name; # TODO: or out.resourceName?
+          keyName = name;
         };
         ca.pem = tf.resources.taskserver_ca.importAttr "cert_pem";
       };

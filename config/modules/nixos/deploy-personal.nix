@@ -1,6 +1,7 @@
-{ tf, meta, config, lib, ... }: with lib; let
+{ tf, meta, config, pkgs, lib, ... }: with lib; let
   cfg = config.deploy.personal;
   inherit (tf) resources;
+  inherit (config.deploy.tf.import) common;
   userType = { config, ... }: let
     userConfig = config;
   in {
@@ -12,16 +13,27 @@
     config = mkMerge [ {
       services.sshd.authorizedKeys = meta.deploy.personal.ssh.authorizedKeys;
     } (mkIf cfg.enable {
-      programs.ssh = {
-        matchBlocks.codecommit.identityFile =
-          userConfig.secrets.files.iam_ssh_key.path;
-        extraConfig = ''
-          IdentityFile ${userConfig.secrets.files.ssh_key.path}
-        '';
+      programs = {
+        ssh = {
+          matchBlocks.codecommit.identityFile =
+            userConfig.secrets.files.iam_ssh_key.path;
+          extraConfig = ''
+            IdentityFile ${userConfig.secrets.files.ssh_key.path}
+          '';
+        };
+        taskwarrior.taskd = {
+          # NOTE: not sure why providing the LE CA is necessary here, but the client fails to verify otherwise
+          authorityCertificate = pkgs.writeText "taskd-ca.pem" (common.acme.certs.${meta.deploy.domains.taskserver.public.fqdn}.out.resource.importAttr "issuer_pem");
+          clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
+          clientKey = userConfig.secrets.files.taskserver-client.path;
+        };
       };
       secrets.files = mkMerge (singleton {
-        iam_ssh_key.text = resources."personal_aws_ssh_key".refAttr "private_key_pem";
-        ssh_key.text = resources."personal_ssh_key".refAttr "private_key_pem";
+        taskserver-client = mkIf userConfig.programs.taskwarrior.enable {
+          text = resources.taskserver_client_key.refAttr "private_key_pem";
+        };
+        iam_ssh_key.text = resources.personal_aws_ssh_key.refAttr "private_key_pem";
+        ssh_key.text = resources.personal_ssh_key.refAttr "private_key_pem";
       } ++ map (ghUser: {
         "github_${ghUser}_ssh_key".text =
           resources."personal_github_ssh_key_${ghUser}".refAttr "private_key_pem";
@@ -44,6 +56,7 @@ in {
   config.deploy = mkIf cfg.enable {
     personal.ssh.authorizedKeys = mkIf (tf.state.resources ? personal_ssh_key) [ (resources."personal_ssh_key".importAttr "public_key_openssh") ];
     tf = mkMerge (singleton {
+      imports = [ "common" ];
       resources = {
         # TODO: deploy this key to gpg via ssh as part of switch??
         personal_ssh_key = {
@@ -62,6 +75,48 @@ in {
           inputs = {
             algorithm = "RSA";
             rsa_bits = 4096;
+          };
+        };
+
+        taskserver_client_key = {
+          provider = "tls";
+          type = "private_key";
+          inputs = {
+            algorithm = "RSA";
+            rsa_bits = 2048;
+          };
+        };
+
+        taskserver_client_csr = {
+          provider = "tls";
+          type = "cert_request";
+          inputs = {
+            key_algorithm = resources.taskserver_client_key.refAttr "algorithm";
+            private_key_pem = resources.taskserver_client_key.refAttr "private_key_pem";
+
+            subject = {
+              common_name = "${config.networking.hostName}.${config.networking.domain}";
+              organization = "arcnmx";
+              organizational_unit = "taskserver";
+            };
+          };
+        };
+        taskserver_client_cert = {
+          provider = "tls";
+          type = "locally_signed_cert";
+          inputs = {
+            cert_request_pem = resources.taskserver_client_csr.refAttr "cert_request_pem";
+            ca_key_algorithm = common.resources.taskserver_ca_key.importAttr "algorithm";
+            ca_private_key_pem = common.resources.taskserver_ca_key.importAttr "private_key_pem";
+            ca_cert_pem = common.resources.taskserver_ca.importAttr "cert_pem";
+
+            allowed_uses = [
+              "digital_signature"
+              "client_auth"
+            ];
+
+            validity_period_hours = 365 * 4 * 24;
+            early_renewal_hours = 365 * 24;
           };
         };
       };
