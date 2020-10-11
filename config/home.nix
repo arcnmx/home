@@ -6,6 +6,7 @@
   config = {
     home.nix = {
       enable = true;
+      nixPath.cwd = "${../channels/cwd.nix}";
     };
     xdg.configFile = {
       "nixpkgs/config.nix".source = "${./channels}/nixpkgs.nix";
