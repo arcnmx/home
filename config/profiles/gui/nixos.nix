@@ -21,7 +21,7 @@ in
 
     fonts = {
       enableDefaultFonts = true;
-      enableFontDir = true;
+      fontDir.enable = true;
       fontconfig = {
         enable = true;
         defaultFonts.monospace = ["Hack" "DejaVu Sans Mono"];
