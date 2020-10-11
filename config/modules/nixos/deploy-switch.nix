@@ -7,20 +7,28 @@ in {
       readOnly = true;
     };
     network = let
-      networkType = kind: types.submodule ({ ... }: {
+      networkType = kind: types.submodule ({ config, ... }: {
         options = {
           ipv4 = mkOption {
             type = types.nullOr types.str;
+          };
+          hasIpv4 = mkOption {
+            type = types.bool;
+            default = config.ipv4 != null;
           };
           ipv6 = mkOption {
             type = types.nullOr types.str;
             default = null;
           };
+          hasIpv6 = mkOption {
+            type = types.bool;
+            default = config.ipv6 != null;
+          };
         };
         config = {
           ipv4 = mkIf (kind == "wan") (mkOptionDefault null);
-          ipv6 = mkIf (config.deploy.network.ipv6.prefix.${kind} != null)
-            (mkDefault "${config.deploy.network.ipv6.prefix.${kind}}:${config.deploy.network.ipv6.postfix.${kind}}");
+          ipv6 = mkIf (cfg.network.ipv6.prefix.${kind} != null)
+            (mkDefault "${cfg.network.ipv6.prefix.${kind}}:${cfg.network.ipv6.postfix.${kind}}");
         };
       });
     in {

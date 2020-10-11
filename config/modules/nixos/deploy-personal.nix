@@ -1,7 +1,39 @@
 { tf, meta, config, lib, ... }: with lib; let
   cfg = config.deploy.personal;
   inherit (tf) resources;
+  userType = { config, ... }: let
+    userConfig = config;
+  in {
+    options.programs.git.gitHub.users = mkOption {
+      type = types.attrsOf (types.submodule ({ name, config, ... }: {
+        config.sshKeyPrivate = mkIf cfg.enable userConfig.secrets.files."github_${name}_ssh_key".path;
+      }));
+    };
+    config = mkMerge [ {
+      services.sshd.authorizedKeys = meta.deploy.personal.ssh.authorizedKeys;
+    } (mkIf cfg.enable {
+      programs.ssh = {
+        matchBlocks.codecommit.identityFile =
+          userConfig.secrets.files.iam_ssh_key.path;
+        extraConfig = ''
+          IdentityFile ${userConfig.secrets.files.ssh_key.path}
+        '';
+      };
+      secrets.files = mkMerge (singleton {
+        iam_ssh_key.text = resources."personal_aws_ssh_key".refAttr "private_key_pem";
+        ssh_key.text = resources."personal_ssh_key".refAttr "private_key_pem";
+      } ++ map (ghUser: {
+        "github_${ghUser}_ssh_key".text =
+          resources."personal_github_ssh_key_${ghUser}".refAttr "private_key_pem";
+      }) (attrNames config.programs.git.gitHub.users));
+    }) ];
+  };
 in {
+  options.home-manager.users = mkOption {
+    type = types.attrsOf (types.submoduleWith {
+      modules = singleton userType;
+    });
+  };
   options.deploy.personal = {
     enable = mkEnableOption "deploy-personal";
     ssh.authorizedKeys = mkOption {
@@ -55,34 +87,5 @@ in {
         };
       };
     }) (unique (concatMap (home: attrNames home.programs.git.gitHub.users) (attrValues config.home-manager.users))));
-  };
-  options.home-manager.users = mkOption {
-    type = types.attrsOf (types.submodule ({ config, ... }: let
-      userConfig = config;
-    in {
-      options.programs.git.gitHub.users = mkOption {
-        type = types.attrsOf (types.submodule ({ name, config, ... }: {
-          config.sshKeyPrivate = mkIf cfg.enable userConfig.secrets.files."github_${name}_ssh_key".path;
-        }));
-      };
-      config = mkMerge [ {
-        services.sshd.authorizedKeys = meta.deploy.personal.ssh.authorizedKeys;
-      } (mkIf cfg.enable {
-        programs.ssh = {
-          matchBlocks.codecommit.identityFile =
-            userConfig.secrets.files.iam_ssh_key.path;
-          extraConfig = ''
-            IdentityFile ${userConfig.secrets.files.ssh_key.path}
-          '';
-        };
-        secrets.files = mkMerge (singleton {
-          iam_ssh_key.text = resources."personal_aws_ssh_key".refAttr "private_key_pem";
-          ssh_key.text = resources."personal_ssh_key".refAttr "private_key_pem";
-        } ++ map (ghUser: {
-          "github_${ghUser}_ssh_key".text =
-            resources."personal_github_ssh_key_${ghUser}".refAttr "private_key_pem";
-        }) (attrNames config.programs.git.gitHub.users));
-      }) ];
-    }));
   };
 }

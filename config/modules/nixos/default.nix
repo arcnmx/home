@@ -8,6 +8,7 @@
     ./deploy-switch.nix
     ./deploy-personal.nix
     ./deploy-tf.nix
+    ./matrix-synapse-bridges.nix
     ./nixbld.nix
     ./connman.nix
     ./home.nix

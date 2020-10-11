@@ -5,5 +5,6 @@
     ./network.nix
     ./deploy.nix
     ./deploy-personal.nix
+    ./deploy-domains.nix
   ];
 }
