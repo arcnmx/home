@@ -1,4 +1,4 @@
-{ meta, name, pkgs, lib, config, ... }: with lib; let
+{ tf, meta, name, pkgs, lib, config, ... }: with lib; let
   cfg = config.deploy;
 in {
   options.deploy = {
@@ -93,6 +93,39 @@ in {
           };
         };
       };
+    };
+    runners.run = {
+      switch.command = ''
+        set -eu
+        export NIXOS_INSTALL_BOOTLOADER=1
+
+        asRoot() {
+          if [[ $(${pkgs.coreutils}/bin/id -u) -ne 0 ]]; then
+            sudo "$@"
+          else
+            "$@"
+          fi
+        }
+
+        if [[ $(${pkgs.inetutils}/bin/hostname -s) != ${config.networking.hostName} ]]; then
+          echo "switch must run on ${config.networking.hostName}" >&2
+          exit 1
+        fi
+
+        asRoot ${pkgs.nix}/bin/nix-env -p /nix/var/nix/profiles/system --set ${cfg.system}
+        asRoot ${cfg.system}/bin/switch-to-configuration switch
+      '';
+      deploy.command = ''
+        set -eu
+
+        if [[ $(${pkgs.inetutils}/bin/hostname -s) = ${config.networking.hostName} ]]; then
+          ${config.runners.run.switch.package}/bin/switch
+        else
+          export NIX_SSHOPTS="${tf.deploy.systems.${name}.connection.nixStoreSshOpts}"
+          ${pkgs.nix}/bin/nix copy --substitute-on-destination --to ${tf.deploy.systems.${name}.connection.nixStoreUrl} ${config.runners.run.switch.package}
+          ${pkgs.openssh}/bin/ssh ${tf.deploy.systems.${name}.connection.host} ${config.runners.run.switch.package}/bin/switch
+        fi
+      '';
     };
     _module.args.target = mapNullable (targetName: meta.deploy.targets.${targetName}) cfg.targetName;
   };
