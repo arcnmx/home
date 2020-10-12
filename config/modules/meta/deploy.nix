@@ -51,6 +51,7 @@ in {
               #version = "0.13"; # TODO: this doesn't seem to be working right now? https://github.com/NixOS/nixpkgs/issues/98652
               logPath = cfg.dataDir + "/terraform-${config.name}.log";
               dataDir = cfg.dataDir + "/tfdata";
+              environment.TF_CLI_ARGS_apply = "-backup=-";
             };
             state = {
               file = cfg.dataDir + "/${config.name}.tfstate";

@@ -44,7 +44,7 @@
           type = "file";
           inputs = {
             sensitive_content = tf.resources.ssh_home.refAttr "private_key_pem";
-            filename = toString (meta.deploy.dataDir + "/ssh_home_mystia");
+            filename = toString (tf.terraform.dataDir + "/ssh_home_mystia");
             file_permission = "0600";
           };
         };

@@ -2,7 +2,7 @@
   imports = (import ./profiles/modules.nix { }).metaImports;
   config = {
     deploy = {
-      dataDir = ../state;
+      dataDir = ../deploy;
     };
     home.profiles = {
       base = {
