@@ -141,11 +141,6 @@
           };
         } ];
       };
-      runners.run = {
-        ssh = {
-          command = ''${pkgs.openssh}/bin/ssh -i ${tf.resources.ssh_home_file.getAttr "filename"} root@${tf.resources.server.getAttr "ipv4_address"} "$@"'';
-        };
-      };
     };
 
     nix.gc.automatic = true;
