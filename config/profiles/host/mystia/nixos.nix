@@ -60,7 +60,7 @@
           provider = "digitalocean";
           type = "ssh_key";
           inputs = {
-            name = "home";
+            name = "${meta.deploy.idTag}/${config.networking.hostName}";
             public_key = tf.resources.ssh_home.refAttr "public_key_openssh";
           };
         };
@@ -73,10 +73,13 @@
             region = "tor1";
             #region = "sfo2";
             size = "s-1vcpu-2gb";
+            #resize_disk = false; # set to temporarily upgrade
+            #monitoring = true; # forces replacement :<
             #ipv6 = true;
             ssh_keys = [
               (tf.resources.server_ssh_home.refAttr "id")
             ];
+            tags = singleton meta.deploy.idTag;
           };
           connection = {
             type = "ssh";

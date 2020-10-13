@@ -18,6 +18,11 @@ in {
       dataDir = mkOption {
         type = types.path;
       };
+      idTag = mkOption {
+        type = types.str;
+        default = "homedeploy";
+        description = "resource tag for identifying managed resources";
+      };
       local = {
         isRoot = mkOption {
           type = types.bool;

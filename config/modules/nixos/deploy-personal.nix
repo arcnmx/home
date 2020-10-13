@@ -136,7 +136,7 @@ in {
           provider = "github.github-${ghUser}";
           type = "user_ssh_key";
           inputs = {
-            title = "${config.networking.hostName} deploy key";
+            title = "${meta.deploy.idTag}/${config.networking.hostName}";
             key = resources."personal_github_ssh_key_${ghUser}".refAttr "public_key_openssh";
           };
         };
