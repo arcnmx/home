@@ -6,6 +6,7 @@
 
   imports = [
     ./deploy-switch.nix
+    ./deploy-state.nix
     ./deploy-personal.nix
     ./deploy-tf.nix
     ./matrix-synapse-bridges.nix

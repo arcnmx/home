@@ -110,7 +110,16 @@ in {
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
     }) (filter (cfg: cfg.package != null) enabledBridges)))));
-    # TODO: deploy.mutableState = mapListToAttrs (cfg: nameValuePair cfg.name { paths = cfg.dataDir; }) enabledBridges;
+    deploy.mutableState = mapListToAttrs (cfg: nameValuePair cfg.name {
+      # TODO: databases?
+      enable = mkDefault cfg.enable;
+      backup.frequency.days = mkDefault 5; # these get noisy
+      owner = mkIf cfg.createUser cfg.user;
+      group = mkIf cfg.createUser cfg.group;
+      paths = singleton {
+        path = cfg.dataDir;
+      };
+    }) (attrValues cfg);
     users = let
       bridges = filter (cfg: cfg.createUser) enabledBridges;
     in {

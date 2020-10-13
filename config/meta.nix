@@ -3,6 +3,11 @@
   config = {
     deploy = {
       dataDir = ../deploy;
+      archive.borg = {
+        repoDir = config.deploy.dataDir + "/data";
+        keyFile = config.deploy.dataDir + "/data.key";
+        passphraseShellCommand = "bitw get tokens/borg-home -f passphrase";
+      };
     };
     home.profiles = {
       base = {
