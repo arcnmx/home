@@ -15,8 +15,10 @@
     } (mkIf cfg.enable {
       programs = {
         ssh = {
-          matchBlocks.codecommit.identityFile =
-            userConfig.secrets.files.iam_ssh_key.path;
+          matchBlocks."git-codecommit.*.amazonaws.com" = {
+            identityFile = userConfig.secrets.files.iam_ssh_key.path;
+            user = resources.personal_aws_ssh_key.getAttr "ssh_public_key_id";
+          };
           extraConfig = ''
             IdentityFile ${userConfig.secrets.files.ssh_key.path}
           '';
