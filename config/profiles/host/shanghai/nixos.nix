@@ -160,16 +160,16 @@
       supportedFilesystems = ["btrfs"];
     } (let
       vfio-pci-ids = [
-        # "10de:1c81" "10de:0fb9" # GTX 1050
-        "10de:1e07" "10de:10f7" "10de:1ad6" "10de:1ad7" # RTX 2080 Ti
-        "10de:1f82" "10de:10fa" # GTX 1660
+        # "10de:1c81" "10de:0fb9" # 1050
+        # "10de:1f82" "10de:10fa" # 1660
+        # "10de:2206" "10de:1aef" # 3080
       ];
     in mkIf config.home.profiles.vfio {
       # TODO: extraModprobeConfig does not seem to be placed in initrd, see: https://github.com/NixOS/nixpkgs/issues/25456
       #extraModprobeConfig = mkIf config.home.profiles.vfio ''
       #  options vfio-pci ids=${concatStringsSep "," vfio-pci-ids}
       #'';
-      kernelParams = [
+      kernelParams = mkIf (vfio-pci-ids != [ ]) [
         "vfio-pci.ids=${concatStringsSep "," vfio-pci-ids}"
       ];
     }) ];
