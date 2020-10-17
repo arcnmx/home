@@ -36,7 +36,7 @@
         default = true;
       };
       out = {
-        config = mkOption {
+        extraConfig = mkOption {
           type = types.attrs;
           default = { };
         };
@@ -51,7 +51,7 @@
       };
     };
     config.out = {
-      config = mkIf config.enable {
+      extraConfig = mkIf config.enable {
         mac = config.mac;
         encryption = config.type;
         keyid = mkIf (config.participants != []) (builtins.head config.participants);
@@ -77,7 +77,7 @@
     };
     config = {
       out = {
-        config = {
+        extraConfig = {
           type = "S3";
           inherit (config) bucket prefix;
         };
@@ -97,7 +97,7 @@
     };
     config = {
       out = {
-        config = {
+        extraConfig = {
           type = "rsync";
           rsyncurl = config.url;
         };
@@ -123,7 +123,7 @@
     };
     config = {
       out = {
-        config = {
+        extraConfig = {
           type = "external";
           externaltype = "b2";
           inherit (config) bucket;
@@ -140,7 +140,7 @@
         default = null;
       };
       out = {
-        config = mkOption {
+        extraConfig = mkOption {
           type = types.attrsOf types.unspecified;
           default = { };
         };
@@ -152,12 +152,12 @@
     };
     config = {
       out = {
-        config = {
+        extraConfig = {
           type = "directory";
           directory = config.path;
         };
         enableConfig = {
-          inherit (config.out.config) directory;
+          inherit (config.out.extraConfig) directory;
         };
       };
     };
@@ -172,7 +172,7 @@
     };
     config = {
       out = {
-        config = {
+        extraConfig = {
           type = "git";
           # inherit config.location;
         };
@@ -195,7 +195,7 @@
           default = null;
           # example "5MiB"
         };
-        config = mkOption {
+        extraConfig = mkOption {
           type = types.attrsOf types.unspecified;
           default = { };
         };
@@ -248,13 +248,14 @@
         };
       };
       config = {
-        enable = mkOptionDefault (config.uuid != null || config.config != {});
-        config = mkMerge [
-          (mapAttrs (_: mkDefault) config.out.specialRemote.config)
+        enable = mkOptionDefault (config.uuid != null || config.extraConfig != {});
+        encryption.participants = mkOptionDefault defaults.annex.participants;
+        extraConfig = mkMerge [
+          (mapAttrs (_: mkDefault) config.out.specialRemote.extraConfig)
           (mkIf (config.chunkSize != null) {
             ${config.chunkType} = mkDefault "${config.chunkSize}";
           })
-          config.encryption.out.config
+          config.encryption.out.extraConfig
         ];
         enableConfig = mapAttrs (_: mkDefault) config.out.specialRemote.enableConfig
           // config.encryption.out.enableConfig;
@@ -266,11 +267,11 @@
             else if config.rsync != null then config.rsync.out
             else if config.git != null then config.git.out
             else {
-              config = { };
+              extraConfig = { };
               enableConfig = { };
             };
           initremote = singleton (
-            mapAttrsToList (k: v: "${k}=${annexString v}") config.config
+            mapAttrsToList (k: v: "${k}=${annexString v}") config.extraConfig
           ) ++ map (key: config.out.enableremote ++ singleton "keyid+=${key}") config.encryption.out.additionalKeys;
           enableremote = mapAttrsToList (k: v: "${k}=${annexString v}") config.enableConfig;
         };
@@ -301,7 +302,7 @@
         };
         provider = mkOption {
           type = tfTypes.providerReferenceType;
-          default = cfg.defaults.providers.aws or "aws";
+          default = cfg.defaults.providers.aws.set or "aws";
         };
         private = mkOption {
           type = types.bool;
@@ -345,7 +346,7 @@
       config.out = {
         url = "https://${config.region}.console.aws.amazon.com/codesuite/codecommit/repositories/${config.repo}/browse";
         httpsCloneUrl = "https://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
-        sshCloneUrl = "ssh://git-codecommit.${config.region}eu-west-1.amazonaws.com/v1/repos/${config.repo}";
+        sshCloneUrl = "ssh://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
         grcCloneUrl = "codecommit::${config.region}://${config.repo}";
         arn = "arn:aws:codecommit:${config.repo}:${config.accountNumber}:${config.repo}";
         cloneUrl = {
@@ -357,10 +358,10 @@
           ${config.out.repoResourceName} = {
             provider = config.provider.reference;
             type = mkDefault "codecommit_repository";
-            inputs = {
+            inputs = mkMerge [ {
               repository_name = mkDefault config.repo;
               description = mkIf (config.description != null) (mkDefault config.description);
-            } // cfg.defaults.providerConfig.aws or { };
+            } (cfg.defaults.providerConfig.aws or { }) ];
           };
         };
       };
@@ -374,14 +375,14 @@
       options = {
         create = mkOption {
           type = types.bool;
-          default = false;
+          default = true;
         };
         owner = mkOption {
           type = types.str;
         };
         provider = mkOption {
           type = tfTypes.providerReferenceType;
-          default = cfg.defaults.providers.github or "github";
+          default = cfg.defaults.providers.github.set or "github";
         };
         repo = mkOption {
           type = types.str;
@@ -406,7 +407,7 @@
             default = { };
           };
           repoResourceName = mkOption {
-            type = types.attrsOf types.unspecified;
+            type = types.str;
             default = tlib.terraformIdent "${config.repo}-github";
           };
           repoResource = mkOption {
@@ -431,16 +432,16 @@
           ${config.out.repoResourceName} = {
             provider = config.provider.reference;
             type = mkDefault "repository";
-            inputs = {
-              name = mkDefault config.name;
+            inputs = mkMerge [ {
+              name = mkDefault config.repo;
               #description = mkIf (config.description != null) (mkDefault config.description);
               private = true;
               # TODO: many other attrs could go here...
-            } // cfg.defaults.providerConfig.github or { };
+            } (cfg.defaults.providerConfig.github or { }) ];
           };
         };
       };
-      config.owner = mkIf (config.provider.out.provider.inputs ? owner) (mkOptionDefault config.provider.out.provider.inputs.owner);
+      config.owner = mkIf (config.provider.out.provider ? inputs.owner) (mkOptionDefault config.provider.out.provider.inputs.owner);
     });
     specialArgs = {
       inherit defaults;
@@ -470,10 +471,10 @@
           default = null;
         };
         annex = mkOption {
-          type = types.nullOr (annexRemoteType {
+          type = annexRemoteType {
             inherit defaults;
-          });
-          default = null;
+          };
+          default = { };
         };
         cloneUrl = {
           fetch = mkOption {
@@ -484,7 +485,7 @@
             default = config.cloneUrl.fetch;
           };
         };
-        config = mkOption {
+        extraConfig = mkOption {
           type = types.attrsOf types.unspecified;
           default = { };
         };
@@ -517,7 +518,6 @@
       };
       config = {
         gcrypt.participants = mkOptionDefault defaults.gcrypt.participants;
-        annex.encryption.participants = mkOptionDefault defaults.annex.participants;
         cloneUrl = mkMerge [
           (mkIf (config.github != null) (mapAttrs (_: mkOptionDefault) {
             inherit (config.github.out.cloneUrl) fetch push;
@@ -531,7 +531,7 @@
           })
         ];
         out = let
-          gitConfig = mapAttrsToList (k: v: "git" "config" "remote.${name}" k v) config.config;
+          gitConfig = mapAttrsToList (k: v: "git" "config" "remote.${name}" k v) config.extraConfig;
         in {
           setRepoResources = mkMerge [
             (mkIf (config.github != null && config.github.create) config.github.out.setRepoResources)
