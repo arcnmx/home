@@ -14,10 +14,6 @@
     # xf86-video-nouveau?
     boot = {
       kernelModules = ["i2c-dev"];
-      extraModprobeConfig = ''
-        options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100
-      '';
-      #initrd.kernelModules = ["nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm"]; # is this necessary? for early kms?
     };
     services.xserver.deviceSection = ''
       Driver "nvidia"

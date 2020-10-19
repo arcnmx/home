@@ -77,22 +77,23 @@
     '';
     services.xserver = let
       benq = {
-        output = "HDMI-0"; # DVI -> HDMI
-        #output = "DP-0";
+        output = "HDMI-0";
+        options = optional (hasPrefix "DP-" benq.output) "AllowGSYNCCompatible = On";
         w = 2560;
         h = 1440;
         x = 0;
         y = lg.h - benq.h;
       };
       lg = {
-        output = "DVI-D-0"; # DVI -> HDMI
+        output = "DP-0";
+        options = optional (hasPrefix "DP-" lg.output) "AllowGSYNCCompatible = On";
         w = 3840;
         h = 2160;
         x = benq.w;
         y = 0;
       };
       acer = {
-        output = "DP-1"; # DP -> HDMI
+        output = "DP-3"; # DP -> HDMI
         w = 1920;
         h = 1080;
         x = benq.w + lg.w;
@@ -114,17 +115,21 @@
           '';
         };
       };
-      deviceSection = ''
+      deviceSection = mkMerge [
         # NOTE: this is decimal, be careful! IDs are typically shown in hex
-        #BusID "PCI:39:0:0" # primary GPU
-        BusID "PCI:40:0:0" # secondary GPU
-        Option "Monitor-${lg.output}" "Monitor[0]"
-        Option "Monitor-${benq.output}" "Monitor[1]"
-        Option "Monitor-${acer.output}" "Monitor[2]"
-      '';
+        #''BusID "PCI:39:0:0"'' # primary GPU
+        #''BusID "PCI:40:0:0"'' # secondary GPU
+        ''BusID "PCI:37:0:0"'' # tertiary (chipset slot) GPU
+        ''
+          Option "Monitor-${lg.output}" "Monitor[0]"
+          Option "Monitor-${benq.output}" "Monitor[1]"
+          Option "Monitor-${acer.output}" "Monitor[2]"
+        ''
+      ];
       screenSection = ''
         Option "MetaModes" "${concatMapStringsSep ", " (mon:
           "${mon.output}: ${toString mon.w}x${toString mon.h} +${toString mon.x}+${toString mon.y}"
+          + optionalString ((mon.options or [ ]) != [ ]) (" { ${concatStringsSep ", " mon.options} }")
         ) [ benq lg acer ]}"
       '';
       monitorSection = ''
@@ -162,13 +167,10 @@
       vfio-pci-ids = [
         # "10de:1c81" "10de:0fb9" # 1050
         # "10de:1f82" "10de:10fa" # 1660
-        # "10de:2206" "10de:1aef" # 3080
+        "10de:2206" "10de:1aef" # 3080
       ];
     in mkIf config.home.profiles.vfio {
       # TODO: extraModprobeConfig does not seem to be placed in initrd, see: https://github.com/NixOS/nixpkgs/issues/25456
-      #extraModprobeConfig = mkIf config.home.profiles.vfio ''
-      #  options vfio-pci ids=${concatStringsSep "," vfio-pci-ids}
-      #'';
       kernelParams = mkIf (vfio-pci-ids != [ ]) [
         "vfio-pci.ids=${concatStringsSep "," vfio-pci-ids}"
       ];
