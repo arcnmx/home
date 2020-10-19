@@ -79,7 +79,7 @@
 
     # fancontrol
     boot.kernel.sysctl = let
-      nct = ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon2";
+      nct = ".//.//.sys.devices.platform.nct6775/2592.hwmon.hwmon3";
     in {
       # motherboard
       "${nct}.temp1_max" = 40000;

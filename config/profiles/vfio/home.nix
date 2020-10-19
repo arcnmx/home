@@ -5,7 +5,7 @@
       split-window -h "top -H" \; \
       split-window -v "watch -t 'cat /proc/cpuinfo|grep MHz'" \; \
       select-pane -L \; \
-      split-window -dv "watch -t sensors -c /etc/sensors3.conf" \; \
+      split-window -dv "watch -t sensors -c /etc/sensors3.conf 'nct6795-*' 'k10temp-pci-*'" \; \
       attach
   '';
 in {
