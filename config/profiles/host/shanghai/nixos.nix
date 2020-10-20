@@ -562,9 +562,11 @@
       ];
     };
 
+    hardware.nvidia.modesetting.enable = mkForce false; # prevents dynamic gpu unbinding
     boot = {
       extraModulePackages = [ config.boot.kernelPackages.v4l2loopback.out ];
       modprobe.modules = {
+        nvidia_drm.blacklist = true; # prevents dynamic gpu unbinding
         vfio-pci = let
           vfio-pci-ids = [
             # "10de:1c81" "10de:0fb9" # 1050
