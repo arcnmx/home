@@ -53,9 +53,9 @@ in {
           };
           config.tf = mkMerge (singleton {
             terraform = {
-              #version = "0.13"; # TODO: this doesn't seem to be working right now? https://github.com/NixOS/nixpkgs/issues/98652
+              version = "0.13";
               logPath = cfg.dataDir + "/terraform-${config.name}.log";
-              dataDir = cfg.dataDir + "/tfdata";
+              dataDir = cfg.dataDir + "/tfdata/${config.name}";
               environment.TF_CLI_ARGS_apply = "-backup=-";
             };
             state = {
