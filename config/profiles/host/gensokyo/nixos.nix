@@ -363,6 +363,10 @@ in {
         $PSQL -tAc 'CREATE USER "matrix-synapse"'
       $PSQL -tAc 'GRANT ALL PRIVILEGES ON DATABASE "matrix-synapse" TO "matrix-synapse"'
     '');
+    systemd.services.bitwarden_rs = mkIf (config.services.bitwarden_rs.enable && config.services.bitwarden_rs.dbBackend == "postgresql") {
+      requires = [ "postgresql.service" ];
+      after = [ "postgresql.service" ];
+    };
     secrets.files = with meta.deploy.domains; mkMerge [ {
       matrix-synapse-secrets = mkIf config.services.matrix-synapse.enable {
         owner = "matrix-synapse";
