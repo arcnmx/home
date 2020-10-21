@@ -143,7 +143,10 @@
       };
     };
 
-    nix.gc.automatic = true;
+    nix.gc = {
+      automatic = true;
+      options = "-d"; # actually delete old things
+    };
 
     swapDevices = [ {
       device = "/swap";
