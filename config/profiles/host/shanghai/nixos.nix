@@ -44,12 +44,7 @@
       };
     };
     services.openssh.ports = [ 22 32022 ];
-    hardware.openrazer = {
-      enable = true;
-      devicesOffOnScreensaver = false;
-      mouseBatteryNotifier = false;
-      #syncEffectsEnabled = false;
-    };
+    hardware.openrazer.enable = true;
     hardware.pulseaudio.extraConfig = let
       usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
     in ''

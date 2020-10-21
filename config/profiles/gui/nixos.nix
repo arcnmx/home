@@ -69,7 +69,7 @@ in
           MatchUSBID "1532:0067"
           Option "SampleRate" "1000"
           Option "Resolution" "5900"
-          Option "Sensitivity" "0.525"
+          #Option "Sensitivity" "0.525"
         ''
         ''
           Identifier "naga2014"
@@ -77,10 +77,25 @@ in
           MatchUSBID "1532:0040"
           Option "SampleRate" "1000"
           Option "Resolution" "3100"
-          Option "Sensitivity" "1.0"
+          #Option "Sensitivity" "1.0"
         ''
       ];
       libinput.naturalScrolling = true;
+    };
+    services.udev.extraRules = let
+      openrazerDpi = pkgs.writeShellScript "openrazer-dpi" ''
+        set -xeu
+
+        printf %04x $1 | ${pkgs.xxd}/bin/xxd -r -p > /sys/$DEVPATH/dpi
+      '';
+    in ''
+      ACTION=="add", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazerDpi} 5900"
+      ACTION=="add", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazerDpi} 3100"
+    '';
+    hardware.openrazer = {
+      devicesOffOnScreensaver = false;
+      mouseBatteryNotifier = false;
+      #syncEffectsEnabled = false;
     };
 
     # TODO: gui/usr/lib/firefox overrides
