@@ -539,7 +539,7 @@ in {
         ${pkgs.xcompmgr}/bin/xcompmgr &
         ${pkgs.rxvt-unicode-arc}/bin/urxvtd &
 
-        export LESS=''${LESS://F}
+        export LESS=''${LESS//F}
       '';
         #${pkgs.xorg.xrandr}/bin/xrandr > /dev/null 2>&1
     };
