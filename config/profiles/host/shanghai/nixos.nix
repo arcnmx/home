@@ -72,7 +72,7 @@
     '';
     services.xserver = let
       benq = {
-        output = "HDMI-0";
+        output = "DP-0";
         options = optional (hasPrefix "DP-" benq.output) "AllowGSYNCCompatible = On";
         w = 2560;
         h = 1440;
@@ -80,7 +80,7 @@
         y = lg.h - benq.h;
       };
       lg = {
-        output = "DP-0";
+        output = "HDMI-0";
         options = optional (hasPrefix "DP-" lg.output) "AllowGSYNCCompatible = On";
         w = 3840;
         h = 2160;
