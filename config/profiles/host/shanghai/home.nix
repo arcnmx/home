@@ -43,12 +43,5 @@
         ExecStart = "${config.home.homeDirectory}/projects/gensokyo/ledger/update_prices";
       };
     };
-
-    systemd.user.timers.konawall = {
-      Timer = {
-        OnCalendar = "Mon..Fri *-*-* 18:00:00";
-      };
-      Install.WantedBy = ["timers.target"];
-    };
   }) ];
 }
