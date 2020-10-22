@@ -69,7 +69,7 @@ in {
                 nixArgs = [ "--show-trace" ];
               };
             };
-            continue.envVar = "TF_NIX_CONTINUE_${config.name}";
+            continue.envVar = "TF_NIX_CONTINUE_${replaceStrings [ "-" ] [ "_" ] config.name}";
           } ++ map (nodeName: mapAttrs (_: mkMerge) meta.network.nodes.${nodeName}.deploy.tf.out.set) config.nodeNames);
         });
       in mkOption {
