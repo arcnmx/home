@@ -3,6 +3,16 @@
 in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
+    home.profileSettings.personal = {
+      primaryHost = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+      };
+      isPrimary = mkOption {
+        type = types.bool;
+        default = config.home.hostName == config.home.profileSettings.personal.primaryHost;
+      };
+    };
     programs.ncmpcpp.mpdHost = mkOption {
       type = types.nullOr types.str;
       default = null;
@@ -40,6 +50,7 @@ in {
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
+    home.profileSettings.personal.primaryHost = "shanghai";
     home.shell = {
       aliases.vit = "task vit";
       functions = {
@@ -679,7 +690,9 @@ in {
           tags = "yes";
         };
         reserved.lines = "2";
-        recurrence.confirmation = "no";
+        recurrence = if config.home.profileSettings.personal.isPrimary then {
+          confirmation = "no";
+        } else "off"; # https://github.com/GothenburgBitFactory/taskserver/issues/46
         bulk = 7;
         nag = "";
 
