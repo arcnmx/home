@@ -53,9 +53,5 @@
         hostName = host;
       };
     }) (builtins.readDir ./profiles/host);
-    /*home.profiles-applied = mapAttrs (_: configuration: import <home-manager/modules> {
-      inherit configuration pkgs lib;
-      #check = ??;
-    }) config.home.profiles;*/
   };
 }
