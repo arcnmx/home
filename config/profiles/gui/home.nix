@@ -185,7 +185,7 @@ in {
             "browser.search.update" = false;
             "browser.selfsupport.url" = "";
             "extensions.getAddons.cache.enabled" = false;
-            "extensions.pocket.enabled" = false;
+            "extensions.pocket.enabled" = true;
             "geo.enabled" = false;
             "geo.wifi.uri" = false;
             "keyword.enabled" = false;
