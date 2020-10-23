@@ -8,6 +8,8 @@
     if value == true then "true"
     else if value == false then "false"
     else toString value;
+  gitConfigCommands = config:
+    mapAttrsToList (k: v: [ "git" "config" k v ]) config;
   gcryptType = types.submodule ({ config, name, ... }: {
     options = {
       enable = mkEnableOption "git-remote-gcrypt";
@@ -55,7 +57,7 @@
         mac = config.mac;
         encryption = config.type;
         keyid = mkIf (config.participants != []) (builtins.head config.participants);
-        embedcreds = config.embed;
+        embedcreds = if config.embed then "yes" else "no";
       };
       enableConfig = { };
       additionalKeys = mkIf config.enable (builtins.tail config.participants);
@@ -79,7 +81,8 @@
       out = {
         extraConfig = {
           type = "S3";
-          inherit (config) bucket prefix;
+          inherit (config) bucket;
+          fileprefix = config.prefix;
         };
         enableConfig = { };
       };
@@ -126,8 +129,7 @@
         extraConfig = {
           type = "external";
           externaltype = "b2";
-          inherit (config) bucket;
-          fileprefix = config.prefix;
+          inherit (config) bucket prefix;
         };
         enableConfig = { };
       };
@@ -343,28 +345,30 @@
           };
         };
       };
-      config.out = {
-        url = "https://${config.region}.console.aws.amazon.com/codesuite/codecommit/repositories/${config.repo}/browse";
-        httpsCloneUrl = "https://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
-        sshCloneUrl = "ssh://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
-        grcCloneUrl = "codecommit::${config.region}://${config.repo}";
-        arn = "arn:aws:codecommit:${config.repo}:${config.accountNumber}:${config.repo}";
-        cloneUrl = {
-          # TODO: configure default protocol: ssh, https, grc
-          fetch = config.out.sshCloneUrl;
-          push = config.out.sshCloneUrl;
-        };
-        setRepoResources = mkIf config.create {
-          ${config.out.repoResourceName} = {
-            provider = config.provider.reference;
-            type = mkDefault "codecommit_repository";
-            inputs = mkMerge [ {
-              repository_name = mkDefault config.repo;
-              description = mkIf (config.description != null) (mkDefault config.description);
-            } (cfg.defaults.providerConfig.aws or { }) ];
+      config = mkMerge [ (cfg.defaults.remoteConfig.aws or { }) {
+        out = {
+          url = "https://${config.region}.console.aws.amazon.com/codesuite/codecommit/repositories/${config.repo}/browse";
+          httpsCloneUrl = "https://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
+          sshCloneUrl = "ssh://git-codecommit.${config.region}.amazonaws.com/v1/repos/${config.repo}";
+          grcCloneUrl = "codecommit::${config.region}://${config.repo}";
+          arn = "arn:aws:codecommit:${config.repo}:${config.accountNumber}:${config.repo}";
+          cloneUrl = {
+            # TODO: configure default protocol: ssh, https, grc
+            fetch = config.out.sshCloneUrl;
+            push = config.out.sshCloneUrl;
+          };
+          setRepoResources = mkIf config.create {
+            ${config.out.repoResourceName} = {
+              provider = config.provider.reference;
+              type = mkDefault "codecommit_repository";
+              inputs = mkMerge [ {
+                repository_name = mkDefault config.repo;
+                description = mkIf (config.description != null) (mkDefault config.description);
+              } (cfg.defaults.providerConfig.aws or { }) ];
+            };
           };
         };
-      };
+      } ];
     });
     specialArgs = {
       inherit defaults;
@@ -420,35 +424,37 @@
           };
         };
       };
-      config.out = {
-        url = "https://github.com/${config.owner}/${config.repo}";
-        httpsCloneUrl = "https://github.com/${config.owner}/${config.repo}.git";
-        sshCloneUrl = "ssh://git@github.com/${config.owner}/${config.repo}.git";
-        cloneUrl = {
-          fetch = if config.private then config.out.sshCloneUrl else config.out.httpsCloneUrl;
-          push = config.out.sshCloneUrl;
-        };
-        setRepoResources = mkIf config.create {
-          ${config.out.repoResourceName} = {
-            provider = config.provider.reference;
-            type = mkDefault "repository";
-            inputs = mkMerge [ {
-              name = mkDefault config.repo;
-              #description = mkIf (config.description != null) (mkDefault config.description);
-              private = true;
-              # TODO: many other attrs could go here...
-            } (cfg.defaults.providerConfig.github or { }) ];
+      config = mkMerge [ (cfg.defaults.remoteConfig.github or { }) {
+        owner = mkIf (config.provider.out.provider ? inputs.owner) (mkOptionDefault config.provider.out.provider.inputs.owner);
+        out = {
+          url = "https://github.com/${config.owner}/${config.repo}";
+          httpsCloneUrl = "https://github.com/${config.owner}/${config.repo}.git";
+          sshCloneUrl = "ssh://git@github.com/${config.owner}/${config.repo}.git";
+          cloneUrl = {
+            fetch = if config.private then config.out.sshCloneUrl else config.out.httpsCloneUrl;
+            push = config.out.sshCloneUrl;
+          };
+          setRepoResources = mkIf config.create {
+            ${config.out.repoResourceName} = {
+              provider = config.provider.reference;
+              type = mkDefault "repository";
+              inputs = mkMerge [ {
+                name = mkDefault config.repo;
+                #description = mkIf (config.description != null) (mkDefault config.description);
+                visibility = "private";
+                # TODO: many other attrs could go here...
+              } (cfg.defaults.providerConfig.github or { }) ];
+            };
           };
         };
-      };
-      config.owner = mkIf (config.provider.out.provider ? inputs.owner) (mkOptionDefault config.provider.out.provider.inputs.owner);
+      } ];
     });
     specialArgs = {
       inherit defaults;
     };
   };
-  repoRemoteType = { defaults }: types.submoduleWith {
-    modules = singleton ({ config, name, defaults, ... }: {
+  repoRemoteType = { repo, defaults }: types.submoduleWith {
+    modules = singleton ({ repo, config, name, defaults, ... }: {
       options = {
         name = mkOption {
           type = types.str;
@@ -530,8 +536,11 @@
             push = mkOptionDefault null;
           })
         ];
+        extraConfig = mkIf (repo.annex.enable && !config.annex.enable) {
+          annex-ignore = mkDefault "true";
+        };
         out = let
-          gitConfig = mapAttrsToList (k: v: "git" "config" "remote.${name}" k v) config.extraConfig;
+          gitConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${name}.${k}") config.extraConfig);
         in {
           setRepoResources = mkMerge [
             (mkIf (config.github != null && config.github.create) config.github.out.setRepoResources)
@@ -572,7 +581,7 @@
       };
     });
     specialArgs = {
-      inherit defaults;
+      inherit defaults repo;
     };
   };
   repoType = types.submodule ({ config, name, ... }: {
@@ -599,11 +608,26 @@
       };
       remotes = mkOption {
         type = types.attrsOf (repoRemoteType {
+          repo = config;
           defaults = {
             inherit (config.out) name;
             inherit (config) annex gcrypt;
           };
         });
+        default = { };
+      };
+      environment = {
+        init = mkOption {
+          type = types.attrsOf types.str;
+          default = { };
+        };
+        fetch = mkOption {
+          type = types.attrsOf types.str;
+          default = { };
+        };
+      };
+      extraConfig = mkOption {
+        type = types.attrsOf types.unspecified;
         default = { };
       };
       out = {
@@ -646,14 +670,19 @@
           ([ "git" "clone" config.out.origin.cloneUrl.fetch "." ]
             ++ optionals (config.out.origin.name != "origin") [ "-o" config.out.origin.name ]
           )
-        ] ++ optionals (config.annex.enable) [
+        ] ++ gitConfigCommands config.extraConfig
+        ++ optionals (config.annex.enable) [
           [ "git" "annex" "init" ]
         ] ++ config.out.origin.out.set
         ++ concatLists (mapAttrsToList (_: remote: remote.out.add)
           (filterAttrs (_: remote: remote.name != config.out.origin.name) config.remotes));
         init = [
           [ "git" "init" ]
-        ] ++ optionals (config.annex.enable) [
+          [ "git" "remote" "add" config.out.origin.name config.out.origin.cloneUrl.fetch ]
+          [ "git" "config-email" ]
+          [ "git" "remote" "rm" config.out.origin.name ]
+        ] ++ gitConfigCommands config.extraConfig
+        ++ optionals (config.annex.enable) [
           [ "git" "annex" "init" ]
         ] ++ concatLists (mapAttrsToList (_: remote: remote.out.init) config.remotes);
         run = let
@@ -684,6 +713,10 @@ in {
           type = types.attrsOf (types.attrsOf types.unspecified);
           default = { };
         };
+        remoteConfig = mkOption {
+          type = types.attrsOf (types.attrsOf types.unspecified);
+          default = { };
+        };
         gcrypt = {
           participants = mkOption {
             type = types.listOf types.str;
@@ -709,7 +742,23 @@ in {
     };
   };
   config.deploy = {
-    targets.${cfg.target}.tf.resources = cfg.setResources;
+    targets.${cfg.target} = {
+      tf = {
+        resources = cfg.setResources;
+        runners.run = let
+          f = repo: k: v: nameValuePair "${repo.name}-${k}" {
+            command = ''
+              set -eu
+
+            '' + concatStrings (mapAttrsToList (k: v: "export ${k}=${v}\n") (repo.environment.init // repo.environment.fetch))
+            + concatMapStringsSep "\n" escapeShellArgs v;
+          };
+          f' = repo: mapAttrs' (f repo) {
+            inherit (repo.out) clone init;
+          };
+        in mkMerge (map f' (attrValues cfg.repos));
+      };
+    };
     repos = {
       setResources = mkMerge (mapAttrsToList (_: repo: repo.out.setRepoResources) cfg.repos);
     };
