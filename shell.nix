@@ -34,5 +34,6 @@ in pkgs.mkShell {
   shellHook = ''
     export HOME_HOSTNAME=$(hostname -s)
     export HOME_UID=$(id -u)
+    export NIX_PATH="$NIX_PATH:home=${toString ./.}"
   '';
 }
