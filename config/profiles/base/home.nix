@@ -569,6 +569,7 @@ in {
         annex = {
           autocommit = false;
           backend = "SHA256"; # TODO: blake3 when?
+          synccontent = true;
         };
         rebase = {
           autoSquash = true;
