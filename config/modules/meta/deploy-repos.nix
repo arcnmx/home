@@ -750,7 +750,7 @@ in {
             command = ''
               set -eu
 
-            '' + concatStrings (mapAttrsToList (k: v: "export ${k}=${v}\n") (repo.environment.init // repo.environment.fetch))
+            '' + concatStrings (mapAttrsToList (k: v: "${k}=${v}\nexport ${k}\n") (repo.environment.init // repo.environment.fetch))
             + concatMapStringsSep "\n" escapeShellArgs v;
           };
           f' = repo: mapAttrs' (f repo) {
