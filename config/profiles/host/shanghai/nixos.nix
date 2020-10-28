@@ -71,28 +71,29 @@
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
     '';
     services.xserver = let
-      benq = {
+      benq = rec {
         output = "DP-0";
-        options = optional (hasPrefix "DP-" benq.output) "AllowGSYNCCompatible = On";
+        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
         w = 2560;
         h = 1440;
         x = 0;
-        y = lg.h - benq.h;
+        y = lg.h - h;
       };
-      lg = {
+      dell = rec {
         output = "HDMI-0";
-        options = optional (hasPrefix "DP-" lg.output) "AllowGSYNCCompatible = On";
+        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
         w = 3840;
         h = 2160;
         x = benq.w;
         y = 0;
       };
-      acer = {
-        output = "DP-3"; # DP -> HDMI
-        w = 1920;
-        h = 1080;
-        x = benq.w + lg.w;
-        y = lg.h - acer.h;
+      lg = rec {
+        output = "DP-2";
+        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
+        w = 3840;
+        h = 2160;
+        x = benq.w + dell.w;
+        y = 0;
       };
     in {
       displayManager = {
@@ -116,16 +117,16 @@
         #''BusID "PCI:40:0:0"'' # secondary GPU
         ''BusID "PCI:37:0:0"'' # tertiary (chipset slot) GPU
         ''
-          Option "Monitor-${lg.output}" "Monitor[0]"
+          Option "Monitor-${dell.output}" "Monitor[0]"
           Option "Monitor-${benq.output}" "Monitor[1]"
-          Option "Monitor-${acer.output}" "Monitor[2]"
+          Option "Monitor-${lg.output}" "Monitor[2]"
         ''
       ];
       screenSection = ''
         Option "MetaModes" "${concatMapStringsSep ", " (mon:
           "${mon.output}: ${toString mon.w}x${toString mon.h} +${toString mon.x}+${toString mon.y}"
           + optionalString ((mon.options or [ ]) != [ ]) (" { ${concatStringsSep ", " mon.options} }")
-        ) [ benq lg acer ]}"
+        ) [ benq dell lg ]}"
       '';
       monitorSection = ''
         Option "Primary" "true"
