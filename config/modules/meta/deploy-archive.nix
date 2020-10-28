@@ -1,9 +1,17 @@
 { pkgs, config, lib, ... }: with lib; let
   cfg = config.deploy.archive;
+  repo = cfg.borg.repos.${config.deploy.idTag};
+  borg-repos = cfg.borg.repos.repos;
   target = config.deploy.targets.archive-backup;
-  borg = "${cfg.borg.package}/bin/borg";
-  exportPassphrase = optionalString (cfg.borg.passphraseShellCommand != null)
-    ''export BORG_PASSPHRASE="''${BORG_PASSPHRASE-$(${cfg.borg.passphraseShellCommand})}"'';
+  borg = "${repo.package}/bin/borg";
+  borgArgs = [
+    "--warning"
+    "--files-cache=ctime,size" "-p" "-s"
+    "-C" "lzma"
+    "-e" "tmp.*"
+  ];
+  exportPassphrase = passphraseShellCommand: optionalString (passphraseShellCommand != null)
+    ''BORG_PASSPHRASE="''${BORG_PASSPHRASE-$(${passphraseShellCommand})}"'' + "\nexport BORG_PASSPHRASE";
   archiveNameFor = state: path:
     if state.name == path.name then state.name
     else "${key}-${path.name}";
@@ -36,11 +44,8 @@
 
     ${sshFor target} true # check connectivity
 
-    ${exportPassphrase}
-    BORG_ARGS=(
-      --warning
-      --files-cache=ctime,size -p -s -C lzma -e 'tmp.*'
-    )
+    ${exportPassphrase repo.passphraseShellCommand}
+    BORG_ARGS=(${escapeShellArgs borgArgs})
 
     MOUNT_DIR=$(mktemp -d)
     cleanup() {
@@ -67,7 +72,7 @@
       "''${BORG_ARGS[@]}"
       ${concatMapStringsSep " " (p: "-e ${escapeShellArg p}") (path.exclude ++ path.excludeExtract)}
     )
-    ${borg} mount -o nonempty,uid=$(id -u) "''${BORG_EXCLUDES[@]}" "${toString cfg.borg.repoDir}::${borgArchive}" "$MOUNT_DIR"
+    ${borg} mount -o nonempty,uid=$(id -u) "''${BORG_EXCLUDES[@]}" "${toString repo.repoDir}::${borgArchive}" "$MOUNT_DIR"
 
     # wow rsync is bad with globs?
     ${pkgs.rsync}/bin/rsync --progress -e "${sshFor target}" -rav --usermap=\\\*:${path.owner} --groupmap=\\\*:${path.group} "$MOUNT_DIR/" ":${toString path.path}/"
@@ -87,7 +92,7 @@
     # TODO: use idmap files?
     ${sshfsFor target path.path "$MOUNT_DIR"}
 
-    (cd "$MOUNT_DIR" && ${borg} create "''${BORG_EXCLUDES[@]}" "${toString cfg.borg.repoDir}::${borgArchive}" .)
+    (cd "$MOUNT_DIR" && ${borg} create "''${BORG_EXCLUDES[@]}" "${toString repo.repoDir}::${borgArchive}" .)
 
     cleanup
   '';
@@ -97,7 +102,7 @@
   , borgArchive
   , fileName ? "stdin" # "postgresql.sql" when --stdin-name is supported?
   }: ''
-    ${borg} extract --stdout "${toString cfg.borg.repoDir}::${borgArchive}" ${fileName} | ${sshFor target} -CT sudo -u postgres psql --set ON_ERROR_STOP=on "${dbName}"
+    ${borg} extract --stdout "${toString repo.repoDir}::${borgArchive}" ${fileName} | ${sshFor target} -CT sudo -u postgres psql --set ON_ERROR_STOP=on "${dbName}"
   '';
   scriptBackupDatabasePostgresql = {
     dbName
@@ -105,7 +110,7 @@
   , borgArchive
   , fileName ? null # "postgresql.sql" when --stdin-name is supported?
   }: ''
-    ${sshFor target} -CT sudo -u postgres pg_dump "${dbName}" | ${borg} create "''${BORG_ARGS[@]}" ${optionalString (fileName != null) "--stdin-name ${escapeShellArg fileName}"} "${toString cfg.borg.repoDir}::${borgArchive}" -
+    ${sshFor target} -CT sudo -u postgres pg_dump "${dbName}" | ${borg} create "''${BORG_ARGS[@]}" ${optionalString (fileName != null) "--stdin-name ${escapeShellArg fileName}"} "${toString repo.repoDir}::${borgArchive}" -
   '';
   restoreScript = {
     system
@@ -222,14 +227,41 @@
       };
       provisioners = mkIf state.enable [ {
         local-exec = {
-          command = "nix run -f ${toString ../../..} network.nodes.${node.networking.hostName}.run.state-${state.name}-backup -c run ${tf.lib.tf.terraformSelf "id"}";
+          command = escapeShellArgs node.runners.lazy.run."state-${state.name}-backup".out.runArgs + " ${tf.lib.tf.terraformSelf "id"}";
         };
       } ];
     };
   };
-in {
-  options.deploy.archive = {
-    borg = {
+  backupRepoResources = { repo }: let
+    resourceName = repo.name;
+    tf = target.tf;
+  in {
+    "${resourceName}-expiry" = {
+      provider = "time";
+      type = "rotating";
+      inputs = if repo.enable then {
+        rotation_days = 2;
+      } else {
+        rotation_years = 99;
+      };
+    };
+    "${resourceName}-backup" = {
+      provider = "null";
+      type = "resource";
+      inputs = {
+        triggers = {
+          expiry = tf.resources."${resourceName}-expiry".refAttr "id";
+        };
+      };
+      provisioners = mkIf repo.enable [ {
+        local-exec = {
+          command = escapeShellArgs target.tf.runners.lazy.run."${repo.name}-backup".out.runArgs + " ${tf.lib.tf.terraformSelf "id"}";
+        };
+      } ];
+    };
+  };
+  borgRepoSubmodule = { config, ... }: {
+    options = {
       repoDir = mkOption {
         type = types.path;
       };
@@ -240,6 +272,65 @@ in {
         type = types.nullOr types.str;
         default = null;
       };
+      package = mkOption {
+        type = types.package;
+        default = pkgs.writeShellScriptBin "borg" ''
+          export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
+          export BORG_REPO="${toString config.repoDir}"
+          export BORG_KEY_FILE="${toString config.keyFile}"
+          ${exportPassphrase config.passphraseShellCommand}
+
+          exec ${pkgs.borgbackup}/bin/borg "$@"
+        '';
+      };
+    };
+  };
+  borgRepoType = types.submoduleWith {
+    modules = singleton borgRepoSubmodule;
+  };
+  backupRepoScript = { cloneUrl, path, borgArchive }: let
+    git = "${pkgs.gitMinimal}/bin/git";
+  in ''
+    set -eu
+
+    if [[ ! -d ${path} ]]; then
+      git clone --mirror "${cloneUrl}" ${path}
+      cd ${path}
+      ${git} config core.compression 0
+      ${git} config core.looseCompression 0
+      ${git} config pack.compression 0
+      ${git} repack -Fad --depth=250 --window=250
+    else
+      cd ${path}
+    fi
+    ${git} remote update
+    ${git} gc --prune=now
+
+    BORG_ARGS=(${escapeShellArgs borgArgs})
+    ${borg-repos.package}/bin/borg create "''${BORG_ARGS[@]}" "${toString borg-repos.repoDir}::${borgArchive}" .
+  '';
+  backupRepoType = types.submodule ({ config, name, ... }: {
+    options = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+      };
+      name = mkOption {
+        type = types.str;
+        default = name;
+      };
+      cloneUrl = mkOption {
+        type = types.str;
+      };
+    };
+  });
+in {
+  options.deploy.archive = {
+    borg = {
+      repos = mkOption {
+        type = types.attrsOf borgRepoType;
+        default = { };
+      };
       retiredArchives = mkOption {
         type = types.listOf types.str;
         default = [ ];
@@ -249,15 +340,14 @@ in {
         type = types.attrsOf (types.nullOr types.str);
         default = { };
       };
-      package = mkOption {
-        type = types.package;
-        default = pkgs.writeShellScriptBin "borg" ''
-          export BORG_REPO="${toString cfg.borg.repoDir}"
-          export BORG_KEY_FILE="${toString cfg.borg.keyFile}"
-          ${exportPassphrase}
-
-          exec ${pkgs.borgbackup}/bin/borg "$@"
-        '';
+    };
+    repos = {
+      repos = mkOption {
+        type = types.attrsOf backupRepoType;
+        default = { };
+      };
+      workingDir = mkOption {
+        type = types.path;
       };
     };
   };
@@ -270,12 +360,45 @@ in {
     deploy.targets.archive-backup = {
       tf = {
         terraform.environment.TF_CLI_ARGS_apply = "-parallelism=1";
-        resources = mkMerge (map backupResources activeStates);
+        resources = mkMerge (
+          map backupResources activeStates
+          ++ map backupRepoResources (mapAttrsToList (_: repo: { inherit repo; }) cfg.repos.repos)
+        );
+        runners.run = mkMerge [
+          (mapAttrs' (k: repo: nameValuePair "borg-${k}" {
+            package = repo.package;
+            executable = "borg";
+          }) cfg.borg.repos)
+          (mapAttrs' (k: repo: nameValuePair "${repo.name}-backup" {
+            command = let
+              path = cfg.repos.workingDir + "/${repo.name}";
+              script = backupRepoScript {
+                path = "$BACKUP_PATH";
+                cloneUrl = "$BACKUP_CLONE_URL";
+                borgArchive = "$BACKUP_ARCHIVE";
+              };
+            in ''
+              set -eu
+
+              export BACKUP_ARCHIVE="${repo.name}-$1"
+              export BACKUP_PATH="${toString path}"
+              export BACKUP_CLONE_URL="${repo.cloneUrl}"
+
+              exec ${pkgs.writeShellScript "repo-backup" script}
+            '';
+          }) cfg.repos.repos)
+        ];
       };
     };
-    deploy.archive.borg.latestArchive = mapListToAttrs ({ node, state }: let
-      resourceName = optionalString state.instanced "${node.networking.hostName}-" + state.name;
-      postfix = target.tf.resources."${resourceName}-backup".importAttr "id";
-    in nameValuePair state.name postfix) activeStates;
+    deploy.archive = {
+      borg.latestArchive = mapListToAttrs ({ node, state }: let
+        resourceName = optionalString state.instanced "${node.networking.hostName}-" + state.name;
+        postfix = target.tf.resources."${resourceName}-backup".importAttr "id";
+      in nameValuePair state.name postfix) activeStates;
+      repos.repos = mapAttrs (k: repo: {
+        name = mkDefault repo.name;
+        cloneUrl = mkDefault repo.out.origin.out.cloneUrl.fetch;
+      }) config.deploy.repos.repos;
+    };
   };
 }

@@ -3,10 +3,20 @@
   config = {
     deploy = {
       dataDir = ../deploy;
-      archive.borg = {
-        repoDir = config.deploy.dataDir + "/data";
-        keyFile = config.deploy.dataDir + "/data.key";
-        passphraseShellCommand = "bitw get tokens/borg-home -f passphrase";
+      archive = {
+        repos.workingDir = config.deploy.dataDir + "/gitarchive/working";
+        borg.repos = {
+          ${config.deploy.idTag} = {
+            repoDir = config.deploy.dataDir + "/data";
+            keyFile = config.deploy.dataDir + "/data.key";
+            passphraseShellCommand = "bitw get tokens/borg-home -f passphrase";
+          };
+          repos = {
+            repoDir = config.deploy.dataDir + "/gitarchive/data";
+            keyFile = config.deploy.dataDir + "/gitarchive.key";
+            passphraseShellCommand = "bitw get tokens/borg-home-git -f passphrase";
+          };
+        };
       };
     };
     runners = {
