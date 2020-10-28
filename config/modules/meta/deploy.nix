@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: with lib; let
+{ channels, config, pkgs, lib, ... }: with lib; let
   cfg = config.deploy;
   meta = config;
   tfModule = { lib, ... }: with lib; {
@@ -13,6 +13,9 @@
     ];
   };
 in {
+  imports = [
+    (toString (channels.paths.tf + "/modules/run.nix"))
+  ];
   options = {
     deploy = {
       dataDir = mkOption {
@@ -57,16 +60,22 @@ in {
               logPath = cfg.dataDir + "/terraform-${config.name}.log";
               dataDir = cfg.dataDir + "/tfdata/${config.name}";
               environment.TF_CLI_ARGS_apply = "-backup=-";
+              environment.TF_CLI_ARGS_taint = "-backup=-";
             };
             state = {
               file = cfg.dataDir + "/${config.name}.tfstate";
             };
             deps = {
               enable = true;
-              apply.continue.run = {
-                nixFilePath = ../../..;
-                nixAttr = "deploy.targets.${name}.tf.runners.run.apply.package";
-                nixArgs = [ "--show-trace" ];
+            };
+            runners = {
+              lazy = {
+                inherit (meta.runners.lazy) file args;
+                attrPrefix = "deploy.targets.${name}.tf.runners.run.";
+              };
+              run = {
+                apply.name = "${name}-apply";
+                terraform.name = "${name}-tf";
               };
             };
             continue.envVar = "TF_NIX_CONTINUE_${replaceStrings [ "-" ] [ "_" ] config.name}";
@@ -76,6 +85,16 @@ in {
         type = types.attrsOf type;
         default = { };
       };
+    };
+  };
+  config = {
+    runners = {
+      run = mkMerge (mapAttrsToList (targetName: target: mapAttrs' (k: run:
+        nameValuePair run.name run.set
+      ) target.tf.runners.run) cfg.targets);
+      lazy.run = mkMerge (mapAttrsToList (targetName: target: mapAttrs' (k: run:
+        nameValuePair run.name run.set
+      ) target.tf.runners.lazy.run) cfg.targets);
     };
   };
 }

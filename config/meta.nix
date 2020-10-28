@@ -9,6 +9,12 @@
         passphraseShellCommand = "bitw get tokens/borg-home -f passphrase";
       };
     };
+    runners = {
+      lazy = {
+        file = ../default.nix;
+        args = [ "--show-trace" ];
+      };
+    };
     home.profiles = {
       base = {
         imports = [

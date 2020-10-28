@@ -19,6 +19,7 @@
     ];
 
     specialArgs = {
+      inherit channels;
       # TODO?
     };
   };

@@ -23,7 +23,7 @@
       default = { };
     };
     nodes = let
-      nixosModule = { config, meta, modulesPath, lib, ... }: with lib; {
+      nixosModule = { name, config, meta, modulesPath, lib, ... }: with lib; {
         imports = [ ../nixos ];
         config = {
           nixpkgs = {
@@ -37,6 +37,12 @@
           home = {
             extraModules = meta.home.extraModules;
             specialArgs = meta.home.specialArgs;
+          };
+          runners = {
+            lazy = {
+              inherit (meta.runners.lazy) file args;
+              attrPrefix = "network.nodes.${name}.runners.run.";
+            };
           };
 
           _module.args.pkgs = mkDefault (import pkgs.path {
