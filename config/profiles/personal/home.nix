@@ -143,6 +143,7 @@ in {
     };
     services.mpd = {
       enable = true;
+      network.startWhenNeeded = true;
       package = pkgs.mpd-youtube-dl;
       dbFile = "${config.services.mpd.dataDir}/mpd.db";
       extraConfig = ''
