@@ -47,6 +47,26 @@ in {
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';
+    xsession.windowManager.i3 = {
+      extraConfig = ''
+        workspace 1:1 output HDMI-0
+        workspace 2:2 output DP-0
+        workspace 3:3 output DP-2
+
+        workspace 11:F1 output DP-0
+        workspace 12:F2 output HDMI-0
+      '';
+      config = {
+        assigns = {
+          "number 11:F1" = [
+            { class = "^screenstub$"; instance = "BenQ"; }
+          ];
+          "number 12:F2" = [
+            { class = "^screenstub$"; instance = "Dell"; }
+          ];
+        };
+      };
+    };
     programs.mpv = {
       config = {
         # may as well use the excess RAM for something
