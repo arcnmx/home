@@ -105,7 +105,11 @@
       dns = {
         records = with meta.deploy.domains; let
           domains'' = concatMap (domain: [ (domain.public or null) (domain.vanity or null) ]) (attrValues meta.deploy.domains)
-            ++ [ meta.deploy.domains.misc.mystia meta.deploy.domains.matrix-synapse.federation ];
+            ++ [
+              meta.deploy.domains.misc.mystia
+              meta.deploy.domains.prosody.federation meta.deploy.domains.prosody.client
+              meta.deploy.domains.matrix-synapse.federation
+            ];
           domains' = filter (domain: domain != null) domains'';
           domains = unique (map (domain: { inherit (domain) tld domain fqdn; }) domains');
         in mkMerge [ (listToAttrs (map (domain: nameValuePair domain.fqdn {
@@ -126,9 +130,17 @@
             srv = {
               service = "xmpp-client";
               proto = "tcp";
-              target = prosody.public.fqdn;
-              port = prosody.public.port;
+              target = prosody.client.fqdn;
+              port = prosody.client.port;
             };
+          };
+          prosody-upload = mkIf config.services.prosody.enable {
+            inherit (prosody.upload) tld domain;
+            cname.target = prosody.client.fqdn;
+          };
+          prosody-muc = mkIf config.services.prosody.enable {
+            inherit (prosody.muc) tld domain;
+            cname.target = prosody.client.fqdn;
           };
           matrix-synapse = mkIf config.services.matrix-synapse.enable {
             inherit (matrix-synapse.vanity) tld domain;
@@ -164,8 +176,8 @@
         SUBSYSTEM=="misc", DEVNAME="/dev/loop-control", TAG+="systemd"
       '';
       #gitolite.enable = true;
-      #prosody.enable = true;
       #bitlbee.enable = true;
+      prosody.enable = true;
       taskserver.enable = true;
       bitwarden_rs.enable = true;
       nginx.enable = true;

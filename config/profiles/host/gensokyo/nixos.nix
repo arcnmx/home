@@ -112,6 +112,11 @@ in {
         '';
       };
       prosody = {
+        package = let
+          package = pkgs.prosody.override (old: {
+            withExtraLibs = old.withExtraLibs ++ singleton pkgs.luaPackages.luadbi-postgresql;
+          });
+        in mkIf config.services.postgresql.enable package;
         allowRegistration = mkDefault false;
         c2sRequireEncryption = mkDefault true;
         s2sRequireEncryption = mkDefault true;
@@ -123,7 +128,6 @@ in {
             "offline";
           }
         '';
-        xmppComplianceSuite = mkDefault false; # TODO: configure uploadHttp
       };
       nginx = {
         package = mkDefault pkgs.nginxMainline;
@@ -188,6 +192,15 @@ in {
       };
       taskserver.organisations.arc.users = singleton "arc";
       #gitolite.adminPubkey = config.secrets.files.ssh_key.getAttr "public_key_openssh";
+      prosody.extraConfig = mkIf config.services.postgresql.enable ''
+        storage = "sql"
+        sql = {
+          driver = "PostgreSQL";
+          host = "";
+          database = "prosody";
+          username = "prosody";
+        }
+      '';
       nginx.virtualHosts = with meta.deploy.domains; let
         extraParameters = [ "reuseport" "deferred" ];
         hostName = config.networking.hostName;
@@ -230,15 +243,31 @@ in {
           ca.cert = ca.certPath;
         };
       };
-      prosody.virtualHosts = with domains.prosody; {
-        ${vanity.fqdn} = {
+      prosody = with domains.prosody; {
+        virtualHosts.${vanity.fqdn} = {
           enabled = true;
           domain = vanity.fqdn;
           ssl = {
-            key = vanity.out.keyPath config;
+            key = config.secrets.files."prosody-key-${vanity.fqdn}".path;
             cert = vanity.certPath;
           };
         };
+        httpPorts = singleton private.port;
+        httpsPorts = [ ];
+        uploadHttp.domain = upload.fqdn;
+        muc = singleton {
+          domain = muc.fqdn;
+          restrictRoomCreation = true;
+        };
+        extraConfig = ''
+          c2s_ports = { ${toString client.port} }
+          s2s_ports = { ${toString federation.port} }
+          component_ports = { ${concatMapStringsSep ", " toString (unique [ upload.port muc.port ])} }
+          -- component_interface = "0.0.0.0"
+          http_host = "${public.fqdn}"
+          http_external_url = "${public.url}"
+          trusted_proxies = { "127.0.0.1", "::1", }
+        '';
       };
       matrix-synapse = with domains.matrix-synapse; {
         server_name = vanity.fqdn;
@@ -281,6 +310,21 @@ in {
             };
             "/admin" = {
               proxyPass = mkIf (config.services.bitwarden_rs.config ? adminToken) private.url;
+            };
+          };
+        };
+        ${prosody.public.url} = with prosody; mkIf config.services.prosody.enable {
+          serverName = public.fqdn;
+          onlySSL = true;
+          sslCertificate = public.certPath;
+          sslCertificateKey = public.out.keyPath config;
+          listen = [
+            { addr = public.bind; port = public.port; ssl = true; }
+            { addr = public.bind; port = 80; ssl = false; }
+          ];
+          locations = {
+            "/" = {
+              proxyPass = private.url;
             };
           };
         };
@@ -353,7 +397,7 @@ in {
       taskserver.public
       bitwarden_rs.public
       matrix-synapse.public matrix-synapse.federation
-      prosody.public prosody.federation
+      prosody.client prosody.federation prosody.upload prosody.muc
     ]);
     # hacky replacement for ensureDatabases
     systemd.services.postgresql.postStart = mkIf (config.services.postgresql.enable) (mkAfter ''
@@ -378,6 +422,10 @@ in {
       ${taskserver.public.fqdn} = mkIf config.services.taskserver.enable {
         owner = mkForce config.services.taskserver.user;
       };
+      "prosody-key-${prosody.vanity.fqdn}" = mkIf config.services.prosody.enable {
+        owner = mkForce config.services.prosody.user;
+        text = config.secrets.files.${prosody.vanity.fqdn}.text;
+      };
       matrix-appservice-irc-passkey = mkIf config.services.matrix-synapse.bridges.irc.enable {
         owner = config.services.matrix-synapse.bridges.irc.user;
         source = tf.resources.matrix-appservice-irc-passkey.refAttr "filename";
@@ -389,6 +437,7 @@ in {
       (nameValuePair taskserver.public.fqdn config.services.taskserver.enable)
       (nameValuePair bitwarden_rs.public.fqdn config.services.bitwarden_rs.enable)
       (nameValuePair prosody.vanity.fqdn config.services.prosody.enable)
+      (nameValuePair prosody.public.fqdn config.services.prosody.enable)
       (nameValuePair matrix-synapse.vanity.fqdn config.services.matrix-synapse.enable)
       (nameValuePair matrix-synapse.public.fqdn config.services.matrix-synapse.enable)
       (nameValuePair matrix-synapse.federation.fqdn config.services.matrix-synapse.enable)

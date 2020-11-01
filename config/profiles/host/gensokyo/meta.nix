@@ -26,6 +26,10 @@ in {
           pem = out.importFullchainPem;
           keyName = name;
         };
+        public = with acme.certs.${domains.prosody.public.fqdn}; {
+          pem = out.importFullchainPem;
+          keyName = name;
+        };
       };
       matrix-synapse = {
         vanity = with acme.certs.${domains.matrix-synapse.vanity.fqdn}; {
@@ -57,8 +61,12 @@ in {
       };
       prosody = {
         vanity = { bind = mkDefault null; };
-        public = { port = mkDefault 5222; bind = mkDefault bindAny; };
+        private = { protocol = mkDefault "http"; port = mkDefault 5280; bind = mkDefault bindLocal; };
+        public = { protocol = mkDefault "https"; bind = mkDefault bindAny; };
+        client = { port = mkDefault 5222; bind = mkDefault bindAny; };
         federation = { port = mkDefault 5269; bind = mkDefault bindAny; };
+        upload = { port = mkDefault 5347; bind = mkDefault bindAny; };
+        muc = { port = mkDefault 5347; bind = mkDefault bindAny; };
       };
       matrix-synapse = {
         private = { protocol = mkDefault "http"; port = mkDefault 0; bind = mkDefault bindLocal; };
@@ -86,6 +94,7 @@ in {
           taskserver.public.fqdn
           bitwarden_rs.public.fqdn
           prosody.vanity.fqdn
+          prosody.public.fqdn
           matrix-synapse.vanity.fqdn
           matrix-synapse.public.fqdn
           matrix-synapse.federation.fqdn
