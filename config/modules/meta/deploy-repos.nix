@@ -283,6 +283,75 @@
       inherit defaults;
     };
   };
+  googleRemoteType = { defaults }: types.submoduleWith {
+    modules = singleton ({ config, name, defaults, ... }: {
+      options = {
+        create = mkOption {
+          type = types.bool;
+          default = true;
+        };
+        repo = mkOption {
+          type = types.str;
+          default = defaults.name;
+        };
+        project = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        provider = mkOption {
+          type = tfTypes.providerReferenceType;
+          default = cfg.defaults.providers.google.set or "google";
+        };
+        out = {
+          url = mkOption {
+            type = types.unspecified;
+          };
+          sshCloneUrl = mkOption {
+            type = types.unspecified;
+          };
+          repoResourceName = mkOption {
+            type = types.str;
+            default = tlib.terraformIdent "${config.repo}-google";
+          };
+          repoResource = mkOption {
+            type = types.unspecified;
+            default = tconfig.resources.${config.out.repoResourceName};
+          };
+          cloneUrl = mkOption {
+            type = types.unspecified;
+            default = { };
+          };
+          setRepoResources = mkOption {
+            type = types.attrsOf types.unspecified;
+            default = { };
+          };
+        };
+      };
+      config = mkMerge [ (cfg.defaults.remoteConfig.google or { }) {
+        out = {
+          url = config.out.repoResource.getAttr "url";
+          sshCloneUrl = config.out.url;
+          cloneUrl = {
+            fetch = config.out.sshCloneUrl;
+            push = config.out.sshCloneUrl;
+          };
+          setRepoResources = mkIf config.create {
+            ${config.out.repoResourceName} = {
+              provider = config.provider.reference;
+              type = mkDefault "sourcerepo_repository";
+              inputs = mkMerge [ {
+                name = mkDefault config.repo;
+                project = mkIf (config.project != null) (mkDefault config.project);
+              } (cfg.defaults.providerConfig.google or { }) ];
+            };
+          };
+        };
+      } ];
+    });
+    specialArgs = {
+      inherit defaults;
+    };
+  };
   awsRemoteType = { defaults }: types.submoduleWith {
     modules = singleton ({ config, name, defaults, ... }: {
       options = {
@@ -305,10 +374,6 @@
         provider = mkOption {
           type = tfTypes.providerReferenceType;
           default = cfg.defaults.providers.aws.set or "aws";
-        };
-        private = mkOption {
-          type = types.bool;
-          default = false;
         };
         out = {
           url = mkOption {
@@ -365,6 +430,95 @@
                 repository_name = mkDefault config.repo;
                 description = mkIf (config.description != null) (mkDefault config.description);
               } (cfg.defaults.providerConfig.aws or { }) ];
+            };
+          };
+        };
+      } ];
+    });
+    specialArgs = {
+      inherit defaults;
+    };
+  };
+  bitbucketRemoteType = { defaults }: types.submoduleWith {
+    modules = singleton ({ config, name, defaults, ... }: {
+      options = {
+        create = mkOption {
+          type = types.bool;
+          default = true;
+        };
+        repo = mkOption {
+          type = types.str;
+          default = defaults.name;
+        };
+        description = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        provider = mkOption {
+          type = tfTypes.providerReferenceType;
+          default = cfg.defaults.providers.bitbucket.set or "bitbucket";
+        };
+        private = mkOption {
+          type = types.bool;
+          default = true;
+        };
+        projectKey = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        owner = mkOption {
+          type = types.str;
+        };
+        out = {
+          url = mkOption {
+            type = types.unspecified;
+          };
+          httpsCloneUrl = mkOption {
+            type = types.unspecified;
+          };
+          sshCloneUrl = mkOption {
+            type = types.unspecified;
+          };
+          repoResourceName = mkOption {
+            type = types.str;
+            default = tlib.terraformIdent "${config.repo}-bitbucket";
+          };
+          repoResource = mkOption {
+            type = types.unspecified;
+            default = tconfig.resources.${config.out.repoResourceName};
+          };
+          cloneUrl = mkOption {
+            type = types.unspecified;
+            default = { };
+          };
+          setRepoResources = mkOption {
+            type = types.attrsOf types.unspecified;
+            default = { };
+          };
+        };
+      };
+      config = mkMerge [ (cfg.defaults.remoteConfig.aws or { }) {
+        owner = mkIf (config.provider.out.provider ? inputs.username) (mkOptionDefault config.provider.out.provider.inputs.username);
+        out = {
+          url = "https://bitbucket.org/${config.owner}/${config.repo}";
+          sshCloneUrl = "ssh://git@bitbucket.org:${config.owner}/${config.repo}.git";
+          httpsCloneUrl = config.out.url + ".git";
+          cloneUrl = {
+            fetch = if config.private then config.out.sshCloneUrl else config.out.httpsCloneUrl;
+            push = config.out.sshCloneUrl;
+          };
+          setRepoResources = mkIf config.create {
+            ${config.out.repoResourceName} = {
+              provider = config.provider.reference;
+              type = mkDefault "repository";
+              inputs = mkMerge [ {
+                owner = mkDefault config.owner;
+                name = mkDefault config.repo;
+                description = mkIf (config.description != null) (mkDefault config.description);
+                project_key = mkIf (config.projectKey != null) (mkDefault config.projectKey);
+                is_private = mkDefault config.private;
+                pipelines_enabled = mkDefault true; # API broken and fails to create repo otherwise?
+              } (cfg.defaults.providerConfig.bitbucket or { }) ];
             };
           };
         };
@@ -441,7 +595,7 @@
               inputs = mkMerge [ {
                 name = mkDefault config.repo;
                 #description = mkIf (config.description != null) (mkDefault config.description);
-                visibility = "private";
+                visibility = if config.private then "private" else "public";
                 # TODO: many other attrs could go here...
               } (cfg.defaults.providerConfig.github or { }) ];
             };
@@ -472,6 +626,18 @@
         };
         aws = mkOption {
           type = types.nullOr (awsRemoteType {
+            inherit defaults;
+          });
+          default = null;
+        };
+        bitbucket = mkOption {
+          type = types.nullOr (bitbucketRemoteType {
+            inherit defaults;
+          });
+          default = null;
+        };
+        google = mkOption {
+          type = types.nullOr (googleRemoteType {
             inherit defaults;
           });
           default = null;
@@ -531,6 +697,12 @@
           (mkIf (config.aws != null) (mapAttrs (_: mkOptionDefault) {
             inherit (config.aws.out.cloneUrl) fetch push;
           }))
+          (mkIf (config.bitbucket != null) (mapAttrs (_: mkOptionDefault) {
+            inherit (config.bitbucket.out.cloneUrl) fetch push;
+          }))
+          (mkIf (config.google != null) (mapAttrs (_: mkOptionDefault) {
+            inherit (config.google.out.cloneUrl) fetch push;
+          }))
           (mkIf config.annex.enable {
             fetch = mkOptionDefault null;
             push = mkOptionDefault null;
@@ -544,6 +716,8 @@
         in {
           setRepoResources = mkMerge [
             (mkIf (config.github != null && config.github.create) config.github.out.setRepoResources)
+            (mkIf (config.google != null && config.google.create) config.google.out.setRepoResources)
+            (mkIf (config.bitbucket != null && config.bitbucket.create) config.bitbucket.out.setRepoResources)
             (mkIf (config.aws != null && config.aws.create) config.aws.out.setRepoResources)
           ];
           cloneUrl = if config.gcrypt.enable then {
