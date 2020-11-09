@@ -151,7 +151,6 @@ in {
         metadata_to_use "artist,artistsort,album,albumsort,albumartist,albumartistsort,title,track,name,genre,date,composer,performer,comment,disc,musicbrainz_artistid,musicbrainz_albumid,musicbrainz_albumartistid,musicbrainz_trackid,musicbrainz_releasetrackid"
         auto_update "yes"
         max_output_buffer_size "65536"
-        samplerate_converter "1"
 
         follow_outside_symlinks "yes"
         follow_inside_symlinks "yes"
@@ -161,30 +160,6 @@ in {
         audio_output {
           type "pulse"
           name "speaker"
-        }
-
-        audio_output {
-          type "httpd"
-          name "httpd-high"
-          encoder "opus"
-          bitrate "96000"
-          port "32101"
-          max_clients "4"
-          format "48000:16:2"
-          always_on "yes"
-          tags "yes"
-        }
-
-        audio_output {
-          type "httpd"
-          name "httpd-low"
-          encoder "opus"
-          bitrate "58000"
-          port "32102"
-          max_clients "4"
-          format "48000:16:2"
-          always_on "yes"
-          tags "yes"
         }
       '';
     };

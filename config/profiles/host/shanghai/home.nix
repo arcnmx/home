@@ -67,6 +67,35 @@ in {
         };
       };
     };
+    services.mpd = {
+      extraConfig = ''
+        samplerate_converter "1"
+
+        audio_output {
+          type "httpd"
+          name "httpd-high"
+          encoder "opus"
+          bitrate "96000"
+          port "32101"
+          max_clients "4"
+          format "48000:16:2"
+          always_on "yes"
+          tags "yes"
+        }
+
+        audio_output {
+          type "httpd"
+          name "httpd-low"
+          encoder "opus"
+          bitrate "58000"
+          port "32102"
+          max_clients "4"
+          format "48000:16:2"
+          always_on "yes"
+          tags "yes"
+        }
+      '';
+    };
     programs.mpv = {
       config = {
         # may as well use the excess RAM for something
