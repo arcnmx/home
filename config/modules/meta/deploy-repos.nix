@@ -610,6 +610,10 @@
   repoRemoteType = { repo, defaults }: types.submoduleWith {
     modules = singleton ({ repo, config, name, defaults, ... }: {
       options = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+        };
         name = mkOption {
           type = types.str;
           default = name;
@@ -839,26 +843,29 @@
           + optionalString config.annex.enable ".anx"
           + optionalString config.gcrypt.enable ".cry";
         setRepoResources = mkMerge (mapAttrsToList (_: r: r.out.setRepoResources) config.remotes);
-        origin = config.remotes.origin or (findFirst (remote: !remote.annex.enable) null (attrValues config.remotes));
+        origin = findFirst (remote: remote.enable && !remote.annex.enable) null (
+          optional (config.remotes ? origin) config.remotes.origin
+          ++ attrValues config.remotes
+        );
         clone = [
-          ([ "git" "clone" config.out.origin.cloneUrl.fetch "." ]
+          ([ "git" "clone" config.out.origin.out.cloneUrl.fetch "." ]
             ++ optionals (config.out.origin.name != "origin") [ "-o" config.out.origin.name ]
           )
         ] ++ gitConfigCommands config.extraConfig
         ++ optionals (config.annex.enable) [
           [ "git" "annex" "init" ]
         ] ++ config.out.origin.out.set
-        ++ concatLists (mapAttrsToList (_: remote: remote.out.add)
-          (filterAttrs (_: remote: remote.name != config.out.origin.name) config.remotes));
+        ++ concatLists (mapAttrsToList (_: remote: remote.out.add) (filterAttrs (_: remote:
+          remote.enable && remote.name != config.out.origin.name
+        ) config.remotes));
         init = [
           [ "git" "init" ]
-          [ "git" "remote" "add" config.out.origin.name config.out.origin.cloneUrl.fetch ]
-          [ "git" "config-email" ]
-          [ "git" "remote" "rm" config.out.origin.name ]
         ] ++ gitConfigCommands config.extraConfig
         ++ optionals (config.annex.enable) [
           [ "git" "annex" "init" ]
-        ] ++ concatLists (mapAttrsToList (_: remote: remote.out.init) config.remotes);
+        ] ++ concatLists (mapAttrsToList (_: remote: remote.out.init) (filterAttrs (_: remote:
+          remote.enable
+        ) config.remotes));
         run = let
           f = k: v: with pkgs; nixRunWrapper {
             package = writeShellScriptBin k (''
