@@ -168,7 +168,7 @@ in {
       bookmarks = {
         howoldis = {
           title = "NixOS Channel Freshness";
-          url = "https://howoldis.herokuapp.com";
+          url = "https://status.nixos.org/";
           tags = [ "nix" "nixos" "channels" ];
         };
         nixexprs-ci = {
