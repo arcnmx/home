@@ -53,10 +53,10 @@ in {
           PULSE_PROP="media.role=video" ${pkgs.mpv}/bin/mpv "$@"
         '';
         discord = ''
-          PULSE_PROP="media.role=phone" ${pkgs.discord}/bin/Discord "$@" &
+          PULSE_PROP="media.role=phone" nix run nixpkgs.discord -c Discord "$@"
         '';
         ffr = ''
-          ${pkgs.flashplayer-standalone}/bin/flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
+          nix run nixpkgs.flashplayer-standalone -c flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
         '';
         monstercatfm = ''
           mpa http://twitch.tv/monstercat
