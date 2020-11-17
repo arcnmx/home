@@ -192,32 +192,11 @@
       SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="*BTJR442300QQ480BGN*", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
     '';
-    services.xserver = let
-      benq = rec {
-        output = "DP-0";
-        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
-        w = 2560;
-        h = 1440;
-        x = 0;
-        y = lg.h - h;
-      };
-      dell = rec {
-        output = "HDMI-0";
-        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
-        w = 3840;
-        h = 2160;
-        x = benq.w;
-        y = 0;
-      };
-      lg = rec {
-        output = "DP-2";
-        options = optional (hasPrefix "DP-" output) "AllowGSYNCCompatible = On";
-        w = 3840;
-        h = 2160;
-        x = benq.w + dell.w;
-        y = 0;
-      };
-    in {
+    hardware.display = {
+      enable = true;
+      monitors = (import ./displays.nix { inherit lib; }).default config.hardware.display.monitors;
+    };
+    services.xserver = {
       displayManager = {
         startx.enable = mkForce false;
         lightdm = {
@@ -238,35 +217,7 @@
         #''BusID "PCI:39:0:0"'' # primary GPU
         #''BusID "PCI:40:0:0"'' # secondary GPU
         ''BusID "PCI:37:0:0"'' # tertiary (chipset slot) GPU
-        ''
-          Option "Monitor-${dell.output}" "Monitor[0]"
-          Option "Monitor-${benq.output}" "Monitor[1]"
-          Option "Monitor-${lg.output}" "Monitor[2]"
-        ''
       ];
-      screenSection = ''
-        Option "MetaModes" "${concatMapStringsSep ", " (mon:
-          "${mon.output}: ${toString mon.w}x${toString mon.h} +${toString mon.x}+${toString mon.y}"
-          + optionalString ((mon.options or [ ]) != [ ]) (" { ${concatStringsSep ", " mon.options} }")
-        ) [ benq dell lg ]}"
-      '';
-      monitorSection = ''
-        Option "Primary" "true"
-        Option "DPMS" "true"
-        Option "DPI" "96 x 96"
-      '';
-      extraConfig = ''
-        Section "Monitor"
-          Identifier "Monitor[1]"
-          Option "DPMS" "true"
-          Option "DPI" "96 x 96"
-        EndSection
-        Section "Monitor"
-          Identifier "Monitor[2]"
-          Option "DPMS" "true"
-          Option "DPI" "96 x 96"
-        EndSection
-      '';
     };
 
     boot = mkMerge [ {

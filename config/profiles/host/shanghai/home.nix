@@ -47,22 +47,26 @@ in {
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';
-    xsession.windowManager.i3 = {
+    hardware.display = mapAttrs (k: v: {
+      nvidia.enable = mkDefault config.home.nixosConfig.hardware.display.nvidia.enable;
+      monitors = v config.hardware.display.${k}.monitors;
+    }) (import ./displays.nix { inherit lib; }).monitors;
+    xsession.windowManager.i3 = with config.home.nixosConfig.hardware.display.monitors; {
       extraConfig = ''
-        workspace 1:1 output HDMI-0
-        workspace 2:2 output DP-0
-        workspace 3:3 output DP-2
+        workspace 1:1 output ${dell.output}
+        workspace 2:2 output ${benq.output}
+        workspace 3:3 output ${lg.output}
 
-        workspace 11:F1 output DP-0
-        workspace 12:F2 output HDMI-0
+        workspace 11:F1 output ${dell.output}
+        workspace 12:F2 output ${benq.output}
       '';
       config = {
         assigns = {
           "number 11:F1" = [
-            { class = "^screenstub$"; instance = "BenQ"; }
+            { class = "^screenstub$"; instance = "Dell"; }
           ];
           "number 12:F2" = [
-            { class = "^screenstub$"; instance = "Dell"; }
+            { class = "^screenstub$"; instance = "BenQ"; }
           ];
         };
       };

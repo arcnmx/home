@@ -8,6 +8,7 @@
 
   config = mkIf config.home.profiles.hw.nvidia {
     hardware.nvidia.modesetting.enable = true;
+    hardware.display.nvidia.enable = true;
     hardware.opengl.extraPackages = with pkgs; [libvdpau-va-gl];
     # TODO: opencl_nvidia?
     services.xserver.videoDrivers = ["nvidiaBeta"];
