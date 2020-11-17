@@ -209,8 +209,6 @@ in
       load-module module-allow-passthrough
 
       load-module module-role-ducking
-
-      # TODO: https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Enable_Echo.2FNoise-Cancellation
     '') ];
   };
 }
