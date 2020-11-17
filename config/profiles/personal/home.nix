@@ -37,7 +37,7 @@ in {
       gnupg
       pass-arc
       bitwarden-cli arc'private.pass2bitwarden
-      awscli
+      awscli2
       ncmpcpp
       ncpamixer
       physlock
@@ -177,6 +177,15 @@ in {
           tags = [ "arc" "ci" "nix" "nixexprs" "actions" ];
         };
       };
+    };
+    programs.filebin = {
+      enable = true;
+      extraConfig = ''
+        AWS_ACCESS_KEY_ID=$(bitw get tokens/aws-filebin -f aws_access_key_id)
+        AWS_SECRET_ACCESS_KEY=$(bitw get tokens/aws-filebin -f aws_secret_access_key)
+        FILEBIN_S3_BUCKET=$(bitw get tokens/aws-filebin -f s3_bucket_name)
+        FILEBIN_BOXCAR_KEY=$(bitw get tokens/boxcar-filebin -f notes)
+      '';
     };
     services.offlineimap.enable = false; #config.programs.offlineimap.enable;
     systemd.user.services.offlineimap = mkIf config.services.offlineimap.enable {
