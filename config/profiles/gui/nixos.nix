@@ -45,8 +45,8 @@ in
 
       serverLayoutSection = ''
         Option "StandbyTime" "0"
-        Option "SuspendTime" "10"
-        Option "OffTime" "20"
+        Option "SuspendTime" "0"
+        Option "OffTime" "10"
       '';
       inputClassSections = [
         ''
