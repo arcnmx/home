@@ -501,7 +501,7 @@
         owner = mkIf (config.provider.out.provider ? inputs.username) (mkOptionDefault config.provider.out.provider.inputs.username);
         out = {
           url = "https://bitbucket.org/${config.owner}/${config.repo}";
-          sshCloneUrl = "ssh://git@bitbucket.org:${config.owner}/${config.repo}.git";
+          sshCloneUrl = "ssh://git@bitbucket.org/${config.owner}/${config.repo}.git";
           httpsCloneUrl = config.out.url + ".git";
           cloneUrl = {
             fetch = if config.private then config.out.sshCloneUrl else config.out.httpsCloneUrl;
