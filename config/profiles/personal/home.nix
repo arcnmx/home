@@ -39,7 +39,6 @@ in {
       bitwarden-cli arc'private.pass2bitwarden
       awscli2
       ncmpcpp
-      ncpamixer
       physlock
       travis
       radare2
@@ -176,6 +175,15 @@ in {
           url = "https://github.com/arcnmx/nixexprs/actions";
           tags = [ "arc" "ci" "nix" "nixexprs" "actions" ];
         };
+      };
+    };
+    programs.ncpamixer = {
+      enable = true;
+      keybinds = {
+        "48" = "set_volume_100"; # 0
+        "96" = "set_volume_0"; # `
+        "74" = "tab_next"; # J
+        "75" = "tab_prev"; # K
       };
     };
     programs.filebin = {
