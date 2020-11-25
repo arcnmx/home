@@ -68,22 +68,9 @@
           device = "surround40:CARD=Generic,DEV=0";
           format = "s32";
           rate = 48000;
-          channels = 6;
-          channel_map = "front-left,front-right,rear-left,rear-right,center,lfe";
-          tsched = 1;
-          fixed_latency_range = 0;
-          fragment_size = 1024;
-          fragments = 16;
-        };
-      } {
-        module = "alsa-sink";
-        opts = {
-          sink_name = "onboard";
-          device = "surround40:CARD=Generic,DEV=0";
-          format = "s32";
-          rate = 48000;
-          channels = 6;
-          channel_map = "front-left,front-right,rear-left,rear-right,center,lfe";
+          channels = 4;
+          # NOTE: first two channels include an amp for headphones
+          channel_map = "front-left,front-right,rear-left,rear-right"; # ,side-left,side-right
           tsched = 1;
           fixed_latency_range = 0;
           fragment_size = 1024;
@@ -111,16 +98,29 @@
           # source_properties = "device.description=Speakers2";
         };
       } {
-        module = "remap-sink";
+        /*module = "remap-sink";
         opts = {
           sink_name = "headphones";
           master = "onboard";
           channels = 2;
           channel_map = "front-left,front-right";
-          master_channel_map = "center,lfe";
+          master_channel_map = "side-left,side-right";
           remix = "no";
           sink_properties = "device.description=Headphones";
           # source_properties = "device.description=Headphones2";
+        };*/
+        module = "alsa-sink";
+        opts = {
+          sink_name = "headphones";
+          device = "front:CARD=Device,DEV=0";
+          format = "s16";
+          rate = 48000;
+          channels = 2;
+          channel_map = "front-left,front-right";
+          tsched = 1;
+          fixed_latency_range = 0;
+          fragment_size = 1024;
+          fragments = 16;
         };
       } {
         module = "remap-sink";
