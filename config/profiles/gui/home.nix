@@ -447,8 +447,6 @@ in {
         opengl-waitvsync = "yes";
 
         keep-open = "yes";
-
-        cache-secs = 10 * 60 * 60; # 10 hours, the default - in practice this is capped by demuxer-max-bytes
       };
     };
     xdg.dataFile = {
