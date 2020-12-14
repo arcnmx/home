@@ -132,13 +132,13 @@ in {
       enableExtraSocket = true;
       enableScDaemon = false;
       enableSshSupport = true;
-      extraConfig = ''
-        pinentry-timeout 30
-        allow-loopback-pinentry
-        no-allow-external-cache
-      '' + optionalString config.home.profiles.gui ''
-        pinentry-program ${pkgs.pinentry.gtk2}/bin/pinentry
-      '';
+      pinentryFlavor = mkDefault null;
+      extraConfig = mkMerge [
+        "auto-expand-secmem 0x30000" # otherwise "gpg: public key decryption failed: Cannot allocate memory"
+        "pinentry-timeout 30"
+        "allow-loopback-pinentry"
+        "no-allow-external-cache"
+      ];
     };
     services.mpd = {
       enable = true;

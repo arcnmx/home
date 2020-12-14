@@ -519,6 +519,7 @@ in {
       '';*/
     };
 
+    services.gpg-agent.pinentryFlavor = "gtk2";
     services.konawall = {
       enable = true;
       interval = "20m";
