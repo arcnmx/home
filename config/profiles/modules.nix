@@ -11,6 +11,7 @@
     hw/ryzen
     hw/nvidia
     hw/x370gpc
+    hw/x570am
     hw/xps13
     host/gensokyo
     host/satorin

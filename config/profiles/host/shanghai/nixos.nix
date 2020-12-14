@@ -10,7 +10,7 @@
     home.profiles.gui = true;
     home.profiles.vfio = true;
     home.profiles.hw.nvidia = true;
-    home.profiles.hw.x370gpc = true;
+    home.profiles.hw.x570am = true;
 
     networking = {
       hostId = "a1184652";
@@ -43,6 +43,8 @@
         to = 32700;
       };
     };
+    services.ofono.enable = true;
+    systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     services.openssh.ports = [ 22 32022 ];
     hardware.openrazer.enable = true;
     hardware.pulseaudio.extraConfig = let
@@ -216,7 +218,7 @@
         # NOTE: this is decimal, be careful! IDs are typically shown in hex
         #''BusID "PCI:39:0:0"'' # primary GPU
         #''BusID "PCI:40:0:0"'' # secondary GPU
-        ''BusID "PCI:37:0:0"'' # tertiary (chipset slot) GPU
+        ''BusID "PCI:05:0:0"'' # tertiary (chipset slot) GPU
       ];
     };
 

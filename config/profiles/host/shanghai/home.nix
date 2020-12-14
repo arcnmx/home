@@ -30,7 +30,7 @@ in {
     home.profiles.personal = true;
     home.profiles.gui = true;
     home.profiles.hw.nvidia = true;
-    home.profiles.hw.x370gpc = true;
+    home.profiles.hw.x570am = true;
 
     xdg.configFile."i3status/config".source = ./files/i3status;
 
