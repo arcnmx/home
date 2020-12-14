@@ -41,6 +41,9 @@
   makeColorCS = n: value: let
     positions = [ "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F" ];
   in "\\e]P${lib.toHexUpper n}${value}";
+  bluephone = pkgs.writeShellScriptBin "bluephone" ''
+    ${pkgs.python3.withPackages (p: with p; [ dbus-python /*pygobject3*/ ])}/bin/python ${./files/bluephone.py} "$@"
+  '';
 in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
@@ -155,7 +158,7 @@ in {
       fuse
       config.boot.kernelPackages.cpupower
       strace
-    ];
+    ] ++ optional config.services.ofono.enable bluephone;
 
     services.udev.extraRules = let
       localGroup = "users";

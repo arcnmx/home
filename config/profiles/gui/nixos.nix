@@ -160,9 +160,6 @@ in
 
       load-module module-switch-on-port-available
     '') (mkAfter ''
-      #load-module module-bluetooth-policy
-      #load-module module-bluetooth-discover
-
       load-module module-native-protocol-unix
 
       load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;10.0.0.0/8
