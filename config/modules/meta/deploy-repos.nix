@@ -83,6 +83,7 @@
           type = "S3";
           inherit (config) bucket;
           fileprefix = config.prefix;
+          partsize = "1GiB";
         };
         enableConfig = { };
       };
@@ -352,6 +353,80 @@
       inherit defaults;
     };
   };
+  s3RemoteType = { defaults }: types.submoduleWith {
+    modules = singleton ({ config, name, defaults, ... }: {
+      options = {
+        bucket = mkOption {
+          type = types.str;
+        };
+        prefix = mkOption {
+          type = types.str;
+          default = "git-remote-s3/" + defaults.name;
+        };
+        gpgRecipients = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+        };
+        accessKeyId = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        secretAccessKey = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        out = {
+          s3CloneUrl = mkOption {
+            type = types.unspecified;
+            description = "git-remote-s3";
+          };
+          cloneUrl = mkOption {
+            type = types.unspecified;
+            default = { };
+          };
+          extraConfig = mkOption {
+            type = types.attrsOf types.str;
+            default = { };
+          };
+          gitConfig = mkOption {
+            type = types.attrsOf types.str;
+            default = { };
+          };
+          env = mkOption {
+            type = types.attrsOf types.str;
+            default = { };
+          };
+        };
+      };
+      config = mkMerge [ (cfg.defaults.remoteConfig.s3 or { }) {
+        out = {
+          s3CloneUrl = "s3://${config.bucket}/${config.prefix}";
+          cloneUrl = {
+            fetch = config.out.s3CloneUrl;
+            push = config.out.s3CloneUrl;
+          };
+          env = {
+            AWS_ACCESS_KEY_ID = mkIf (config.accessKeyId != null) config.accessKeyId;
+            AWS_SECRET_ACCESS_KEY = mkIf (config.secretAccessKey != null) config.secretAccessKey;
+          };
+          extraConfig = {
+            gpgRecipients = mkIf (config.gpgRecipients != [ ]) (mkDefault (concatStringsSep " " config.gpgRecipients));
+            vcs = mkIf (config.out.env != { }) "s3-${config.bucket}";
+          };
+          gitConfig = mkIf (config.out.env != { }) {
+            "alias.remote-s3-${config.bucket}" = mkIf (config.out.env != { }) "${pkgs.writeShellScript "git-remote-s3-${config.bucket}" ''
+              ${concatStringsSep "\n" (mapAttrsToList (k: v: "export ${k}=${v}") config.out.env)}
+
+              exec ${pkgs.gitAndTools.git-remote-s3}/bin/git-remote-s3 "$@"
+            ''}";
+          };
+        };
+      } ];
+    });
+    specialArgs = {
+      inherit defaults;
+    };
+  };
   awsRemoteType = { defaults }: types.submoduleWith {
     modules = singleton ({ config, name, defaults, ... }: {
       options = {
@@ -497,7 +572,7 @@
           };
         };
       };
-      config = mkMerge [ (cfg.defaults.remoteConfig.aws or { }) {
+      config = mkMerge [ (cfg.defaults.remoteConfig.bitbucket or { }) {
         owner = mkIf (config.provider.out.provider ? inputs.username) (mkOptionDefault config.provider.out.provider.inputs.username);
         out = {
           url = "https://bitbucket.org/${config.owner}/${config.repo}";
@@ -634,6 +709,12 @@
           });
           default = null;
         };
+        s3 = mkOption {
+          type = types.nullOr (s3RemoteType {
+            inherit defaults;
+          });
+          default = null;
+        };
         bitbucket = mkOption {
           type = types.nullOr (bitbucketRemoteType {
             inherit defaults;
@@ -662,6 +743,10 @@
           };
         };
         extraConfig = mkOption {
+          type = types.attrsOf types.unspecified;
+          default = { };
+        };
+        gitConfig = mkOption {
           type = types.attrsOf types.unspecified;
           default = { };
         };
@@ -701,6 +786,9 @@
           (mkIf (config.aws != null) (mapAttrs (_: mkOptionDefault) {
             inherit (config.aws.out.cloneUrl) fetch push;
           }))
+          (mkIf (config.s3 != null) (mapAttrs (_: mkOptionDefault) {
+            inherit (config.s3.out.cloneUrl) fetch push;
+          }))
           (mkIf (config.bitbucket != null) (mapAttrs (_: mkOptionDefault) {
             inherit (config.bitbucket.out.cloneUrl) fetch push;
           }))
@@ -712,11 +800,17 @@
             push = mkOptionDefault null;
           })
         ];
-        extraConfig = mkIf (repo.annex.enable && !config.annex.enable) {
-          annex-ignore = mkDefault "true";
-        };
+        extraConfig = mkMerge [
+          (mkIf (repo.annex.enable && !config.annex.enable) {
+            annex-ignore = mkDefault "true";
+          })
+          (mkIf (config.s3 != null) (mapAttrs (_: mkDefault) config.s3.extraConfig))
+        ];
+        gitConfig = mkMerge [
+          (mkIf (config.s3 != null) (mapAttrs (_: mkDefault) config.s3.gitConfig))
+        ];
         out = let
-          gitConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${name}.${k}") config.extraConfig);
+          remoteConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${name}.${k}") config.extraConfig);
         in {
           setRepoResources = mkMerge [
             (mkIf (config.github != null && config.github.create) config.github.out.setRepoResources)
@@ -737,7 +831,7 @@
               [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
               [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
-            ]) ++ gitConfig;
+            ]) ++ remoteConfig;
           set =
             (if config.annex.enable then [
               ([ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote)
@@ -745,7 +839,7 @@
               [ "git" "remote" "set-url" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
               [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
-            ]) ++ gitConfig;
+            ]) ++ remoteConfig;
           init =
             (if config.annex.enable then ([
               ([ "git" "annex" "initremote" name ] ++ builtins.head config.annex.out.initremote)
@@ -754,7 +848,7 @@
               [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
               [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
-            ]) ++ gitConfig;
+            ]) ++ remoteConfig;
         };
       };
     });
@@ -838,6 +932,9 @@
       annex.enable = mkOptionDefault (any (r: r.annex.enable) (attrValues config.remotes));
       gcrypt.participants = mkOptionDefault cfg.defaults.gcrypt.participants;
       annex.participants = mkOptionDefault cfg.defaults.annex.participants;
+      extraConfig = mkMerge (mapAttrsToList (_: remote:
+        (mapAttrs (_: mkDefault) remote.gitConfig)
+      ) config.remotes);
       out = {
         name = config.name
           + optionalString config.annex.enable ".anx"

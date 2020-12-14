@@ -302,6 +302,7 @@
       ${git} repack -Fad --depth=250 --window=250
     else
       cd ${path}
+      git remote set-url origin "${cloneUrl}"
     fi
     ${git} remote update
     ${git} gc --prune=now
