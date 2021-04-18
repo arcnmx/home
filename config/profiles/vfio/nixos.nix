@@ -6,9 +6,10 @@
   config = mkIf config.home.profiles.vfio {
     boot = {
       initrd.kernelModules = ["vfio" "vfio_iommu_type1" "vfio_pci" "vfio_virqfd"];
-      extraModprobeConfig = ''
-        options kvm ignore_msrs=1 report_ignored_msrs=0
-      '';
+      modprobe.modules.kvm.options = {
+        ignore_msrs = mkDefault true;
+        report_ignored_msrs = mkDefault false;
+      };
       extraModulePackages = [ config.boot.kernelPackages.forcefully-remove-bootfb ];
       kernelPatches = mkIf false [
         {

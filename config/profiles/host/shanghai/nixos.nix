@@ -222,7 +222,18 @@
       ];
     };
 
-    boot = mkMerge [ {
+    boot = {
+      modprobe.modules = {
+        vfio-pci = let
+          vfio-pci-ids = [
+            # "10de:1c81" "10de:0fb9" # 1050
+            # "10de:1f82" "10de:10fa" # 1660
+            "10de:2206" "10de:1aef" # 3080
+          ];
+        in mkIf (config.home.profiles.vfio && vfio-pci-ids != [ ]) {
+          options.ids = concatStringsSep "," vfio-pci-ids;
+        };
+      };
       loader = {
         generationsDir = {
           copyKernels = true;
@@ -234,18 +245,7 @@
         };
       };
       supportedFilesystems = ["btrfs"];
-    } (let
-      vfio-pci-ids = [
-        # "10de:1c81" "10de:0fb9" # 1050
-        # "10de:1f82" "10de:10fa" # 1660
-        "10de:2206" "10de:1aef" # 3080
-      ];
-    in mkIf config.home.profiles.vfio {
-      # TODO: extraModprobeConfig does not seem to be placed in initrd, see: https://github.com/NixOS/nixpkgs/issues/25456
-      kernelParams = mkIf (vfio-pci-ids != [ ]) [
-        "vfio-pci.ids=${concatStringsSep "," vfio-pci-ids}"
-      ];
-    }) ];
+    };
 
     fileSystems = {
       "/" = {

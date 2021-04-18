@@ -68,10 +68,13 @@ in {
         printf '\e[2J' >> /dev/console
       '';
       blacklistedKernelModules = ["pcspkr"];
-      extraModprobeConfig = ''
-        options snd_hda_intel power_save=1 power_save_controller=Y
-        options kvm_amd avic=1
-      '';
+      modprobe.modules = {
+        snd_hda_intel.options = {
+          power_save = mkDefault true;
+          power_save_controller = mkDefault "Y";
+        };
+        kvm_amd.options.avic = true;
+      };
       kernelPatches = mkIf false [
         {
           name = "ubuntu-unprivileged-overlayfs";

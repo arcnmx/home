@@ -6,12 +6,14 @@
   config = mkIf config.home.profiles.hw.x570am {
     home.profiles.hw.ryzen = true;
 
-    boot.initrd.availableKernelModules = [
-      "nvme" "sd_mod" "xhci_pci" "ahci" "usbhid"
-    ];
-    boot.extraModprobeConfig = ''
-      options snd-hda-intel model=dual-codecs
-    '';
+    boot = {
+      initrd.availableKernelModules = [
+        "nvme" "sd_mod" "xhci_pci" "ahci" "usbhid"
+      ];
+      modprobe.modules.snd_hda_intel.options = {
+        model = "dual-codecs";
+      };
+    };
     hardware.bluetooth = {
       enable = true;
       package = pkgs.bluezFull;
