@@ -8,6 +8,12 @@ in
 {
   options = {
     home.profiles.gui = mkEnableOption "graphical system";
+    home.profileSettings.gui = {
+      x11bell = mkOption {
+        type = types.bool;
+        default = true;
+      };
+    };
   };
 
   config = mkIf config.home.profiles.gui {
@@ -163,16 +169,6 @@ in
       load-module module-native-protocol-unix
 
       load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;10.0.0.0/8
-      #load-module module-zeroconf-publish
-
-      ### Load the RTP receiver module (also configured via paprefs)
-      #load-module module-rtp-recv
-
-      ### Load the RTP sender module (also configured via paprefs)
-      #load-module module-null-sink sink_name=rtp format=s16be channels=2 rate=44100 sink_properties="device.description='RTP Multicast Sink'"
-      #load-module module-rtp-send source=rtp.monitor
-
-      #load-module module-gconf
 
       load-module module-udev-detect
 
@@ -191,13 +187,8 @@ in
 
       load-module module-position-event-sounds
 
-      #load-module module-role-cork
-
       load-module module-filter-heuristics
       load-module module-filter-apply
-
-      load-sample x11-bell ${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga
-      load-module module-x11-bell sample=x11-bell display=:0
 
       # Allow any user in X11 to access pulse
       # Using this also breaks pulse when SSH'ing with X11 forwarding enabled
@@ -205,7 +196,10 @@ in
 
       load-module module-allow-passthrough
 
-      load-module module-role-ducking
+      #load-module module-role-ducking
+    '') (mkIf config.home.profileSettings.gui.x11bell ''
+      load-sample x11-bell ${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga
+      load-module module-x11-bell sample=x11-bell display=:0
     '') ];
   };
 }

@@ -79,6 +79,36 @@
           fragments = 16;
         };
       } {
+        module = "alsa-sink";
+        opts = {
+          sink_name = "headphones";
+          device = "iec958:CARD=Generic,DEV=0";
+          format = "s32";
+          rate = 96000;
+          channels = 2;
+          channel_map = "front-left,front-right";
+          tsched = 0;
+          #fixed_latency_range = 1;
+          fragment_size = 1024;
+          fragments = 16;
+          sink_properties = "device.description=Headphones";
+        };
+      } {
+        module = "alsa-sink";
+        opts = {
+          sink_name = "light";
+          device = "iec958:CARD=Generic,DEV=0";
+          format = "s32";
+          rate = 48000;
+          channels = 2;
+          channel_map = "front-left,front-right";
+          tsched = 1;
+          fixed_latency_range = 0;
+          fragment_size = 1024;
+          fragments = 16;
+          sink_properties = "device.description=OpticalTSched";
+        };
+      } {
         module = "alsa-source";
         opts = {
           source_name = "mic";
@@ -100,29 +130,16 @@
           # source_properties = "device.description=Speakers2";
         };
       } {
-        /*module = "remap-sink";
+        module = "remap-sink";
         opts = {
-          sink_name = "headphones";
+          sink_name = "dac";
           master = "onboard";
           channels = 2;
           channel_map = "front-left,front-right";
           master_channel_map = "side-left,side-right";
           remix = "no";
-          sink_properties = "device.description=Headphones";
-          # source_properties = "device.description=Headphones2";
-        };*/
-        module = "alsa-sink";
-        opts = {
-          sink_name = "headphones";
-          device = "front:CARD=Device,DEV=0";
-          format = "s16";
-          rate = 48000;
-          channels = 2;
-          channel_map = "front-left,front-right";
-          tsched = 1;
-          fixed_latency_range = 0;
-          fragment_size = 1024;
-          fragments = 16;
+          sink_properties = "device.description=DAC";
+          # source_properties = "device.description=DAC2";
         };
       } {
         module = "remap-sink";

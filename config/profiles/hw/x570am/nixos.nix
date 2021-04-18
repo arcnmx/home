@@ -5,6 +5,7 @@
 
   config = mkIf config.home.profiles.hw.x570am {
     home.profiles.hw.ryzen = true;
+    home.profileSettings.gui.x11bell = false; # buggy audio drivers make this a bad idea :<
 
     boot = {
       initrd.availableKernelModules = [
