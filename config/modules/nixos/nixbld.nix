@@ -6,7 +6,7 @@ in {
   config = mkMerge [
     (mkIf cfg.enable {
       users.users.nixbld = {
-        isNormalUser = false;
+        isSystemUser = true;
         extraGroups = ["builders"];
         useDefaultShell = true;
         openssh.authorizedKeys.keyFiles = [

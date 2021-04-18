@@ -127,6 +127,7 @@ in {
         home = cfg.dataDir;
         createHome = true;
         group = cfg.group;
+        isSystemUser = true;
       }) bridges);
       groups = listToAttrs (map (cfg: nameValuePair cfg.user {
         #members = [ cfg.user ];
