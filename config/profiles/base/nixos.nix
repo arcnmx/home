@@ -40,7 +40,13 @@ in {
     boot = {
       kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
       tmpOnTmpfs = true;
+      initrd = {
+        compressor = lib.mkDefault "${pkgs.zstd}/bin/zstd -19";
+      };
     };
+    system.requiredKernelConfig = with config.lib.kernelConfig; [
+      (isYes "RD_ZSTD")
+    ];
 
     nix = {
       distributedBuilds = true;
