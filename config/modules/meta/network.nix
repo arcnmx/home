@@ -28,8 +28,11 @@
         config = {
           nixpkgs = {
             system = mkDefault pkgs.system;
-            pkgs = mkDefault pkgs;
-            inherit (meta.channels.config.nixpkgs) config overlays; # TODO: mkDefault?
+            pkgs = mkDefault (if config.nixpkgs.config == pkgs.config then pkgs else import pkgs.path {
+              inherit (config.nixpkgs) config localSystem crossSystem;
+              inherit (meta.channels.config.nixpkgs) overlays;
+            });
+            inherit (meta.channels.config.nixpkgs) config; # TODO: mkDefault?
           };
           nix = {
             inherit (meta.channels) nixPath;
@@ -44,10 +47,6 @@
               attrPrefix = "network.nodes.${name}.runners.run.";
             };
           };
-
-          _module.args.pkgs = mkDefault (import pkgs.path {
-            inherit (config.nixpkgs) config overlays localSystem crossSystem;
-          });
         };
       };
       nixosType = let
