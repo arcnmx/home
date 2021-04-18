@@ -108,10 +108,10 @@ in {
         '';
       } // optionalAttrs pkgs.hostPlatform.isLinux {
         lorri-status = ''
-          ${pkgs.systemd}/bin/systemctl --user status lorri.service
+          ${config.systemd.package}/bin/systemctl --user status lorri.service
         '';
         lorri-log = ''
-          ${pkgs.systemd}/bin/journalctl --user -fu lorri.service
+          ${config.systemd.package}/bin/journalctl --user -fu lorri.service
         '';
       };
       aliases = {

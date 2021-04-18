@@ -35,7 +35,7 @@
     fi
   '';
   shellLogin = ''
-    ! ${pkgs.systemd}/bin/systemctl --user -q is-system-running 2> /dev/null || ${pkgs.systemd}/bin/systemctl --user import-environment TERMINFO_DIRS # gpg-agent/pinentry-curses needs this
+    ! ${config.systemd.package}/bin/systemctl --user -q is-system-running 2> /dev/null || ${config.systemd.package}/bin/systemctl --user import-environment TERMINFO_DIRS # gpg-agent/pinentry-curses needs this
   '';
   zshOpts = [
     "auto_pushd" "pushd_ignore_dups" "pushdminus"

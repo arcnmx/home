@@ -51,7 +51,7 @@
       serviceConfig = {
         Type = "oneshot";
         ExecStart = [
-          "${pkgs.systemd}/bin/systemctl stop bluetooth"
+          "${config.systemd.package}/bin/systemctl stop bluetooth"
           "${pkgs.connman}/bin/connmanctl disable wifi"
         ];
         ExecStop = [

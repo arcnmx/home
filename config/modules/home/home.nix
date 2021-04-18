@@ -11,6 +11,7 @@
   };
   config = {
     home.nix.nixPath = mapAttrs (_: path: mkForce (toString path)) meta.channels.imports;
+    systemd.package = mkIf (config.home.nixosConfig != null) (mkDefault config.home.nixosConfig.systemd.package);
     _module.args = {
       pkgs = mkIf (config.home.nixosConfig == null) (mkForce meta.channels.nixpkgs);
       pkgs_i686 = mkForce null;

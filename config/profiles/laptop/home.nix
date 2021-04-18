@@ -6,13 +6,13 @@
   config = mkIf config.home.profiles.laptop {
     home.shell.functions = {
       bluenet = ''
-        ${pkgs.systemd}/bin/systemctl start bluetooth
+        ${config.systemd.package}/bin/systemctl start bluetooth
         ${pkgs.connman}/bin/connmanctl enable bluetooth
         ${pkgs.connman}/bin/connmanctl disable wifi
-        ${pkgs.systemd}/bin/systemctl restart connman
+        ${config.systemd.package}/bin/systemctl restart connman
       '';
       iosnet = ''
-        ${pkgs.systemd}/bin/systemctl restart usbmuxd
+        ${config.systemd.package}/bin/systemctl restart usbmuxd
         ${pkgs.connman}/bin/connmanctl disable wifi
         ${pkgs.connman}/bin/connmanctl disable bluetooth
         sleep 2.5

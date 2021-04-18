@@ -83,7 +83,7 @@
         forceWrapping = true;
       };
       startup = lib.optional config.services.konawall.enable {
-        command = "${pkgs.systemd}/bin/systemctl --user restart konawall.service";
+        command = "${config.systemd.package}/bin/systemctl --user restart konawall.service";
         always = true;
         notification = false;
       };
@@ -126,7 +126,7 @@
         #"--release KP_Multiply" = "exec --no-startup-id ${vm} seat";
 
         # "--release ${mod}+bracketleft" = "exec ${pkgs.physlock}/bin/physlock -dms";
-        "--release ${mod}+bracketleft" = "exec --no-startup-id ${pkgs.systemd}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
+        "--release ${mod}+bracketleft" = "exec --no-startup-id ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
 
         "${mod}+shift+Escape" = "exit";
 
