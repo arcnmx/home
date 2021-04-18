@@ -26,7 +26,7 @@ in {
         (if config.home.profiles.gui
           then duc
           else duc-cli)
-      ] ++ (lib.optional config.services.yggdrasil.enable pkgs.yggdrasilctl);
+      ] ++ (lib.optional config.services.yggdrasil.enable pkgs.yggdrasil);
     };
 
     i18n = {

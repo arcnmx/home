@@ -78,6 +78,7 @@ in {
       xorg.xinit
       xdg_utils-mimi
       rxvt-unicode-arc
+      mumble-speechd
       luakit-develop
       libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
     ] ++ optionals config.gtk.enable [

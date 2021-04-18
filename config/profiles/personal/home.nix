@@ -20,23 +20,23 @@ in {
   };
 
   config = mkIf config.home.profiles.personal {
-    home.file = {
-      ".task/hooks/on-exit.task-blocks".source = pkgs.arc'private.task-blocks.on-exit;
-      ".task/hooks/on-add.task-blocks".source = pkgs.arc'private.task-blocks.on-add;
-      ".task/hooks/on-modify.task-blocks".source = pkgs.arc'private.task-blocks.on-modify;
+    home.file = with pkgs.arc.packages.personal.task-blocks; {
+      ".task/hooks/on-exit.task-blocks".source = on-exit;
+      ".task/hooks/on-add.task-blocks".source = on-add;
+      ".task/hooks/on-modify.task-blocks".source = on-modify;
       ".taskrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/taskrc";
       ".electrum".source = mkOutOfStoreSymlink "${config.xdg.configHome}/electrum/";
     };
     xdg.configFile = {
       taskrc.text = config.home.file.".taskrc".text;
     };
-    home.packages = with pkgs; with gitAndTools; [
-      gitRemoteGcrypt git-revise gitAnnex git-annex-remote-b2
+    home.packages = with pkgs; [
+      git-remote-gcrypt git-revise git-annex git-annex-remote-b2
       hub
       nixos-option
       gnupg
       pass-arc
-      bitwarden-cli arc'private.pass2bitwarden
+      bitwarden-cli arc.packages.personal.pass2bitwarden
       awscli2
       ncmpcpp
       physlock

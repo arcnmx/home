@@ -31,7 +31,7 @@
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";
       "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
-      "${mod}+control+${key}" = "exec --no-startup-id ${pkgs.arc'private.i3workspaceoutput.exec} 'number ${workspace}' current";
+      "${mod}+control+${key}" = "exec --no-startup-id ${pkgs.arc.packages.personal.i3workspaceoutput.exec} 'number ${workspace}' current";
     };
     bindsym = k: v: "bindsym ${k} ${v}";
     # NOTE/TODO: modes could be used for additional/uncommon workspace (and other) bindings
