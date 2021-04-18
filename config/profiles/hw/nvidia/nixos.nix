@@ -7,11 +7,14 @@
   };
 
   config = mkIf config.home.profiles.hw.nvidia {
-    hardware.nvidia.modesetting.enable = true;
+    hardware.nvidia = {
+      modesetting.enable = true;
+      package = config.boot.kernelPackages.nvidiaPackages.beta;
+    };
     hardware.display.nvidia.enable = true;
     hardware.opengl.extraPackages = with pkgs; [libvdpau-va-gl];
     # TODO: opencl_nvidia?
-    services.xserver.videoDrivers = ["nvidiaBeta"];
+    services.xserver.videoDrivers = ["nvidia"];
     # xf86-video-nouveau?
     boot = {
       kernelModules = ["i2c-dev"];

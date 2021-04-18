@@ -55,10 +55,23 @@ in {
       packages = [pkgs.tamzen];
       font = "Tamzen7x14";
       earlySetup = true;
+      mingetty = {
+        greetingPrefix =
+          ''\e[H\e[2J'' + # topleft
+          ''\e[9;10]''; # setterm blank/powersave = 10 minutes
+        greeting =
+          "\n" +
+          lib.concatStringsSep "\n" nixos +
+          "\n\n" +
+          ''\e[1;32m>>> NixOS ${config.system.nixos.label} (Linux \r) - \l\e[0m'';
+      };
     };
     i18n.supportedLocales = [
       "ja_JP.UTF-8/UTF-8"
     ];
+    services.getty = {
+      helpLine = lib.mkForce "";
+    };
     boot = {
       loader = {
         timeout = 1;
@@ -113,18 +126,6 @@ in {
         Description = "Belkin B2B128 USB Ethernet";
         Name = "ethb2b";
       };
-    };
-
-    services.mingetty = {
-      greetingPrefix =
-        ''\e[H\e[2J'' + # topleft
-        ''\e[9;10]''; # setterm blank/powersave = 10 minutes
-      greeting =
-        "\n" +
-        lib.concatStringsSep "\n" nixos +
-        "\n\n" +
-        ''\e[1;32m>>> NixOS ${config.system.nixos.label} (Linux \r) - \l\e[0m'';
-      helpLine = lib.mkForce "";
     };
 
     networking = {

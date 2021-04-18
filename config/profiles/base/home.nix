@@ -83,7 +83,7 @@ in {
       ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {
         target = "${config.xdg.configHome}/gnupg/gpg.conf";
       };
-      ".gnupg/gpg-agent.conf" = lib.mkIf config.services.gpg-agent.enable {
+      "${config.programs.gpg.homedir}/gpg-agent.conf" = lib.mkIf config.services.gpg-agent.enable {
         target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
       };
       ".markdownlintrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/markdownlint/markdownlintrc";

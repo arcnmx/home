@@ -34,7 +34,10 @@ in {
 
     xdg.configFile."i3status/config".source = ./files/i3status;
 
-    home.packages = [ pkgs.paswitch config.home.programs.paswitch.patoggle ];
+    home.packages = [
+      pkgs.paswitch
+      config.home.programs.paswitch.patoggle
+    ];
     services.konawall.tags = ["score:>=200" "width:>=1600" "rating:safe"];
     home.shell.functions = {
       _paswitch_sinks = ''

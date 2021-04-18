@@ -80,7 +80,7 @@ in
           #Option "Sensitivity" "1.0"
         ''
       ];
-      libinput.naturalScrolling = true;
+      libinput.touchpad.naturalScrolling = true;
     };
     services.udev.extraRules = let
       openrazerDpi = pkgs.writeShellScript "openrazer-dpi" ''
