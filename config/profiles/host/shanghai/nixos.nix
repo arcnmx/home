@@ -191,7 +191,8 @@
       SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+="${pkgs.runtimeShell} -c 'for x in /sys/devices/system/cpu/cpufreq/*/scaling_governor; do echo performance > $$x; done'"
 
       # my VM disks
-      SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="*BTJR442300QQ480BGN*", OWNER="arc"
+      SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="naa.55cd2e404b6f84e5", OWNER="arc"
+      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="4", ATTR{size}=="125829120", ATTRS{wwid}=="eui.6479a741e0203d76", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
     '';
     hardware.display = {
@@ -244,7 +245,7 @@
           efiSysMountPoint = "/mnt/efi";
         };
       };
-      supportedFilesystems = ["btrfs"];
+      supportedFilesystems = ["btrfs" "xfs"];
     };
 
     fileSystems = {
@@ -252,6 +253,11 @@
         device = "/dev/disk/by-uuid/4a260bff-eac5-40c9-8c40-00f0557b5923";
         fsType = "btrfs";
         options = ["rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/"];
+      };
+      "/nix" = {
+        device = "/dev/disk/by-uuid/a82e1a40-e0e5-4461-a29d-42caf5a502b6";
+        fsType = "xfs";
+        options = ["rw" "relatime"]; # discard
       };
       "/boot" = {
         device = "/mnt/efi/EFI/nixos";
