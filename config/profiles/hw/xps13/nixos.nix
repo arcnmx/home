@@ -3,10 +3,17 @@
 in {
   options = {
     home.profiles.hw.xps13 = mkEnableOption "Dell XPS 13 (9343)";
-    home.hw.xps13.lieDpi = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Lie about the screen's DPI";
+    home.hw.xps13 = {
+      lieDpi = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Lie about the screen's DPI";
+      };
+      wifi = mkOption {
+        type = types.enum [ "7265" "ax210" ];
+        default = "7265";
+        description = "WiFi chip currently installed";
+      };
     };
   };
 
@@ -24,6 +31,18 @@ in {
     # boot.kernelParams = ["i915.enable_execlists=0"]; # try if getting freezes
     # boot.kernelParams = ["i915.enable_psr=1"]; # try for powersaving
     # boot.kernelParams = ["intel_idle.max_cstate=1"]; # try to fix baytrail freeze?
+
+    systemd.network.links.wlan = {
+      matchConfig = {
+        MACAddress = mkMerge [
+          (mkIf (config.home.hw.xps13.wifi == "7265") "00:15:00:ec:c6:51")
+          (mkIf (config.home.hw.xps13.wifi == "ax210") "d8:f8:83:36:81:b6")
+        ];
+      };
+      linkConfig = {
+        Name = "wlan";
+      };
+    };
 
     hardware.opengl.extraPackages = with pkgs; [vaapiIntel libvdpau-va-gl vaapiVdpau intel-ocl];
     services.xserver = {

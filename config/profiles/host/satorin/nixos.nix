@@ -15,14 +15,6 @@
     };
 
     deploy.network.local.ipv4 = "10.1.1.64";
-    systemd.network.links.wlan = {
-      matchConfig = {
-        MACAddress = "00:15:00:ec:c6:51";
-      };
-      linkConfig = {
-        Name = "wlan";
-      };
-    };
     services.openssh.ports = [ 22 64022 ];
     #networking.connman.extraFlags = ["-I" "eth0" "-I" "wlan0"]; # why did I have this there? these don't even exist?
 
@@ -44,6 +36,7 @@
         requestEncryptionCredentials = true;
       };
     };
+    home.hw.xps13.wifi = "ax210";
     services.zfs = {
       autoScrub = {
         enable = true;
