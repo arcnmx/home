@@ -271,6 +271,7 @@ in {
         "notmuch-vim"
         "editorconfig-vim"
         "vim-fugitive"
+        "vim-hexokinase"
         "coc-nvim"
         "coc-json"
         "coc-yaml"
