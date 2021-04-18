@@ -1,5 +1,6 @@
 { meta, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
+  mpv = "${config.programs.mpv.finalPackage}/bin/mpv";
   firefoxFiles = let
     pathConds = {
       "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}" = config.programs.firefox.extensions != [];
@@ -44,13 +45,13 @@ in {
     home.shell = {
       functions = {
         mradio = mkIf config.home.profiles.trusted ''
-          PULSE_PROP="media.role=music" ${pkgs.mpv}/bin/mpv --cache=no --cache-backbuffer=0 --cache-seek-min=0 --cache-secs=1 http://shanghai:32101
+          PULSE_PROP="media.role=music" ${mpv} --cache=no --cache-backbuffer=0 --cache-seek-min=0 --cache-secs=1 http://shanghai:32101
         '';
         mpa = ''
-          PULSE_PROP="media.role=music" ${pkgs.mpv}/bin/mpv --no-video "$@"
+          PULSE_PROP="media.role=music" ${mpv} --no-video "$@"
         '';
         mpv = ''
-          PULSE_PROP="media.role=video" ${pkgs.mpv}/bin/mpv "$@"
+          PULSE_PROP="media.role=video" ${mpv} "$@"
         '';
         discord = ''
           PULSE_PROP="media.role=phone" nix run nixpkgs.discord -c Discord "$@"
@@ -72,7 +73,6 @@ in {
       feh
       ffmpeg
       youtube-dl
-      mpv
       scrot
       xsel
       xorg.xinit
@@ -228,7 +228,6 @@ in {
     programs.firefox.tridactyl = let
       src = ./files/tridactyl/tridactylrc;
       xsel = "${pkgs.xsel}/bin/xsel";
-      mpv = "${pkgs.mpv}/bin/mpv";
       urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
       vim = "${config.programs.vim.package}/bin/vim";
       firefox = "${config.programs.firefox.packageWrapped}/bin/firefox";
@@ -441,13 +440,67 @@ in {
     };
     programs.mpv = {
       enable = true;
+      scripts = with pkgs.mpvScripts; [
+        sponsorblock mpris
+      ];
       config = {
         hwdec = mkDefault "auto";
 
         vo = mkDefault "gpu";
-        opengl-waitvsync = "yes";
+        opengl-waitvsync = true;
 
-        keep-open = "yes";
+        keep-open = true;
+
+        volume-max = 200;
+        osd-scale-by-window = false;
+        osd-font-size = config.lib.gui.fontSize 26; # pixels at 720 window height, then scaled to real size
+        osd-bar-h = 2.5; # 3.125 default
+        osd-border-size = 2; # font border pixels, default 3
+        term-osd-bar = true;
+        script-opts = concatStringsSep "," (mapAttrsToList (k: v: "${k}=${toString v}") {
+          osc-layout = "slimbox";
+          osc-vidscale = "no";
+          osc-deadzonesize = 0.75;
+          osc-minmousemove = 4;
+          osc-hidetimeout = 2000;
+          osc-valign = 0.9;
+          osc-timems = "yes";
+          osc-seekbarstyle = "knob";
+          osc-seekbarkeyframes = "no";
+          osc-seekrangestyle = "slider";
+        });
+      };
+      bindings = let
+        unbind = "keyup"; # dunno what's the best null command
+        #unbind = "stop";
+      in {
+        "Ctrl+c" = unbind; # defaults to quit and no I don't want that
+        "Ctrl+r" = "loadfile \${path}";
+        "R" = "video-reload";
+        "B" = "drop-buffers";
+      };
+    };
+    programs.syncplay = {
+      enable = true;
+      username = "arc";
+      defaultRoom = "lounge";
+      gui = false;
+      trustedDomains = [ "youtube.com" "youtu.be" "twitch.tv" "soundcloud.com" ];
+      config = {
+        client_settings = {
+          autoplayrequiresamefiles = false;
+          readyatstart = true;
+          pauseonleave = false;
+          rewindondesync = false;
+          rewindthreshold = 6.0;
+          fastforwardthreshold = 6.0;
+          unpauseaction = "Always";
+        };
+        gui = {
+          #autosavejoinstolist = false;
+          showdurationnotification = false;
+          chatoutputrelativefontsize = config.lib.gui.fontSize 13.0;
+        };
       };
     };
     xdg.dataFile = {
