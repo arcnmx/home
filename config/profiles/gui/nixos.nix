@@ -89,8 +89,8 @@ in
         printf %04x $1 | ${pkgs.xxd}/bin/xxd -r -p > /sys/$DEVPATH/dpi
       '';
     in ''
-      ACTION=="add", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazerDpi} 5900"
-      ACTION=="add", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazerDpi} 3100"
+      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazerDpi} 5900"
+      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazerDpi} 3100"
     '';
     hardware.openrazer = {
       devicesOffOnScreensaver = false;
