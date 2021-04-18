@@ -99,6 +99,7 @@ in {
       matrix-synapse = {
         rc_messages_per_second = mkDefault "0.1";
         rc_message_burst_count = mkDefault "25.0";
+        max_upload_size = mkDefault "128M";
         url_preview_enabled = mkDefault true;
         enable_registration = mkDefault false;
         enable_metrics = mkDefault false;
@@ -337,6 +338,9 @@ in {
           locations = {
             "/_matrix" = {
               proxyPass = private.url;
+              extraConfig = ''
+                proxy_read_timeout 180s;
+              '';
             };
             "/mautrix-hangouts/" = mkIf config.services.matrix-synapse.bridges.hangouts.enable {
               proxyPass = "http://127.0.0.1:${toString config.services.matrix-synapse.bridges.hangouts.port}/mautrix-hangouts/";
@@ -351,6 +355,9 @@ in {
           listen = [ { addr = federation.bind; port = federation.port; ssl = true; } ];
           locations."/" = {
             proxyPass = private-federation.url;
+            extraConfig = ''
+              proxy_read_timeout 240s;
+            '';
           };
         };
         ${matrix-synapse.vanity.url} = with matrix-synapse; mkIf config.services.matrix-synapse.enable {
