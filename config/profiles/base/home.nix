@@ -164,10 +164,6 @@ in {
         " I want to select things in X thanks
         set mouse=
       '';
-      "user-dirs.dirs".text = ''
-        XDG_DESKTOP_DIR="$HOME"
-        XDG_DOWNLOAD_DIR="$HOME/downloads"
-      '';
       "inputrc".text = ''
         set editing-mode vi
         set keyseq-timeout 1
@@ -212,6 +208,17 @@ in {
       "gnupg/gpg-agent.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg-agent.conf";
       "gnupg/gpg.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg.conf";
       "gnupg/sshcontrol".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/sshcontrol";
+    };
+    xdg.userDirs = {
+      enable = true;
+      desktop = "$HOME";
+      download = "$HOME/downloads";
+      music = "$HOME/media/music";
+      pictures = "$HOME/media/pictures";
+      videos = "$HOME/media/videos";
+      publicShare = "$HOME/share/public";
+      templates = "$HOME/templates";
+      documents = "$HOME/projects";
     };
     home.language = {
       base = "en_US.UTF-8";
