@@ -23,9 +23,9 @@
     tnew = "tmux new -s";
     tatt = "tmux att -t";
     tmain = "tatt main";
-    t3 = "tatt 3s";
     open = "xdg-open";
     clear = "clear && printf '\\e[3J'";
+    bell = "tput bel";
 
     ${if config.home.mutableHomeDirectory != null then "up" else null} = "${config.home.mutableHomeDirectory}/update";
   };
