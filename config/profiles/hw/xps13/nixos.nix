@@ -24,9 +24,13 @@ in {
 
     fonts.fontconfig.dpi = if cfg.lieDpi then 96 else 166;
 
-    boot.initrd.availableKernelModules = [
-      "xhci_pci" "ehci_pci" "ahci" "sd_mod" "rtsx_pci_sdmmc"
-    ];
+    boot = {
+      kernelPackages = mkIf (config.home.hw.xps13.wifi == "ax210")
+        (assert versionOlder pkgs.linuxPackages_testing.kernel.version "5.13"; pkgs.linuxPackages_testing);
+      initrd.availableKernelModules = [
+        "xhci_pci" "ehci_pci" "ahci" "sd_mod" "rtsx_pci_sdmmc"
+      ];
+    };
 
     # boot.kernelParams = ["i915.enable_execlists=0"]; # try if getting freezes
     # boot.kernelParams = ["i915.enable_psr=1"]; # try for powersaving
