@@ -551,6 +551,14 @@ in {
             mode_indicator_replace_color = base0E;
             mode_indicator_search_color_bg = base0A;
             mode_indicator_search_color = base04;
+            no_warn = true;
+          };
+          var.python.go = {
+            short_name = true;
+            use_core_instead_weechat = true;
+            fuzzy_search = true;
+            sort = "hotlist,number,beginning";
+            #auto_jump = true;
           };
         };
       };
