@@ -141,6 +141,9 @@ in {
           '')
         ];
       };
+      interfaces.ethb2b = {
+        useDHCP = true;
+      };
     };
 
     # allow wheel to do things without password

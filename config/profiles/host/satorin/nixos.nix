@@ -12,6 +12,8 @@
     networking = {
       hostId = "451b608e";
       nftables.ruleset = mkAfter (builtins.readFile ./files/nftables.conf);
+      useNetworkd = true;
+      useDHCP = false;
     };
 
     deploy.network.local.ipv4 = "10.1.1.64";

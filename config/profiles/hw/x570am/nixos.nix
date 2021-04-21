@@ -29,14 +29,42 @@
     ];
     systemd.network = {
       networks.eno1 = {
-        matchConfig.Name = "enp7s0";
+        inherit (config.systemd.network.links.eth) matchConfig;
         bridge = ["br"];
       };
       netdevs.br = {
         netdevConfig = {
           Name = "br";
           Kind = "bridge";
-          MACAddress = "18:c0:4d:08:87:bd";
+          inherit (config.systemd.network.links.eth.matchConfig) MACAddress;
+        };
+      };
+      links = {
+        wlan = {
+          matchConfig = {
+            MACAddress = "a4:b1:c1:d9:14:df";
+          };
+          linkConfig = {
+            Name = "wlan";
+          };
+        };
+        eth = {
+          matchConfig = {
+            MACAddress = "18:c0:4d:08:87:bd";
+            Type = "ether";
+          };
+          linkConfig = {
+            Name = "eth";
+          };
+        };
+        eth25 = {
+          matchConfig = {
+            MACAddress = "18:c0:4d:08:87:bc";
+            Type = "ether";
+          };
+          linkConfig = {
+            Name = "eth25";
+          };
         };
       };
     };
