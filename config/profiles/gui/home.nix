@@ -572,6 +572,10 @@ in {
     };
 
     services.gpg-agent.pinentryFlavor = "gtk2";
+    services.redshift = {
+      enable = true;
+      tray = false;
+    };
     services.konawall = {
       enable = true;
       interval = "20m";
