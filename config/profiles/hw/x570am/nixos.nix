@@ -5,7 +5,6 @@
 
   config = mkIf config.home.profiles.hw.x570am {
     home.profiles.hw.ryzen = true;
-    home.profileSettings.gui.x11bell = false; # buggy audio drivers make this a bad idea :<
 
     boot = {
       initrd.availableKernelModules = [
@@ -21,11 +20,8 @@
     };
     hardware.pulseaudio = {
       package = pkgs.pulseaudioFull;
-      extraModules = [ pkgs.pulseaudio-modules-bt ];
-      extraConfig = ''
-        load-module module-bluetooth-policy
-        load-module module-bluetooth-discover headset=${if config.services.ofono.enable then "ofono" else "native"}
-      '';
+      bluetooth.enable = true;
+      x11bell.enable = mkForce false; # buggy audio drivers make this a bad idea :<
     };
     environment.systemPackages = with pkgs; [
       wirelesstools

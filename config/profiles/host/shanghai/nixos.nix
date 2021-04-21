@@ -47,162 +47,187 @@
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     services.openssh.ports = [ 22 32022 ];
     hardware.openrazer.enable = true;
-    hardware.pulseaudio.extraConfig = let
-      usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
-      load-module = { module, opts ? { } }: "load-module module-${module}" +
-        optionalString (opts != { }) (" " + concatStringsSep " " (mapAttrsToList (k: v: "${k}=${toString v}") opts));
+    hardware.pulseaudio = let
       default_aec_args = {
         # https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Enable_Echo.2FNoise-Cancellation
-        analog_gain_control = 0;
-        digital_gain_control = 1;
-        noise_suppression = 1;
-        high_pass_filter = 0;
-        extended_filter = 1;
-        experimental_agc = 1;
-        intelligibility_enhancer = 0;
+        analog_gain_control = false;
+        digital_gain_control = true;
+        noise_suppression = true;
+        high_pass_filter = false;
+        extended_filter = true;
+        experimental_agc = true;
+        intelligibility_enhancer = false;
       };
-      aec_args = opts: ''"${concatStringsSep " " (mapAttrsToList (k: v: "${k}=${toString v}") opts)}"'';
-      modules = [ {
-        # { module = "mmkbd-evdev"; }
-        module = "alsa-sink";
-        opts = {
-          sink_name = "onboard";
-          device = "surround40:CARD=Generic,DEV=0";
-          format = "s32";
-          rate = 48000;
-          channels = 4;
-          # NOTE: first two channels include an amp for headphones
-          channel_map = "front-left,front-right,rear-left,rear-right"; # ,side-left,side-right
-          tsched = 1;
-          fixed_latency_range = 0;
-          fragment_size = 1024;
-          fragments = 16;
-        };
-      } {
-        module = "alsa-sink";
-        opts = {
-          sink_name = "headphones";
-          device = "iec958:CARD=Generic,DEV=0";
-          format = "s32";
-          rate = 96000;
-          channels = 2;
-          channel_map = "front-left,front-right";
-          tsched = 0;
-          #fixed_latency_range = 1;
-          fragment_size = 1024;
-          fragments = 16;
-          sink_properties = "device.description=Headphones";
-        };
-      } {
-        module = "alsa-sink";
-        opts = {
-          sink_name = "light";
-          device = "iec958:CARD=Generic,DEV=0";
-          format = "s32";
-          rate = 48000;
-          channels = 2;
-          channel_map = "front-left,front-right";
-          tsched = 1;
-          fixed_latency_range = 0;
-          fragment_size = 1024;
-          fragments = 16;
-          sink_properties = "device.description=OpticalTSched";
-        };
-      } {
-        module = "alsa-source";
-        opts = {
-          source_name = "mic";
-          device = "front:CARD=Generic,DEV=0";
-          format = "s32";
-          rate = 96000;
-          tsched = 1;
-        };
-      } {
-        module = "remap-sink";
-        opts = {
-          sink_name = "speakers";
-          master = "onboard";
-          channels = 2;
-          channel_map = "front-left,front-right";
-          master_channel_map = "rear-left,rear-right";
-          remix = "no";
-          sink_properties = "device.description=Speakers";
-          # source_properties = "device.description=Speakers2";
-        };
-      } {
-        module = "remap-sink";
-        opts = {
-          sink_name = "dac";
-          master = "onboard";
-          channels = 2;
-          channel_map = "front-left,front-right";
-          master_channel_map = "side-left,side-right";
-          remix = "no";
-          sink_properties = "device.description=DAC";
-          # source_properties = "device.description=DAC2";
-        };
-      } {
-        module = "remap-sink";
-        opts = {
-          sink_name = "headset";
-          master = "onboard";
-          channels = 2;
-          channel_map = "front-left,front-right";
-          master_channel_map = "front-left,front-right";
-          remix = "no";
-          sink_properties = "device.description=Headset";
-          # source_properties = "device.description=Headset2";
-        };
-      } {
-        module = "virtual-surround-sink";
-        opts = {
-          sink_name = "vsurround";
-          sink_master = "headset";
-          hrir = "${./files/hrir-kemar.wav}";
-          sink_properties = ''"device.description='Headset VSurround'"'';
-          # source_properties="device.description='Headset VSurround2'"
-        };
-      } {
-        module = "echo-cancel";
-        opts = {
-          source_master = "mic";
-          sink_master = "headset";
-          source_name = "mic_headset";
-          sink_name = "mic_headset_sink";
-          use_volume_sharing = 1;
-          use_master_format = 1;
-          channels = 1;
-          aec_method = "webrtc";
-          aec_args = aec_args (default_aec_args // {
-            agc_start_volume = 150;
-            #high_pass_filter = 1;
-            #routing_mode = "loud-earpiece";
-          });
-        };
-      } {
-        module = "echo-cancel";
-        opts = {
-          source_master = "mic";
-          sink_master = "speakers";
-          source_name = "mic_speakers";
-          sink_name = "mic_speakers_sink";
-          use_volume_sharing = 1;
-          use_master_format = 1;
-          channels = 1;
-          aec_method = "webrtc";
-          aec_args = aec_args (default_aec_args // {
-            agc_start_volume = 200; # 85
-            #routing_mode = "loud-speakerphone";
-          });
-        };
-      } ];
-    in mkMerge (
-      (map load-module modules) ++ [
-        "set-default-source mic"
-        #"set-default-sink alsa_output.${usb}.analog-stereo"
-        #"set-default-source alsa_input.${usb}.mono-fallback"
-      ]
-    );
+      usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
+      channels = 4; # NOTE: first two channels include an amp for headphones, 3rd needs an external amp
+      channel_map =
+        [ "front-left" "front-right" "rear-left" "rear-right" "side-left" "side-right" ];
+    in {
+      loadModule = [
+        # "mmkbd-evdev"
+        {
+          module = "alsa-sink";
+          opts = {
+            sink_name = "onboard";
+            device = "surround40:CARD=Generic,DEV=0";
+            format = "s32";
+            rate = 48000;
+            inherit channels;
+            channel_map =
+              sublist 0 4 channel_map
+              ++ optional (channels == 5) [ "lfe" ]
+              ++ optionals (channels == 6) (sublist channel_map 4 2);
+            tsched = true;
+            fixed_latency_range = false;
+            fragment_size = 1024;
+            fragments = 16;
+          };
+        }
+        {
+          module = "remap-sink";
+          opts = {
+            sink_name = "speakers";
+            master = "onboard";
+            channels = 2;
+            channel_map = sublist 0 2 channel_map;
+            master_channel_map = sublist 2 2 channel_map;
+            remix = "no";
+            sink_properties = {
+              "device.description" = "Speakers";
+            };
+            # source_properties = "device.description=Speakers2";
+          };
+        }
+        {
+          module = "remap-sink";
+          opts = {
+            sink_name = "dac";
+            master = "onboard";
+            channels = 2;
+            channel_map = sublist 0 2 channel_map;
+            master_channel_map = sublist 4 2 channel_map;
+            remix = "no";
+            sink_properties = {
+              "device.description" = "DAC";
+            };
+            # source_properties = { "device.description" = "DAC2"; };
+          };
+        }
+        {
+          module = "remap-sink";
+          opts = {
+            sink_name = "headset";
+            master = "onboard";
+            channels = 2;
+            channel_map = sublist 0 2 channel_map;
+            master_channel_map = sublist 0 2 channel_map;
+            remix = "no";
+            sink_properties = {
+              "device.description" = "Headset";
+            };
+            # source_properties = "device.description=Headset2";
+          };
+        }
+        {
+          module = "alsa-sink";
+          opts = {
+            sink_name = "headphones";
+            device = "iec958:CARD=Generic,DEV=0";
+            format = "s32";
+            rate = 96000;
+            channels = 2;
+            channel_map = sublist 0 2 channel_map;
+            tsched = false;
+            #fixed_latency_range = true;
+            fragment_size = 1024;
+            fragments = 16;
+            sink_properties = {
+              "device.description" = "Headphones (Optical)";
+            };
+          };
+        }
+        {
+          module = "alsa-sink";
+          opts = {
+            sink_name = "light";
+            device = "iec958:CARD=Generic,DEV=0";
+            format = "s32";
+            rate = 48000;
+            channels = 2;
+            channel_map = sublist 0 2 channel_map;
+            tsched = true;
+            fixed_latency_range = false;
+            fragment_size = 1024;
+            fragments = 16;
+            sink_properties = {
+              "device.description" = "Optical TShed";
+            };
+          };
+        }
+        {
+          module = "alsa-source";
+          opts = {
+            source_name = "mic";
+            device = "front:CARD=Generic,DEV=0";
+            format = "s32";
+            rate = 96000;
+            tsched = true;
+          };
+        }
+        {
+          module = "virtual-surround-sink";
+          opts = {
+            sink_name = "vsurround";
+            sink_master = "headset";
+            hrir = "${./files/hrir-kemar.wav}";
+            sink_properties = {
+              "device.description" = "Headset VSurround";
+            };
+            # source_properties="device.description='Headset VSurround2'"
+          };
+        }
+        {
+          module = "echo-cancel";
+          opts = {
+            source_master = "mic";
+            sink_master = "headset";
+            source_name = "mic_headset";
+            sink_name = "mic_headset_sink";
+            use_volume_sharing = true;
+            use_master_format = true;
+            channels = 1;
+            aec_method = "webrtc";
+            aec_args = default_aec_args // {
+              agc_start_volume = 150;
+              #high_pass_filter = true;
+              #routing_mode = "loud-earpiece";
+            };
+          };
+        }
+        {
+          module = "echo-cancel";
+          opts = {
+            source_master = "mic";
+            sink_master = "speakers";
+            source_name = "mic_speakers";
+            sink_name = "mic_speakers_sink";
+            use_volume_sharing = true;
+            use_master_format = true;
+            channels = 1;
+            aec_method = "webrtc";
+            aec_args = default_aec_args // {
+              agc_start_volume = 200; # 85
+              #routing_mode = "loud-speakerphone";
+            };
+          };
+        }
+      ];
+      defaults = {
+        source = "mic";
+        #sink = "alsa_output.${usb}.analog-stereo";
+        #source = "alsa_input.${usb}.mono-fallback";
+      };
+    };
 
     services.udev.extraRules = ''
       SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+="${pkgs.runtimeShell} -c 'for x in /sys/devices/system/cpu/cpufreq/*/scaling_governor; do echo performance > $$x; done'"

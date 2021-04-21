@@ -23,7 +23,7 @@
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
     sleep = "${pkgs.coreutils}/bin/sleep";
     xset = "${pkgs.xorg.xset}/bin/xset";
-    pactl = "${pkgs.pulseaudio}/bin/pactl";
+    pactl = "${config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio}/bin/pactl";
     pkill = "${pkgs.procps}/bin/pkill";
     mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";

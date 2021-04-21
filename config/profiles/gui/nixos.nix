@@ -8,12 +8,6 @@ in
 {
   options = {
     home.profiles.gui = mkEnableOption "graphical system";
-    home.profileSettings.gui = {
-      x11bell = mkOption {
-        type = types.bool;
-        default = true;
-      };
-    };
   };
 
   config = mkIf config.home.profiles.gui {
@@ -140,66 +134,76 @@ in
       '';
     };
 
-    hardware.pulseaudio.enable = true;
-    hardware.pulseaudio.daemon.config = {
-      # pulse-daemon.conf(5)
-      exit-idle-time = 5;
-      load-default-script-file = "yes";
-      #default-script-file = "/etc/pulse/autoload.pa";
-      resample-method = "speex-float-5";
-      avoid-resampling = "true";
-      flat-volumes = "no";
-      default-sample-format = "s32le";
-      default-sample-rate = 48000;
-      alternate-sample-rate = 44100;
-      default-sample-channels = 2;
+    hardware.pulseaudio = {
+      enable = true;
+      daemon.config = {
+        # pulse-daemon.conf(5)
+        exit-idle-time = 5;
+        #log-level = "debug";
+        load-default-script-file = "yes";
+        #default-script-file = "/etc/pulse/autoload.pa";
+        resample-method = "speex-float-5";
+        avoid-resampling = "true";
+        flat-volumes = "no";
+        #default-fragments = "4";
+        #default-fragment-size-msec = "10";
+        #default-sample-format = "s16le";
+        #default-sample-rate = 44100;
+        #alternate-sample-rate = 48000;
+        #default-sample-channels = 2;
+        #default-channel-map = "front-left,front-right";
+        default-sample-format = "s32le";
+        default-sample-rate = 48000;
+        alternate-sample-rate = 44100;
+        default-sample-channels = 2;
+        #default-sample-channels = 2;
+        #default-channel-map = "front-left,front-right";
+      };
+      clearDefaults = mkDefault true;
+      x11bell.enable = mkDefault true;
+      loadModule = mkMerge [
+        (mkBefore [
+          "module-device-restore"
+          "module-stream-restore"
+          "module-card-restore"
+
+          "module-augment-properties"
+
+          "module-switch-on-port-available"
+        ])
+        (mkAfter [
+          "native-protocol-unix"
+          {
+            module = "native-protocol-tcp";
+            opts.auth-ip-acl = "127.0.0.1;10.0.0.0/8";
+          }
+          "udev-detect"
+          "default-device-restore"
+          "module-rescue-streams"
+          "module-always-sink"
+          "module-intended-roles"
+          "module-suspend-on-idle"
+          "console-kit"
+          "systemd-login"
+          "position-event-sounds"
+          "filter-heuristics"
+          "filter-apply"
+
+          /*{
+            # Allow any user in X11 to access pulse
+            # Using this also breaks pulse when SSH'ing with X11 forwarding enabled
+            module = "x11-publish";
+            opts.display = ":0";
+          }*/
+
+          "allow-passthrough"
+
+          #"role-ducking" # ducks for as long as a matching stream exists, even if silent... unfortunately that makes it useless :<
+        ])
+      ];
+      extraConfig = mkBefore ''
+        .fail
+      '';
     };
-    hardware.pulseaudio.configFile = builtins.toFile "default.pa" "";
-    hardware.pulseaudio.extraConfig = mkMerge [ (mkBefore ''
-      .fail
-
-      load-module module-device-restore
-      load-module module-stream-restore
-      load-module module-card-restore
-
-      load-module module-augment-properties
-
-      load-module module-switch-on-port-available
-    '') (mkAfter ''
-      load-module module-native-protocol-unix
-
-      load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;10.0.0.0/8
-
-      load-module module-udev-detect
-
-      load-module module-default-device-restore
-
-      load-module module-rescue-streams
-
-      load-module module-always-sink
-
-      load-module module-intended-roles
-
-      load-module module-suspend-on-idle
-
-      load-module module-console-kit
-      load-module module-systemd-login
-
-      load-module module-position-event-sounds
-
-      load-module module-filter-heuristics
-      load-module module-filter-apply
-
-      # Allow any user in X11 to access pulse
-      # Using this also breaks pulse when SSH'ing with X11 forwarding enabled
-      #load-module module-x11-publish display=:0
-
-      load-module module-allow-passthrough
-
-      #load-module module-role-ducking
-    '') (mkIf config.home.profileSettings.gui.x11bell ''
-      load-sample x11-bell ${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga
-      load-module module-x11-bell sample=x11-bell display=:0
-    '') ];
   };
 }

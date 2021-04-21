@@ -1,9 +1,11 @@
 { config, pkgs, lib, ... }: with lib; let
+  pulseaudio = config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio;
+  pactl = "${pulseaudio}/bin/pactl";
   patoggle = pkgs.writeShellScriptBin "patoggle" ''
     set -eu
-    SINKS=(headphones speakers)
+    SINKS=(${concatStringsSep " " config.home.programs.paswitch.sinks})
 
-    DEFAULT_SINK=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gnugrep}/bin/grep Sink | ${pkgs.coreutils}/bin/cut -d ' ' -f 3)
+    DEFAULT_SINK=$(${pactl} info | ${pkgs.gnugrep}/bin/grep Sink | ${pkgs.coreutils}/bin/cut -d ' ' -f 3)
     SINK_INDEX=0
     for sink in "''${SINKS[@]}"; do
       ((++SINK_INDEX))
@@ -18,9 +20,15 @@
 in {
   options = {
     home.profiles.host.shanghai = mkEnableOption "hostname: shanghai";
-    home.programs.paswitch.patoggle = mkOption {
-      type = types.package;
-      default = patoggle;
+    home.programs.paswitch = {
+      sinks = mkOption {
+        type = types.listOf types.str;
+        default = [ "headphones" "speakers" ];
+      };
+      patoggle = mkOption {
+        type = types.package;
+        default = patoggle;
+      };
     };
   };
 
@@ -41,7 +49,7 @@ in {
     services.konawall.tags = ["score:>=200" "width:>=1600" "rating:safe"];
     home.shell.functions = {
       _paswitch_sinks = ''
-        ${pkgs.pulseaudio}/bin/pactl list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
+        ${pactl} list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
       '';
       _paswitch = ''
         _alternative 'preset:preset:(headphones speakers)' 'sink:sink:($(_paswitch_sinks))'
