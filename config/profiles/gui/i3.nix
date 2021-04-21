@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }:
-{
+{ config, pkgs, lib, ... }: with lib; {
   xsession.windowManager.i3 = let
     run = pkgs.writeShellScriptBin "run" ''
       ARGS=(${term} +sb
@@ -20,6 +19,7 @@
     term = "${pkgs.rxvt-unicode-arc}/bin/urxvtc"; # urxvt
     #term = "${pkgs.xterm}/bin/xterm";
     i3-easyfocus = "${pkgs.i3-easyfocus}/bin/i3-easyfocus";
+    #lock = "${pkgs.physlock}/bin/physlock -dms";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
     sleep = "${pkgs.coreutils}/bin/sleep";
     xset = "${pkgs.xorg.xset}/bin/xset";
@@ -28,6 +28,7 @@
     mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
     browser = "${pkgs.luakit-develop}/bin/luakit";
+    bar-refresh = "&& ${pkill} -USR1 i3status";
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";
       "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
@@ -38,13 +39,13 @@
     workspaceBindings =
       map (v: bindWorkspace v "${v}:${v}") ["1" "2" "3" "4" "5" "6" "7" "8" "9"]
       ++ [(bindWorkspace "0" "10:10")]
-      ++ lib.imap1 (i: v: bindWorkspace v "${toString (10 + i)}:${v}") ["F1" "F2" "F3" "F4" "F5" "F6" "F7" "F8" "F9" "F10" "F11" "F12"];
+      ++ imap1 (i: v: bindWorkspace v "${toString (10 + i)}:${v}") ["F1" "F2" "F3" "F4" "F5" "F6" "F7" "F8" "F9" "F10" "F11" "F12"];
     workspaceBindings' =
-      map (lib.mapAttrsToList bindsym) workspaceBindings;
+      map (mapAttrsToList bindsym) workspaceBindings;
     workspaceBindingsStr =
-      lib.concatStringsSep "\n" (lib.flatten workspaceBindings');
+      concatStringsSep "\n" (flatten workspaceBindings');
     #vm = "${pkgs.arc.vm.exec}";
-  in lib.mkIf config.home.profiles.gui {
+  in mkIf config.home.profiles.gui {
     enable = true;
     i3gopher.enable = true;
     extraConfig = ''
@@ -82,7 +83,7 @@
       focus = {
         forceWrapping = true;
       };
-      startup = lib.optional config.services.konawall.enable {
+      startup = optional config.services.konawall.enable {
         command = "${config.systemd.package}/bin/systemctl --user restart konawall.service";
         always = true;
         notification = false;
@@ -105,8 +106,8 @@
         "${mod}+z" = ''mode "resize"'';
 
         "${mod}+Return" = "exec ${term}";
-        "${mod}+control+Return" = lib.mkDefault "exec ${term} -e ${ssh} shanghai";
-        "${mod}+shift+Return" = lib.mkDefault "exec ${term} -e ${mosh} shanghai";
+        "${mod}+control+Return" = mkDefault "exec ${term} -e ${ssh} shanghai";
+        "${mod}+shift+Return" = mkDefault "exec ${term} -e ${mosh} shanghai";
 
         "${mod}+shift+c" = "kill";
         "${mod}+r" = "exec ${run.exec}";
@@ -115,17 +116,13 @@
 
         "${mod}+shift+r" = "reload";
 
-        "XF86AudioLowerVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ -5% && ${pkill} -USR1 i3status";
-        "XF86AudioRaiseVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ +5% && ${pkill} -USR1 i3status";
-        "XF86AudioMute" = "exec --no-startup-id ${pactl} set-sink-mute @DEFAULT_SINK@ toggle && ${pkill} -USR1 i3status";
+        "XF86AudioLowerVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ -5% ${bar-refresh}";
+        "XF86AudioRaiseVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ +5% ${bar-refresh}";
+        "XF86AudioMute" = "exec --no-startup-id ${pactl} set-sink-mute @DEFAULT_SINK@ toggle ${bar-refresh}";
+        "${mod}+XF86AudioMute" = "exec --no-startup-id ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle ${bar-refresh}";
 
         "--release ${mod}+p" = "exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off";
 
-        # vm hotkeys
-        #"--release KP_Divide" = "exec --no-startup-id ${vm} unseat";
-        #"--release KP_Multiply" = "exec --no-startup-id ${vm} seat";
-
-        # "--release ${mod}+bracketleft" = "exec ${pkgs.physlock}/bin/physlock -dms";
         "--release ${mod}+bracketleft" = "exec --no-startup-id ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
 
         "${mod}+shift+Escape" = "exit";
