@@ -9,7 +9,9 @@
   config = mkIf config.home.profiles.hw.nvidia {
     hardware.nvidia = {
       modesetting.enable = true;
-      package = config.boot.kernelPackages.nvidiaPackages.beta;
+      package = let
+        inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
+      in if versionAtLeast beta.version stable.version then beta else stable;
     };
     hardware.display.nvidia.enable = true;
     hardware.opengl.extraPackages = with pkgs; [libvdpau-va-gl];
