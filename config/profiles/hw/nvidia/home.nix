@@ -4,6 +4,12 @@
   };
 
   config = mkIf config.home.profiles.hw.nvidia {
+    services.picom = {
+      backend = "xrender";
+      extraOptions = ''
+        unredir-if-possible = true;
+      '';
+    };
     programs.mpv = {
       config = {
         hwdec = "cuda";
