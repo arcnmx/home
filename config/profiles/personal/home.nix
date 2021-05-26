@@ -267,6 +267,7 @@ in {
       ];
       #defaultCacheTtl = 31536000; maxCacheTtl = 31536000; defaultCacheTtlSsh = 31536000; maxCacheTtlSsh = 31536000; # doing a bad remove me later thanks
     };
+    # TODO: services.diod.enable = true; # 9p fs server on each system?
     services.mpd = {
       enable = true;
       network.startWhenNeeded = true;

@@ -9,6 +9,7 @@
     home.profiles.gui = true;
     home.profiles.hw.xps13 = true;
     home.profiles.host.gensokyo = true;
+    deploy.tf.deploy.systems.satorin.connection.host = config.deploy.network.local.ipv4;
 
     networking = {
       hostId = "451b608e";

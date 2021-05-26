@@ -74,9 +74,56 @@ in {
         };
         kvm_amd.options.avic = true;
       };
-      kernel.sysctl = {
-        "net.ipv6.conf.all.accept_ra_rt_info_max_plen" = 128;
-        "net.ipv6.conf.default.accept_ra_rt_info_max_plen" = 128;
+      kernel.sysctl = let
+        core = {
+          rmem_default = 208 * 1024;
+          rmem_max = 64 * 208 * 1024;
+          wmem_default = 208 * 1024;
+          wmem_max = 64 * 208 * 1024;
+          netdev_max_backlog = 8 * 1024;
+          default_qdisc = "cake";
+          tcp_low_latency = true;
+          tcp_thin_linear_timeouts = true;
+        };
+        ipv4 = {
+          core = {
+            tcp_rmem = "4096 ${toString core.rmem_default} ${toString (core.rmem_max / 16)}";
+            tcp_wmem = "4096 65536 ${toString core.wmem_max}";
+            udp_rmem_min = 8 * 1024;
+            udp_wmem_min = 8 * 1024;
+            tcp_fastopen = 3;
+            tcp_slow_start_after_idle = 0;
+            tcp_keepalive_time = 60;
+            tcp_keepalive_intvl = 10;
+            tcp_keepalive_probes = 6;
+            tcp_mtu_probing = 1;
+            #tcp_timestamps = 0;
+            tcp_congestion_control = "bbr";
+          };
+        };
+        ipv6 = {
+          conf = {
+            "accept_ra_rt_info_max_plen" = 128;
+            "router_solicitation_max_interval" = 120;
+            "router_solicitation_interval" = 2;
+            "router_solicitation_delay" = 0;
+            "router_probe_interval" = 20;
+            "use_optimistic" = 1;
+            "optimistic_dad" = 1;
+          };
+          neigh = {
+            "app_solicit" = 1;
+            "retrans_time_ms" = 250;
+            "delay_first_probe_time" = 1;
+          };
+        };
+        addprefix = prefix: mapAttrs' (k: v: nameValuePair "${prefix}${k}" v);
+      in addprefix "net.core." core
+      // addprefix "net.ipv4." ipv4.core
+      // addprefix "net.ipv6.conf.default." ipv6.conf
+      // addprefix "net.ipv6.conf.all." ipv6.conf
+      // addprefix "net.ipv6.neigh.default." ipv6.neigh
+      // {
         "kernel.unprivileged_userns_clone" = 1;
         "kernel.sysrq" = 1;
       };
