@@ -163,13 +163,13 @@ in
       x11bell.enable = mkDefault true;
       loadModule = mkMerge [
         (mkBefore [
-          "module-device-restore"
-          "module-stream-restore"
-          "module-card-restore"
+          "device-restore"
+          "stream-restore"
+          "card-restore"
 
-          "module-augment-properties"
+          "augment-properties"
 
-          "module-switch-on-port-available"
+          "switch-on-port-available"
         ])
         (mkAfter [
           "native-protocol-unix"
@@ -179,10 +179,9 @@ in
           }
           "udev-detect"
           "default-device-restore"
-          "module-rescue-streams"
-          "module-always-sink"
-          "module-intended-roles"
-          "module-suspend-on-idle"
+          "always-sink"
+          "intended-roles"
+          "suspend-on-idle"
           "console-kit"
           "systemd-login"
           "position-event-sounds"
