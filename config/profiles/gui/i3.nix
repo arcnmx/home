@@ -1,4 +1,5 @@
 { config, pkgs, lib, ... }: with lib; {
+  services.i3gopher.enable = config.xsession.windowManager.i3.enable;
   xsession.windowManager.i3 = let
     run = pkgs.writeShellScriptBin "run" ''
       ARGS=(${term} +sb
@@ -48,7 +49,6 @@
     #vm = "${pkgs.arc.vm.exec}";
   in mkIf config.home.profiles.gui {
     enable = true;
-    i3gopher.enable = true;
     extraConfig = ''
       ${workspaceBindingsStr}
 
@@ -135,7 +135,7 @@
         "${mod}+shift+Escape" = "exit";
 
         "${mod}+grave" = "[urgent=latest] focus";
-        "${mod}+Tab" = "exec --no-startup-id ${config.xsession.windowManager.i3.i3gopher.package.exec} --focus-last";
+        "${mod}+Tab" = "exec --no-startup-id ${config.services.i3gopher.focus-last}";
         "${mod}+control+f" = "exec --no-startup-id ${i3-easyfocus} -a || ${i3-easyfocus} -c";
         "${mod}+control+shift+f" = "exec --no-startup-id ${i3-easyfocus} -ar || ${i3-easyfocus} -cr";
         "${mod}+a" = "focus parent";
