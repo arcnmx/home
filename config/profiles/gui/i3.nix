@@ -55,23 +55,28 @@
       workspace_auto_back_and_forth yes
     '';
     config = {
-      bars = [
-        {
-          workspaceNumbers = false;
-          fonts = ["monospace ${config.lib.gui.fontSizeStr 8}"];
-          position = "top";
-          colors = {
-            statusline = "#ffffff";
-            background = "#323232";
-            inactiveWorkspace = {
-              border = "#32323200";
-              background = "#32323200";
-              text = "#5c5c5c";
-            };
+      bars = optional (!config.services.polybar.enable) {
+        workspaceNumbers = false;
+        fonts = {
+          names = [ "monospace" ];
+          size = config.lib.gui.fontSize 8;
+        };
+        position = "top";
+        colors = {
+          statusline = "#ffffff";
+          background = "#323232";
+          inactiveWorkspace = {
+            border = "#32323200";
+            background = "#32323200";
+            text = "#5c5c5c";
           };
-        }
-      ];
-      fonts = ["monospace ${config.lib.gui.fontSizeStr 6}"];
+        };
+        statusCommand = "${pkgs.i3status}/bin/i3status";
+      };
+      fonts = {
+        names = [ "monospace" ];
+        size = config.lib.gui.fontSize 6;
+      };
       modifier = mod;
       floating = {
         border = 1;
