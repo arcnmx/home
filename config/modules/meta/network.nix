@@ -67,7 +67,8 @@
         specialArgs = {
           inherit baseModules;
           inherit (config.network.nixos) modulesPath;
-        } // config.network.nixos.specialArgs;
+          inherit (config.network.nixos.specialArgs) nodes meta;
+        }; #// config.network.nixos.specialArgs;
       };
     in mkOption {
       type = types.attrsOf nixosType;
