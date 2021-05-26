@@ -77,7 +77,7 @@ in {
   };
 
   config = lib.mkIf config.home.profiles.base {
-    home.stateVersion = "19.03";
+    home.stateVersion = "21.05";
     home.file = {
       ".gnupg".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/gnupg";
       ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {
