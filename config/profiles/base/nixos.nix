@@ -43,6 +43,9 @@ in {
       initrd = {
         compressor = lib.mkDefault "${pkgs.zstd}/bin/zstd -19";
       };
+      modprobe.modules.msr.options = {
+        allow_writes = lib.mkDefault "on";
+      };
     };
     system.requiredKernelConfig = with config.lib.kernelConfig; [
       (isYes "RD_ZSTD")
