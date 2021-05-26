@@ -542,38 +542,6 @@ in {
         text/plain=vim.desktop
         application/xml=vim.desktop
       '';
-      "luakit" = {
-        source = ./files/luakit;
-        recursive = true;
-      };
-      "luakit/rc/nix.lua".source = pkgs.substituteAll {
-        src = ./files/luakit-nix.lua;
-        pass = pkgs.pass-arc;
-      };
-      "luakit/pass".source = pkgs.fetchFromGitHub {
-        owner = "arcnmx";
-        repo = "luakit-pass";
-        rev = "7d242c6570d14edba71b047c91631110c703a95d";
-        sha256 = "1k2gnnq92axdshd629svr4vzv7m0sl5gijb1bsvivc4hq3j85vj2";
-      };
-      "luakit/paste".source = pkgs.fetchFromGitHub {
-        owner = "arcnmx";
-        repo = "luakit-paste";
-        rev = "0df1e777ca3ff9bf20532288ea86992024491bc3";
-        sha256 = "1g3di8qyah0zgkx6lmk7h3x44c3w5xiljn76igmd66cmqlk6lg6q";
-      };
-      "luakit/unique_instance".source = pkgs.fetchFromGitHub {
-        owner = "arcnmx";
-        repo = "luakit-unique_instance";
-        rev = "e35d5c27327a29797f4eb5a2cbbc2c1b569a36ad";
-        sha256 = "0l7g83696pmws40nhfdg898lv9arkc7zc5qa4aa9cyickb9xgadz";
-      };
-      "luakit/plugins".source = pkgs.fetchFromGitHub {
-        owner = "luakit";
-        repo = "luakit-plugins";
-        rev = "eb766fca92c1e709f8eceb215d2a2716b0748806";
-        sha256 = "0f1cq0m22bdd8a3ramlwyymlp8kjz9mcbfdcyhb5bw8iw4cmc8ng";
-      };
     };
 
     services.gpg-agent.pinentryFlavor = "gtk2";
