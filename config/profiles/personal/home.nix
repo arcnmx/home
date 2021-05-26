@@ -127,6 +127,7 @@ in {
       physlock
       travis
       radare2
+      rink-readline
       electrum-cli
       jq yq
       lorri
