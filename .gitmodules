@@ -14,10 +14,6 @@
 	path = channels/arc
 	url = https://github.com/arcnmx/nixexprs.git
 	branch = master
-[submodule "channels/mozilla"]
-	path = channels/mozilla
-	url = https://github.com/mozilla/nixpkgs-mozilla.git
-	branch = master
 [submodule "config/profiles/trusted"]
 	path = config/profiles/trusted
 	url = git@github.com:arcnmx/home-trusted.git

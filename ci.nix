@@ -29,7 +29,7 @@
           curl -fSL https://github.com/$2/archive/''${SUBMODULE_COMMIT#-}.tar.gz | tar -xz --strip-components=1 -C $1
         }
 
-        git submodule update --init channels/{arc,home-manager,rust,mozilla,nur}
+        git submodule update --init channels/{arc,tf,home-manager,rust,nur}
         gh_submodule channels/nixpkgs nixos/nixpkgs
       '';
     };

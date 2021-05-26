@@ -10,7 +10,6 @@
     arc = ./arc;
     home-manager = ./home-manager;
     nur = ./nur;
-    mozilla = ./mozilla;
     rust = ./rust;
     tf = ./tf;
   };
