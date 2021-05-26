@@ -46,6 +46,7 @@ in {
       gnupg
       pass-arc
       bitwarden-cli arc.packages.personal.pass2bitwarden
+      weechat-matrix
       playerctl
       awscli2
       ncmpcpp
