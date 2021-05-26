@@ -482,6 +482,7 @@ in {
         "vim-cool"
         "vim-ledger"
         "vim-dispatch"
+        "vim-lastplace"
         "vim-toml"
         "kotlin-vim"
         "swift-vim"

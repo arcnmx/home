@@ -65,12 +65,6 @@ nnoremap q <Nop>
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
-" When editing a file, always jump to the last known cursor position.
-autocmd BufReadPost *
-\ if line("'\"") > 1 && line("'\"") <= line("$") |
-\   exe "normal! g`\"" |
-\ endif
-
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 		  \ | wincmd p | diffthis
