@@ -135,8 +135,165 @@ in
     };
     environment.systemPackages = [ openrazer-dpi ];
 
+    services.pipewire = {
+      enable = !config.hardware.pulseaudio.enable;
+      alsa.enable = true;
+      pulse.enable = true;
+      jack.enable = true;
+      config.pipewire = {
+        "context.properties" = {
+          "support.dbus" = true;
+          "mem.allow-mlock" = true;
+          "link.max-buffers" = 64;
+          "default.clock.rate" = 48000;
+          "default.clock.quantum" = 1024;
+          "default.clock.min-quantum" = 32;
+          "default.clock.max-quantum" = 8192;
+          "default.video.rate.num" = 60;
+          "log.level" = 3;
+        };
+        "context.objects" = [
+          {
+            factory = "spa-node-factory";
+            args = {
+              "factory.name" = "support.node.driver";
+              "node.name" = "Dummy-Driver";
+              "priority.driver" = 8000;
+            };
+          }
+          /*{
+            factory = "adapter";
+            args = {
+              "factory.name" = "api.alsa.pcm.source";
+              "node.name" = "mic";
+              "node.description" = "Mic";
+              "media.class" = "Audio/Source";
+              "api.alsa.path" = "hw:1,0";
+              "audio.format" = "S16LE";
+              "audio.rate" = 48000;
+              "audio.channels" = 1;
+            };
+          }*/
+        ];
+        "context.modules" = [
+          {
+            name = "libpipewire-module-rtkit";
+            args = {
+              "nice.level" = -15;
+              "rt.prio" = 88;
+              "rt.time.soft" = 200000;
+              "rt.time.hard" = 200000;
+            };
+            flags = [ "ifexists" "nofail" ];
+          }
+          { name = "libpipewire-module-protocol-native"; }
+          { name = "libpipewire-module-profiler"; }
+          { name = "libpipewire-module-metadata"; }
+          { name = "libpipewire-module-spa-device-factory"; }
+          { name = "libpipewire-module-spa-node-factory"; }
+          { name = "libpipewire-module-client-node"; }
+          { name = "libpipewire-module-client-device"; }
+          {
+            name = "libpipewire-module-portal";
+            flags = [ "ifexists" "nofail" ];
+          }
+          {
+            name = "libpipewire-module-access";
+            args = {};
+          }
+          { name = "libpipewire-module-adapter"; }
+          { name = "libpipewire-module-link-factory"; }
+          { name = "libpipewire-module-session-manager"; }
+        ];
+      };
+      config.pipewire-pulse = {
+        "context.modules" = [
+          {
+            name = "libpipewire-module-rtkit";
+            args = {
+              "nice.level" = -15;
+              "rt.prio" = 88;
+              "rt.time.soft" = 200000;
+              "rt.time.hard" = 200000;
+            };
+            flags = [ "ifexists" "nofail" ];
+          }
+          { name = "libpipewire-module-protocol-native"; }
+          { name = "libpipewire-module-client-node"; }
+          { name = "libpipewire-module-adapter"; }
+          { name = "libpipewire-module-metadata"; }
+          {
+            name = "libpipewire-module-protocol-pulse";
+            args = {
+              "pulse.min.req" = "32/48000";
+              "pulse.default.req" = "1024/48000";
+              "pulse.max.req" = "8192/48000";
+              "pulse.min.quantum" = "32/48000";
+              "pulse.max.quantum" = "8192/48000";
+              "server.address" = [ "unix:native" ];
+            };
+          }
+        ];
+        #"stream.properties" = {
+        #  "node.latency" = "32/48000";
+        #  "resample.quality" = 1;
+        #};
+      };
+      media-session = {
+        config = {
+          media-session = {
+            "context.properties" = {
+              "log.level" = 3;
+            };
+          };
+          alsa-monitor = {
+            rules = [
+              {
+                matches = [ { "node.name" = "alsa_output.*"; } ];
+                actions = {
+                  update-props = {
+                    "audio.format" = "S32LE";
+                    "audio.allowed-rates" = "48000,96000";
+                    #"api.alsa.period-size" = 32; # defaults to 1024, tweak by trial-and-error
+                    "node.pause-on-idle" = true;
+                    #"api.alsa.disable-batch" = true; # generally, USB soundcards use the batch mode
+                    "session.suspend-timeout-seconds" = 30; # 0 disables suspend
+                  };
+                };
+              }
+            ];
+          };
+          bluez-monitor = {
+            #properties = {
+            #  bluez5.codecs = [ "sbc" ];
+            #};
+            rules = [
+              {
+                matches = [ { "device.name" = "~bluez_card.*"; } ];
+                actions = {
+                  update-props = {
+                    "bluez5.reconnect-profiles" = [ "hfp_hf" "hsp_hs" "a2dp_sink" ];
+                    "bluez5.msbc-support" = true;
+                  };
+                };
+              }
+              {
+                matches = [
+                  { "node.name" = "~bluez_input.*"; }
+                  { "node.name" = "~bluez_output.*"; }
+                ];
+                actions = {
+                  "node.pause-on-idle" = false;
+                };
+              }
+            ];
+          };
+        };
+      };
+    };
+    services.wireplumber.alsa.migrateMediaSession = mkDefault true;
     hardware.pulseaudio = {
-      enable = true;
+      enable = false;
       daemon.config = {
         # pulse-daemon.conf(5)
         exit-idle-time = 5;
@@ -205,5 +362,6 @@ in
         .fail
       '';
     };
+    hardware.alsa.enable = true;
   };
 }

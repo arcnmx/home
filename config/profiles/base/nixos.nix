@@ -124,6 +124,12 @@ in {
       nodeInfoPrivacy = true;
     };
 
+    services.pipewire = {
+      media-session = {
+        enable = lib.mkDefault (config.services.pipewire.enable && !config.services.wireplumber.enable);
+      };
+    };
+
     security.sudo.enable = true;
     security.sudo.extraConfig = ''
       Defaults env_keep += "SSH_CLIENT"

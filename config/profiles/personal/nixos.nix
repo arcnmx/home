@@ -125,6 +125,7 @@ in {
         }
       });
     '';
+    security.rtkit.enable = true;
     environment.systemPackages = with pkgs; [
       usbutils
       libimobiledevice
@@ -197,6 +198,16 @@ in {
     services.resolved = {
       enable = true;
       dnssec = "false";
+    };
+    services.wireplumber = {
+      logLevel = mkDefault 3;
+      policy.roles.enable = mkDefault true;
+      service.moduleDir = let
+        modules = pkgs.symlinkJoin {
+          name = "wireplumber-modules";
+          paths = [ pkgs.wireplumber pkgs.wireplumber-scripts-arc ];
+        };
+      in "${modules}/lib/wireplumber-${versions.majorMinor pkgs.wireplumber.version}";
     };
     services.physlock.enable = true;
     security.sudo.wheelNeedsPassword = false;

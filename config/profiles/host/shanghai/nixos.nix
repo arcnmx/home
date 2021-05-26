@@ -1,4 +1,8 @@
 { tf, config, pkgs, lib, ... }: with lib; {
+  imports = [
+    ./audio.nix
+  ];
+
   options = {
     home.profiles.host.shanghai = mkEnableOption "hostname: shanghai";
   };
@@ -50,34 +54,128 @@
     hardware.openrazer.enable = true;
     hardware.pulseaudio = let
       default_aec_args = {
-        # https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Enable_Echo.2FNoise-Cancellation
+        # https://wiki.archlinux.org/title/PulseAudio#Possible_'aec_args'_for_'aec_method=webrtc'
         analog_gain_control = false;
         digital_gain_control = true;
         noise_suppression = true;
         high_pass_filter = false;
+        voice_detection = true;
         extended_filter = true;
         experimental_agc = true;
-        intelligibility_enhancer = false;
+        #intelligibility_enhancer = false;
+        intelligibility_enhancer = true;
       };
-      usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
-      channels = 4; # NOTE: first two channels include an amp for headphones, 3rd needs an external amp
-      channel_map =
+      rnnoise_aec_args = {
+        # features that rnnoise does better
+        noise_suppression = false;
+        extended_filter = false;
+        #voice_detection = false;
+        #experimental_agc = false;
+      };
+      channel_map_list =
         [ "front-left" "front-right" "rear-left" "rear-right" "side-left" "side-right" ];
+      toChannelMap = channels: let
+      in optionals (channels > 1) (sublist 0 2 channel_map_list)
+        ++ optionals (channels > 3) (sublist 2 2 channel_map_list)
+        ++ optionals (channels > 5) (sublist 4 2 channel_map_list)
+        ++ optional (mod channels 2 == 1) (if channels == 1 then "mono" else "lfe");
+      channelConfig = channels: {
+        "2" = "front";
+        "3" = "surround21";
+        "4" = "surround40";
+        #"5" = "surround41";
+        #"5" = "surround50"; # ambiguous
+        "6" = "surround51";
+        "8" = "surround71";
+      }.${toString channels} or (throw "unsupported");
+      ladspa-sink = { name, description ? name, rate ? 48000, channels ? length sources, outChannels ? 1, opts ? { }, sources ? [ source ], source ? null }: [
+        {
+          module = "null-sink";
+          opts = {
+            sink_name = "${name}_outsink";
+            inherit rate;
+            channels = outChannels;
+            channel_map = toChannelMap outChannels;
+            sink_properties = {
+              "device.description" = "${description} Output";
+            };
+          };
+        }
+        {
+          module = "ladspa-sink";
+          opts = {
+            sink_name = "${name}_sink";
+            sink_master = "${name}_outsink";
+            format = "float32";
+            inherit rate channels;
+            channel_map = toChannelMap channels;
+            sink_properties = {
+              "device.description" = "LADSPA ${description} Sink";
+            };
+          } // opts;
+        }
+        { # alias the monitor
+          module = "remap-source";
+          opts = {
+            source_name = name;
+            master = "${name}_outsink.monitor";
+            source_properties = {
+              "device.description" = description;
+            };
+          };
+        }
+      ] ++ concatLists (imap0 (i: source: let
+        sourceId = source.opts.source_name or source;
+        sourceName = "source${toString i}";
+        channel = elemAt (toChannelMap channels) i;
+        description = "LADSPA ${name} ${sourceName}";
+        sink_input_properties = {
+          "media.name" = "${description} Input";
+        };
+        source_output_properties = {
+          "media.name" = "${description} Output";
+        };
+        loopback = {
+          module = "loopback";
+          opts = {
+            source = if hasRemap then remap.opts.source_name else "${sourceId}";
+            sink = "${name}_sink";
+            source_dont_move = true;
+            sink_dont_move = true;
+            remix = false;
+            inherit sink_input_properties source_output_properties;
+          };
+        };
+        hasRemap = length sources > 1;
+        remap = {
+          module = "remap-source";
+          opts = {
+            source_name = "${name}_${sourceName}";
+            master = "${sourceId}";
+            channels = 1;
+            channel_map = [ channel ];
+            master_channel_map = toChannelMap (source.opts.channels or 1);
+            remix = false;
+            source_properties = {
+              "device.description" = description;
+            };
+          };
+        };
+      in optional (isAttrs source) source ++ optional hasRemap remap ++ singleton loopback) sources);
+      usb = "usb-C-Media_Electronics_Inc._USB_Audio_Device-00";
+      channels = 6; # NOTE: first two channels include an amp for headphones, 3rd needs an external amp
     in {
-      loadModule = [
+      loadModule = mkMerge [ [
         # "mmkbd-evdev"
         {
           module = "alsa-sink";
           opts = {
             sink_name = "onboard";
-            device = "surround40:CARD=Generic,DEV=0";
+            device = "${channelConfig channels}:CARD=Generic,DEV=0";
             format = "s32";
             rate = 48000;
             inherit channels;
-            channel_map =
-              sublist 0 4 channel_map
-              ++ optional (channels == 5) [ "lfe" ]
-              ++ optionals (channels == 6) (sublist channel_map 4 2);
+            channel_map = toChannelMap channels;
             tsched = true;
             fixed_latency_range = false;
             fragment_size = 1024;
@@ -90,9 +188,9 @@
             sink_name = "speakers";
             master = "onboard";
             channels = 2;
-            channel_map = sublist 0 2 channel_map;
-            master_channel_map = sublist 2 2 channel_map;
-            remix = "no";
+            channel_map = toChannelMap 2;
+            master_channel_map = sublist 2 2 (toChannelMap channels);
+            remix = false;
             sink_properties = {
               "device.description" = "Speakers";
             };
@@ -102,16 +200,16 @@
         {
           module = "remap-sink";
           opts = {
-            sink_name = "dac";
+            sink_name = "amp";
             master = "onboard";
             channels = 2;
-            channel_map = sublist 0 2 channel_map;
-            master_channel_map = sublist 4 2 channel_map;
-            remix = "no";
+            channel_map = toChannelMap 2;
+            master_channel_map = sublist 4 2 (toChannelMap channels);
+            remix = false;
             sink_properties = {
-              "device.description" = "DAC";
+              "device.description" = "Amp";
             };
-            # source_properties = { "device.description" = "DAC2"; };
+            # source_properties = { "device.description" = "Amp2"; };
           };
         }
         {
@@ -120,16 +218,16 @@
             sink_name = "headset";
             master = "onboard";
             channels = 2;
-            channel_map = sublist 0 2 channel_map;
-            master_channel_map = sublist 0 2 channel_map;
-            remix = "no";
+            channel_map = toChannelMap 2;
+            master_channel_map = sublist 0 2 (toChannelMap channels);
+            remix = false;
             sink_properties = {
               "device.description" = "Headset";
             };
             # source_properties = "device.description=Headset2";
           };
         }
-        {
+        (mkIf true {
           module = "alsa-sink";
           opts = {
             sink_name = "headphones";
@@ -137,7 +235,7 @@
             format = "s32";
             rate = 96000;
             channels = 2;
-            channel_map = sublist 0 2 channel_map;
+            channel_map = toChannelMap 2;
             tsched = false;
             #fixed_latency_range = true;
             fragment_size = 1024;
@@ -146,8 +244,8 @@
               "device.description" = "Headphones (Optical)";
             };
           };
-        }
-        {
+        })
+        (mkIf false {
           module = "alsa-sink";
           opts = {
             sink_name = "light";
@@ -155,26 +253,75 @@
             format = "s32";
             rate = 48000;
             channels = 2;
-            channel_map = sublist 0 2 channel_map;
+            channel_map = toChannelMap 2;
             tsched = true;
             fixed_latency_range = false;
             fragment_size = 1024;
             fragments = 16;
             sink_properties = {
-              "device.description" = "Optical TShed";
+              "device.description" = "Optical TSched";
+            };
+          };
+        })
+        {
+          module = "alsa-source";
+          opts = {
+            source_name = "mic";
+            #device = "front:CARD=Generic,DEV=0";
+            device = "hw:1,0";
+            format = "s32";
+            channels = 1;
+            channel_map = toChannelMap 1;
+            rate = 96000;
+            tsched = true;
+            source_properties = {
+              "device.description" = "Mic";
             };
           };
         }
         {
           module = "alsa-source";
           opts = {
-            source_name = "mic";
-            device = "front:CARD=Generic,DEV=0";
-            format = "s32";
-            rate = 96000;
+            source_name = "condenser";
+            device = "sysdefault:CARD=Device"; # hw:2,0
+            format = "float32";
+            channels = 1;
+            channel_map = toChannelMap 1;
+            rate = 48000;
             tsched = true;
+            source_properties = {
+              "device.description" = "Condenser Mic";
+            };
           };
         }
+        (mkIf false {
+          module = "alsa-source";
+          opts = {
+            source_name = "line";
+            device = "hw:1,2";
+            format = "s32";
+            channels = 1;
+            channel_map = toChannelMap 1;
+            rate = 96000;
+            tsched = true;
+            source_properties = {
+              "device.description" = "Line-In";
+            };
+          };
+        })
+        (mkIf true {
+          module = "remap-source";
+          opts = {
+            source_name = "line";
+            master = "mic";
+            channel_map = toChannelMap 1;
+            master_channel_map = toChannelMap 1;
+            source_properties = {
+              "device.description" = "Line-In";
+            };
+            remix = false;
+          };
+        })
         {
           module = "virtual-surround-sink";
           opts = {
@@ -198,10 +345,10 @@
             use_master_format = true;
             channels = 1;
             aec_method = "webrtc";
-            aec_args = default_aec_args // {
+            aec_args = default_aec_args // rnnoise_aec_args // {
               agc_start_volume = 150;
               #high_pass_filter = true;
-              #routing_mode = "loud-earpiece";
+              #routing_mode = "loud-earpiece"; mobile = true;
             };
           };
         }
@@ -218,11 +365,162 @@
             aec_method = "webrtc";
             aec_args = default_aec_args // {
               agc_start_volume = 200; # 85
-              #routing_mode = "loud-speakerphone";
+              routing_mode = "loud-speakerphone"; mobile = true;
             };
           };
         }
-      ];
+        {
+          module = "echo-cancel";
+          opts = {
+            source_master = "condenser";
+            sink_master = "speakers";
+            source_name = "condenser_speakers";
+            sink_name = "condenser_speakers_sink";
+            use_volume_sharing = true;
+            use_master_format = true;
+            channels = 1;
+            aec_method = "webrtc";
+            aec_args = default_aec_args // rnnoise_aec_args // {
+              digital_gain_control = false;
+            };
+          };
+        }
+      ] /*(ladspa-sink {
+        name = "ladspa_limiter_line";
+        description = "Limiter";
+        rate = 96000;
+        channels = 2;
+        outChannels = 2;
+
+        opts = {
+          label = "fastLookaheadLimiter"; # 1913
+          plugin = "${pkgs.ladspaPlugins}/lib/ladspa/fast_lookahead_limiter_1913.so";
+          #channels = 1;
+          control = [
+            20 # input gain (dB)
+            (-1) # limit (dB)
+            0.5 # release time (s)
+          ];
+        };
+        source = {
+          module = "remap-source";
+          opts = {
+            master = "line";
+            source_name = "line_stereo";
+            master_channel_map = [ "mono" "mono" ];
+            channel_map = toChannelMap 2;
+            remix = false;
+          };
+        };
+      })*/ (ladspa-sink {
+        name = "mic_headset_rnnoise";
+        description = "RnNoise (Headset)";
+        rate = 48000;
+        source = "mic_headset";
+        opts = {
+          #label = "noise_suppressor_mono";
+          #plugin = "${pkgs.rnnoise-plugin-develop}/lib/ladspa/librnnoise_ladspa.so";
+          #control = [ 50 ];
+          label = "mono_nnnoiseless";
+          plugin = "${pkgs.ladspa-rnnoise}/lib/ladspa/libladspa_rnnoise_rs.so";
+          #channels = 1;
+        };
+      }) (ladspa-sink {
+        name = "condenser_speakers_rnnoise";
+        description = "RnNoise (Condenser - Speakers)";
+        rate = 48000;
+        source = "condenser_speakers";
+        opts = {
+          label = "mono_nnnoiseless";
+          plugin = "${pkgs.ladspa-rnnoise}/lib/ladspa/libladspa_rnnoise_rs.so";
+        };
+      }) (ladspa-sink {
+        name = "condenser_rnnoise";
+        description = "RnNoise (Condenser)";
+        rate = 48000;
+        source = "condenser";
+        opts = {
+          label = "mono_nnnoiseless";
+          plugin = "${pkgs.ladspa-rnnoise}/lib/ladspa/libladspa_rnnoise_rs.so";
+        };
+      }) /*(ladspa-sink {
+        name = "vocoder";
+        description = "Vocoder";
+        rate = 96000;
+        sources = [
+          #input0 source # formant
+          #input1 source # carrier
+          "mic_headset_rnnoise"
+          {
+            module = "sine-source";
+            opts = {
+              source_name = "ladspa_vocoder_sine";
+              frequency = 1710; # default: 440
+              rate = 96000;
+            };
+          }
+        ];
+        opts = {
+          label = "vocoder";
+          plugin = "${pkgs.vocoder-ladspa}/lib/ladspa/vocoder.so";
+          control = [
+            6 # band count, 1 ~ 16
+            # 16 band levels, 0 ~ 1
+            0.5 0.2 0.7 0.3 0.8 1.0 0.8 0.8
+            0.8 0.8 0.8 0.8 0.8 0.8 0.8 0.8
+          ];
+        };
+      })*/ [
+        # TODO: multivoiceChorus 1201, amPitchshift 1433, pointerCastDistortion 1910
+        {
+          module = "null-sink";
+          opts = {
+            sink_name = "stream";
+            channels = 2;
+            rate = 48000;
+            format = "s16";
+            sink_properties = {
+              "device.description" = "Stream";
+            };
+          };
+        }
+        /*{
+          module = "match";
+          opts.table = ${pkgs.writeText "pulse-match.table" ''
+            ^sample: 32000
+          ''};
+        }*/
+      ] (mkAfter [
+        {
+          module = "null-sink";
+          opts = {
+            sink_name = "default";
+            sink_properties = {
+              "device.description" = "Default Loopback";
+            };
+          };
+        }
+        {
+          module = "loopback";
+          opts = {
+            source = "default.monitor";
+            sink = "@DEFAULT_SINK@";
+            source_dont_move = true;
+            remix = true;
+          };
+        }
+        {
+          module = "combine-sink";
+          opts = {
+            sink_name = "stream_echo";
+            slaves = [ "default" "stream" ];
+            resample_method = "speex-float-1";
+            sink_properties = {
+              "device.description" = "Stream (Echo)";
+            };
+          };
+        }
+      ]) ];
       defaults = {
         source = "mic";
         #sink = "alsa_output.${usb}.analog-stereo";

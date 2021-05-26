@@ -15,9 +15,6 @@
         "nvme" "sd_mod" "xhci_pci" "ahci" "usbhid"
       ];
       modprobe.modules = {
-        snd_hda_intel.options = {
-          model = "dual-codecs";
-        };
         it87.options = {
           force_id = "0x8628";
         };
