@@ -846,6 +846,14 @@ in {
           osc-seekbarstyle = "knob";
           osc-seekbarkeyframes = "no";
           osc-seekrangestyle = "slider";
+          torque-progressbar-pause-indicator = "yes";
+          torque-progressbar-enable-bar = "no";
+          torque-progressbar-enable-elapsed-time = "no";
+          torque-progressbar-enable-remaining-time = "no";
+          torque-progressbar-enable-hover-time = "no";
+          torque-progressbar-enable-title = "yes";
+          torque-progressbar-enable-system-time = "no";
+          torque-progressbar-enable-chapter-markers = "no";
         });
       };
       bindings = let
