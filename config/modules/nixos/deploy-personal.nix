@@ -15,7 +15,7 @@
     } (mkIf cfg.enable {
       programs = {
         ssh = {
-          matchBlocks."git-codecommit.*.amazonaws.com" = {
+          matchBlocks."git-codecommit.*.amazonaws.com" = mkIf config.home.profiles.trusted {
             identityFile = userConfig.secrets.files.iam_ssh_key.path;
             user = resources.personal_iam_ssh.getAttr "ssh_public_key_id";
           };

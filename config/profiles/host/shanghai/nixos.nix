@@ -25,7 +25,7 @@
       address = [ "${config.deploy.network.local.ipv4}/24" ];
     };
     deploy.tf = {
-      dns.records = {
+      dns.records = mkIf (config.home.profileSettings.gensokyo.tld != null) {
         hourai = {
           inherit (tf.dns.records.local_a) tld;
           domain = "hourai";

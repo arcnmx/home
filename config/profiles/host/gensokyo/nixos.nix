@@ -5,11 +5,15 @@ in {
     profiles = {
       host.gensokyo = mkEnableOption "network: gensokyo";
     };
+    profileSettings.gensokyo.tld = mkOption {
+      type = types.nullOr types.str;
+      default = findFirst (k: hasSuffix k config.networking.domain) null (mapAttrsToList (_: zone: zone.tld) tf.dns.zones);
+    };
   };
 
   config = mkIf config.home.profiles.host.gensokyo {
     deploy.tf = let
-      tld = findFirst (k: hasSuffix k config.networking.domain) null (mapAttrsToList (_: zone: zone.tld) tf.dns.zones);
+      inherit (config.home.profileSettings.gensokyo) tld;
       domain = removeSuffix tld "${config.networking.hostName}.${config.networking.domain}";
     in {
       dns.records = mkIf (tld != null) {
@@ -249,7 +253,7 @@ in {
           enabled = true;
           domain = vanity.fqdn;
           ssl = {
-            key = config.secrets.files."prosody-key-${vanity.fqdn}".path;
+            key = config.secrets.files."prosody-key-vanity".path;
             cert = vanity.certPath;
           };
         };
@@ -429,7 +433,7 @@ in {
       ${taskserver.public.fqdn} = mkIf config.services.taskserver.enable {
         owner = mkForce config.services.taskserver.user;
       };
-      "prosody-key-${prosody.vanity.fqdn}" = mkIf config.services.prosody.enable {
+      "prosody-key-vanity" = mkIf config.services.prosody.enable {
         owner = mkForce config.services.prosody.user;
         text = config.secrets.files.${prosody.vanity.fqdn}.text;
       };

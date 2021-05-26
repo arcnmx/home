@@ -546,7 +546,7 @@ in {
 
     services.gpg-agent.pinentryFlavor = "gtk2";
     services.redshift = {
-      enable = true;
+      enable = mkIf config.home.profiles.trusted true;
       tray = false;
     };
     services.konawall = {
