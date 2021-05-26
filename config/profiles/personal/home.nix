@@ -145,6 +145,7 @@ in {
       network.startWhenNeeded = true;
       package = pkgs.mpd-youtube-dl;
       dbFile = "${config.services.mpd.dataDir}/mpd.db";
+      musicDirectory = config.xdg.userDirs.absolute.music;
       extraConfig = ''
         restore_paused "yes"
         metadata_to_use "artist,artistsort,album,albumsort,albumartist,albumartistsort,title,track,name,genre,date,composer,performer,comment,disc,musicbrainz_artistid,musicbrainz_albumid,musicbrainz_albumartistid,musicbrainz_trackid,musicbrainz_releasetrackid"
@@ -297,7 +298,7 @@ in {
         source ${./files/vimrc-notmuch}
         let g:notmuch_config_file='${config.xdg.configHome}/notmuch/notmuchrc'
         let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
-        let g:notmuch_attachment_dir='${config.home.homeDirectory}/downloads'
+        let g:notmuch_attachment_dir='${config.xdg.userDirs.absolute.download}'
         let g:notmuch_view_attachment='xdg-open'
         let g:notmuch_sendmail_method='sendmail'
         let g:notmuch_sendmail_location='${pkgs.msmtp}/bin/msmtp'

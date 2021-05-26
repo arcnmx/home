@@ -108,7 +108,7 @@ in {
           id = 0;
           isDefault = true;
           settings = {
-            "browser.download.dir" = "${config.home.homeDirectory}/downloads";
+            "browser.download.dir" = "${config.xdg.userDirs.absolute.download}";
             ${if config.home.hostName != null then "services.sync.client.name" else null} = config.home.hostName;
             "services.sync.engine.prefs" = false;
             "services.sync.engine.prefs.modified" = false;

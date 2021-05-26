@@ -211,6 +211,7 @@ in {
     };
     xdg.userDirs = {
       enable = true;
+      createDirectories = true;
       desktop = "$HOME";
       download = "$HOME/downloads";
       music = "$HOME/media/music";
@@ -336,11 +337,10 @@ in {
       defaultKeymap = "viins";
       dotDir = ".config/zsh";
       history = {
-        path = ".local/share/zsh/history";
-        size = 100000;
-        save = 100000;
+        path = "${config.xdg.dataHome}/zsh/history";
+        size = 1000000;
+        save = 1000000;
         extended = true;
-        ignoreDups = true;
         expireDuplicatesFirst = true;
       };
       plugins = [
