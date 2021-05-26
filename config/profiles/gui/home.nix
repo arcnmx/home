@@ -444,6 +444,7 @@ in {
     };
     programs.firefox = {
       enable = true;
+      wrapper = pkgs.wrapFirefoxJS;
       packageUnwrapped = pkgs.firefox-bin-unwrapped;
       wrapperConfig = {
         extraPolicies = {
@@ -452,11 +453,15 @@ in {
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
         ] ++ optional config.programs.buku.enable bukubrow;
+        jsLoaders = with pkgs; [
+          userChromeJS
+        ];
       };
       profiles = {
         arc = {
           id = 0;
           isDefault = true;
+          # TODO: userScripts
           settings = {
             "browser.download.dir" = "${config.xdg.userDirs.absolute.download}";
             ${if config.home.hostName != null then "services.sync.client.name" else null} = config.home.hostName;
