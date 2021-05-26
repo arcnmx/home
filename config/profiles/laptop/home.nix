@@ -25,6 +25,53 @@
       '';
     };
 
+    services.polybar = {
+      config = {
+        "bar/base" = {
+          modules-right = mkMerge [
+            (mkOrder 490 [ "backlight" ])
+            (mkOrder 1248 [ "battery" ])
+          ];
+        };
+      };
+      settings = with base16.map.hash.argb; {
+        "module/backlight" = {
+          type = "internal/backlight";
+          card = mkDefault "intel_backlight"; # /sys/class/backlight/
+          enable-scroll = true;
+          format = "<ramp> <label>";
+          ramp = [
+            "🌕"
+            "🌔"
+            "🌓"
+            "🌒"
+            "🌑"
+          ];
+        };
+        "module/battery" = {
+          type = "internal/battery";
+          battery = mkDefault "BAT0"; # ls /sys/class/power_supply/
+          adapter = mkDefault "AC";
+          poll-interval = 60;
+          time-format = "%H:%M";
+          label = {
+            charging = {
+              text = "⚡ %consumption%/%percentage%% %time%";
+              foreground = inserted;
+            };
+            discharging = {
+              text = "🔋 %consumption%/%percentage%% %time%";
+              foreground = constant;
+            };
+            full = {
+              text = "🔌 100%";
+            };
+          };
+          low-at = 20;
+          format.low.foreground = deleted;
+        };
+      };
+    };
     xsession.windowManager.i3.config.keybindings = let
       xbacklight = "${pkgs.acpilight}/bin/xbacklight"; # pkgs.xorg.xbacklight
     in {

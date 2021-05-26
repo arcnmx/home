@@ -50,6 +50,11 @@ in {
       commonTags = [ "width:>=1600" ];
       tags = [ "score:>=200" "rating:safe" ];
     };
+    services.polybar.settings = {
+      "module/fs-root" = {
+        mount = mkAfter [ "/nix" "/mnt/data" ];
+      };
+    };
     home.shell.functions = {
       _paswitch_sinks = ''
         ${pactl} list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2

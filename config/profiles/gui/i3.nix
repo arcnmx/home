@@ -30,7 +30,10 @@
     mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
     browser = "${config.programs.firefox.package}/bin/firefox";
-    bar-refresh = "&& ${pkill} -USR1 i3status";
+    bar-refresh = optionalString (!config.services.polybar.enable) "&& ${pkill} -USR1 i3status";
+    bar-refresh-mic = if config.services.polybar.enable
+      then "&& ${config.services.polybar.package}/bin/polybar-msg hook mic 1"
+      else bar-refresh;
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";
       "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
@@ -161,7 +164,7 @@
         "XF86AudioLowerVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ -5% ${bar-refresh}";
         "XF86AudioRaiseVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ +5% ${bar-refresh}";
         "XF86AudioMute" = "exec --no-startup-id ${pactl} set-sink-mute @DEFAULT_SINK@ toggle ${bar-refresh}";
-        "ctrl+XF86AudioMute" = "exec --no-startup-id ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle ${bar-refresh}";
+        "ctrl+XF86AudioMute" = "exec --no-startup-id ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle ${bar-refresh-mic}";
         "shift+XF86AudioMute" = "exec --no-startup-id ${playerctl} stop ${bar-refresh}";
         "shift+XF86AudioLowerVolume" = "exec --no-startup-id ${playerctl} volume 0.05- ${bar-refresh}";
         "shift+XF86AudioRaiseVolume" = "exec --no-startup-id ${playerctl} volume 0.05+ ${bar-refresh}";
