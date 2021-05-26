@@ -28,10 +28,7 @@
         config = {
           nixpkgs = {
             system = mkDefault pkgs.system;
-            pkgs = mkDefault (if config.nixpkgs.config == pkgs.config then pkgs else import pkgs.path {
-              inherit (config.nixpkgs) config localSystem crossSystem;
-              inherit (meta.channels.config.nixpkgs) overlays;
-            });
+            pkgs = mkDefault pkgs;
             inherit (meta.channels.config.nixpkgs) config; # TODO: mkDefault?
           };
           nix = {

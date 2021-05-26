@@ -3,7 +3,6 @@
   name = "home";
   ci.gh-actions.enable = true;
 
-  # eventually have this not use the nx wrapper...
   ci.gh-actions.export = true;
   gh-actions.jobs.ci.step = let
     hostnames = [ "satorin" "shanghai" ];

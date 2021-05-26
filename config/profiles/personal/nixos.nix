@@ -1,20 +1,4 @@
 { pkgs, config, lib, ... }: with lib; let
-  hugepages = { where, options }: {
-    before = ["sysinit.target"];
-    unitConfig = {
-      DefaultDependencies = "no";
-      ConditionPathExists = "/sys/kernel/mm/hugepages";
-      ConditionCapability = "CAP_SYS_ADMIN";
-      ConditionVirtualization = "!private-users";
-    };
-    what = "hugetlbfs";
-    where = where;
-    type = "hugetlbfs";
-    options = options;
-    mountConfig = {
-      Group = "kvm";
-    };
-  };
   c1 = ''\e[22;34m'';
   c2 = ''\e[1;35m'';
   nixos = [
@@ -233,9 +217,24 @@ in {
     security.sudo.extraRules = mkAfter [
       { commands = [ { command = "ALL"; options = ["NOPASSWD"]; } ]; groups = [ "wheel" ]; }
     ];
-    systemd.services.dev-hugepages.wantedBy = ["sysinit.target"];
-    systemd.services.dev-hugepages1G.wantedBy = ["sysinit.target"];
-    systemd.mounts = [
+    systemd.mounts = let
+      hugepages = { where, options }: {
+        before = ["sysinit.target"];
+        unitConfig = {
+          DefaultDependencies = "no";
+          ConditionPathExists = "/sys/kernel/mm/hugepages";
+          ConditionCapability = "CAP_SYS_ADMIN";
+          ConditionVirtualization = "!private-users";
+        };
+        what = "hugetlbfs";
+        inherit where options;
+        type = "hugetlbfs";
+        mountConfig = {
+          Group = "kvm";
+        };
+        wantedBy = ["sysinit.target"];
+      };
+    in [
       (hugepages { where = "/dev/hugepages"; options = "mode=0775"; })
       (hugepages { where = "/dev/hugepages1G"; options = "pagesize=1GB,mode=0775"; })
     ];

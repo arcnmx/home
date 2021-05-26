@@ -6,7 +6,8 @@
   borg = "${repo.package}/bin/borg";
   borgArgs = [
     "--warning"
-    "--files-cache=ctime,size" "-p" "-s"
+    "--ignore-inode"
+    "--files-cache=mtime,size" "-p" "-s"
     "-C" "lzma"
     "-e" "tmp.*"
   ];
@@ -34,7 +35,7 @@
 
       exec ${sshCommand} "$@"
     '';
-  in ''${pkgs.sshfs}/bin/sshfs "${ssh.host}:${toString dir}" "${mountpoint}" -o ssh_command=${sshExec} -o idmap=user'';
+  in ''${pkgs.sshfs}/bin/sshfs "${ssh.host}:${toString dir}" "${mountpoint}" -o ssh_command=${sshExec} -o idmap=user -o reconnect'';
   scriptHeader = {
     system
   , target

@@ -545,24 +545,6 @@ in {
         rev = "eb766fca92c1e709f8eceb215d2a2716b0748806";
         sha256 = "0f1cq0m22bdd8a3ramlwyymlp8kjz9mcbfdcyhb5bw8iw4cmc8ng";
       };
-      /*"sway/config".text = ''
-        # man 5 sway
-
-        # font "Droid Sans Mono Dotted 8"
-        exec_always xrdb -I$HOME -load ~/.Xresources
-        exec_always urxvtd
-
-        smart_gaps on
-        seamless_mouse on
-
-        include ${config.xdg.configHome}/i3/config
-        #include /etc/sway/config.d/*
-
-        bindsym $mod+bracketleft exec ${pkgs.swaylock}/bin/swaylock -u -c 111111
-        bindsym $mod+p exec ${pkgs.acpilight}/bin/xbacklight -set $([[ $(${pkgs.acpilight}/bin/xbacklight -get) = 0 ]] && echo 100 || echo 0)
-
-        output * background #111111 solid_color
-      '';*/
     };
 
     services.gpg-agent.pinentryFlavor = "gtk2";

@@ -84,11 +84,6 @@
       focus = {
         forceWrapping = true;
       };
-      startup = optional config.services.konawall.enable {
-        command = "${config.systemd.package}/bin/systemctl --user restart konawall.service";
-        always = true;
-        notification = false;
-      };
       window = {
         hideEdgeBorders = "smart";
         border = 1;

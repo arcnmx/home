@@ -57,9 +57,9 @@ in {
   };
   config.deploy = mkIf cfg.enable {
     personal.ssh.authorizedKeys = mkIf (tf.state.resources ? personal_ssh_key) [ (resources."personal_ssh_key".importAttr "public_key_openssh") ];
-    tf = mkMerge (singleton {
+    tf = {
       imports = [ "common" ];
-      resources = {
+      resources = mkMerge (singleton {
         # TODO: deploy this key to gpg via ssh as part of switch??
         personal_ssh_key = {
           provider = "tls";
@@ -121,9 +121,7 @@ in {
             early_renewal_hours = 365 * 24;
           };
         };
-      };
-    } ++ map (ghUser: {
-      resources = {
+      } ++ map (ghUser: {
         # TODO: deploy this key to gpg via ssh as part of switch??
         "personal_github_ssh_key_${ghUser}" = {
           provider = "tls";
@@ -142,7 +140,7 @@ in {
             key = resources."personal_github_ssh_key_${ghUser}".refAttr "public_key_openssh";
           };
         };
-      };
-    }) (unique (concatMap (home: attrNames home.programs.git.gitHub.users) (attrValues config.home-manager.users))));
+      }) (unique (concatMap (home: attrNames home.programs.git.gitHub.users) (attrValues config.home-manager.users))));
+    };
   };
 }
