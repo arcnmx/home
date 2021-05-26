@@ -113,6 +113,7 @@ in {
             "services.sync.declinedEngines" = "passwords,adblockplus,prefs";
             "media.eme.enabled" = true; # whee drm
             "gfx.webrender.all.qualified" = true;
+            "gfx.webrender.all" = true;
             "layers.acceleration.force-enabled" = true;
             "gfx.canvas.azure.accelerated" = true;
             "browser.ctrlTab.recentlyUsedOrder" = false;
@@ -122,10 +123,14 @@ in {
             "tridactyl.unfixedamo_removed" = true; # wh-what happened this time?
             "browser.shell.checkDefaultBrowser" = false;
             "spellchecker.dictionary" = "en-CA";
+            "ui.context_menus.after_mouseup" = true;
             "browser.warnOnQuit" = false;
+            "browser.quitShortcut.disabled" = true;
             "browser.startup.homepage" = "about:blank";
             "browser.contentblocking.category" = "strict";
             "browser.discovery.enabled" = false;
+            "browser.tabs.multiselect" = true;
+            "browser.tabs.unloadOnLowMemory" = true;
             "browser.newtab.privateAllowed" = true;
             "browser.newtabpage.enabled" = false;
             "browser.urlbar.placeholderName" = "";
@@ -282,6 +287,9 @@ in {
         docStart = [
           { urlPattern = ''^https:\/\/www\.reddit\.com''; cmd = ''js tri.excmds.urlmodify("-t", "www", "old")''; }
         ];
+        tabEnter = [
+          { urlPattern = ".*"; cmd = "unfocus"; } # alternative to `allowautofocus=false`
+        ];
       };
 
       exalias = {
@@ -343,10 +351,14 @@ in {
 
         { mode = ["normal" "input" "insert"]; key = "h"; mods = ["ctrl"]; cmd = "tabprev"; }
         { mode = ["normal" "input" "insert"]; key = "l"; mods = ["ctrl"]; cmd = "tabnext"; }
+        { mode = ["normal" "input" "insert"]; key = "J"; mods = ["ctrl"]; cmd = "tabnext"; }
+        { mode = ["normal" "input" "insert"]; key = "K"; mods = ["ctrl"]; cmd = "tabprev"; }
         # TODO: consider C-jk instead of C-hl?
         { mode = ["normal" "input" "insert"]; key = "k"; mods = ["ctrl"]; cmd = "tabmove -1"; }
         { mode = ["normal" "input" "insert"]; key = "j"; mods = ["ctrl"]; cmd = "tabmove +1"; }
         { key = "<Space>"; cmd = "scrollpage 0.75"; }
+        { key = "f"; mods = ["ctrl"]; cmd = null; }
+        { key = "b"; mods = ["ctrl"]; cmd = null; }
         { mode = "ex"; key = "a"; mods = ["ctrl"]; cmd = null; }
 
         # Make gu take you back to subreddit from comments
@@ -362,7 +374,7 @@ in {
         { key = "gi"; cmd = "focusinput -l"; } # this should be 0 but it never seems to focus anything visible or useful?
         { key = "i"; cmd = "focusinput -l"; }
         { key = "I"; cmd = "mode ignore"; }
-        { mode = "ignore"; key = "<Escape>"; cmd = "composite mode normal ; hidecmdline"; }
+        { mode = "ignore"; key = "<Escape>"; mods = ["shift"]; cmd = "composite mode normal ; hidecmdline"; }
 
         { key = "<Insert>"; mods = ["shift"]; cmd = "composite fn_getsel | fillcmdline_notrail open"; }
         { key = "<Insert>"; mods = ["shift" "alt"]; cmd = "composite fn_getclip | fillcmdline_notrail open"; }
@@ -373,10 +385,12 @@ in {
         { mode = ["ex" "input" "insert"]; key = "C"; mods = ["shift" "alt"]; cmd = "composite fn_getsel | fn_setclip"; }
 
         { mode = ["insert" "input"]; key = "e"; mods = ["ctrl"]; cmd = "editor"; }
+
+        { key = "<F1>"; cmd = null; }
       ];
 
       settings = {
-        allowautofocus = false;
+        #allowautofocus = false;
 
         browser = firefox;
 
@@ -389,7 +403,7 @@ in {
         newtab = "http://blank.org";
         tabopencontaineraware = false;
         #storageloc = "local";
-        storageloc = "sync";
+        #storageloc = "sync";
         hintuppercase = false;
         hintchars = "fdsqjklmrezauiopwxcvghtybn";
         #hintfiltermode = "vimperator-reflow";
@@ -397,9 +411,6 @@ in {
         modeindicator = true;
         modeindicatorshowkeys = true;
         autocontainmode = "relaxed";
-
-        # Make Tridactyl work on more sites at the expense of some security
-        csp = "clobber";
 
         searchengine = "g";
         "searchurls.g" = "https://encrypted.google.com/search?q=%s";
@@ -414,7 +425,8 @@ in {
         "searchurls.r" = "https://reddit.com/r/%s";
         "searchurls.rs" = "https://doc.rust-lang.org/std/index.html?search=%s";
         "searchurls.crates" = "https://lib.rs/search?q=%s";
-        "searchurls.docs" = "https://docs.rs/%s/*";
+        "searchurls.docs" = "https://docs.rs/%s1/*/?search=%s2";
+        "searchurls.nixos" = "https://search.nixos.org/options?channel=unstable&from=0&size=1000&sort=alpha_asc&query=%s";
         "searchurls.aur" = "https://aur.archlinux.org/packages/?K=%s";
         "searchurls.yt" = "https://www.youtube.com/results?search_query=%s";
         "searchurls.az" = "https://www.amazon.ca/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=%s";
