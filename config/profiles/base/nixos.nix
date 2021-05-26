@@ -47,6 +47,9 @@ in {
     system.requiredKernelConfig = with config.lib.kernelConfig; [
       (isYes "RD_ZSTD")
     ];
+    powerManagement = {
+      cpuFreqGovernor = lib.mkDefault "schedutil";
+    };
 
     nix = {
       distributedBuilds = true;
