@@ -6,11 +6,16 @@
   config = mkIf config.home.profiles.vfio {
     boot = {
       initrd.kernelModules = ["vfio" "vfio_iommu_type1" "vfio_pci" "vfio_virqfd"];
-      modprobe.modules.kvm.options = {
-        ignore_msrs = mkDefault true;
-        report_ignored_msrs = mkDefault false;
+      modprobe.modules = {
+        kvm.options = {
+          ignore_msrs = mkDefault true;
+          report_ignored_msrs = mkDefault false;
+        };
+        kvmfr.options = {
+          static_size_mb = "64";
+        };
       };
-      extraModulePackages = [ config.boot.kernelPackages.forcefully-remove-bootfb ];
+      extraModulePackages = with config.boot.kernelPackages; [ forcefully-remove-bootfb looking-glass-kvmfr ];
       kernelPatches = mkIf false [
         {
           name = "efifb-nobar";
