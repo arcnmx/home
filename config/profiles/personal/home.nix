@@ -352,10 +352,20 @@ in {
         packages = [ "weechat-matrix" ];
       };
       scripts = with pkgs.weechatScripts; [
-        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix
+        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix highmon
         # TODO: add emoji script for :emoj<tab> completion
       ];
+      init = mkMerge [
+        # make a new split window for highmon
+        ''
+          /window splith +10
+          /window 2
+          /buffer highmon
+          /window 1
+        ''
+      ];
       config = with mapAttrs (_: toString) pkgs.base16.shell.shell256; let
+        nothighmon.conditions = "\${window.buffer.full_name} != perl.highmon";
         # base16-shell colour names
       in {
         urlgrab.default.copycmd = "${pkgs.xsel}/bin/xsel -i";
@@ -416,17 +426,24 @@ in {
             input = {
               items = "[input_prompt]+(away),[input_search],[input_paste],input_text,[vi_buffer]";
               color_delim = base0C;
+              inherit (nothighmon) conditions;
             };
             status = {
               color_delim = base0C;
               color_bg = base01;
               color_fg = base04;
               items = "[time],mode_indicator,[buffer_last_number],[buffer_plugin],buffer_number+:+buffer_name+(buffer_modes)+{buffer_nicklist_count}+matrix_typing_notice+buffer_zoom+buffer_filter,scroll,[lag],[hotlist],completion,cmd_completion";
+              inherit (nothighmon) conditions;
             };
             title = {
               color_delim = base0C;
               color_bg = base01;
               color_fg = base04;
+              inherit (nothighmon) conditions;
+            };
+            highmon = {
+              position = "top";
+              color_delim = base0A;
             };
           };
           look = {
@@ -583,6 +600,12 @@ in {
             fuzzy_search = true;
             sort = "hotlist,number,beginning";
             #auto_jump = true;
+          };
+          var.perl.highmon = {
+            output = "buffer";
+            short_names = true;
+            merge_private = true;
+            alignment = "nchannel,nick";
           };
         };
       };
