@@ -483,7 +483,11 @@ in {
             "browser.contentblocking.category" = "strict";
             "browser.discovery.enabled" = false;
             "browser.tabs.multiselect" = true;
+            "browser.tabs.remote.separatedMozillaDomains" = "";
+            "browser.tabs.remote.separatePrivilegedContentProcess" = false;
+            "browser.tabs.remote.separatePrivilegedMozillaWebContentProcess" = false;
             "browser.tabs.unloadOnLowMemory" = true;
+            "browser.tabs.closeWindowWithLastTab" = false;
             "browser.newtab.privateAllowed" = true;
             "browser.newtabpage.enabled" = false;
             "browser.urlbar.placeholderName" = "";
