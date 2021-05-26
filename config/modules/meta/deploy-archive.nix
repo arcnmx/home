@@ -29,7 +29,12 @@
     "${package}/bin/${executable}";
   sshfsFor = target: dir: mountpoint: let
     ssh = target.tf.outputs."${target.tf.deploy.systems.${target.name}.out.resourceName}_ssh".import;
-    opts = concatStringsSep " " (mapAttrsToList (k: v: "-o ${escapeShellArg "${k} ${v}"}") ssh.opts);
+    ssh_opts = {
+      ServerAliveInterval = toString 10;
+      ServerAliveCountMax = toString 3;
+      ControlMaster = "no";
+    } // ssh.opts;
+    opts = concatStringsSep " " (mapAttrsToList (k: v: "-o ${escapeShellArg "${k} ${v}"}") ssh_opts);
     portOpt = optionalString (ssh.port != null) "-p ${toString ssh.port}";
     sshCommand = "${pkgs.openssh}/bin/ssh ${portOpt} ${opts}";
     sshExec = pkgs.writeShellScript "sshfs-ssh" ''
