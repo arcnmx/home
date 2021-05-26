@@ -577,6 +577,7 @@ in {
             { id = 9; name = "Sensitive"; icon = "gift"; color = "orange"; }
             { id = 10; name = "Private"; icon = "fence"; color = "blue"; }
           ];
+          userChrome = builtins.readFile ./files/firefox-tst.css;
         };
       };
     };

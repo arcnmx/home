@@ -1,0 +1,151 @@
+/* TST (Tab Style Tree)
+  https://github.com/piroor/treestyletab/wiki/Code-snippets-for-custom-style-rules
+*/
+tab-item {
+  --tab-margin-left: 30px;
+  --tab-margin-right: 30px;
+  --tab-size: 25px !important;
+  height: var(--tab-size);
+}
+
+tab-item:not(.pinned) {
+  padding-left: 0px !important;
+}
+
+tab-item.discarded {
+  opacity: 0.95;
+}
+
+tab-item.unread .label-content {
+  font-style: italic;
+}
+
+/* container highlight */
+:root.sidebar .contextual-identity-marker {
+  margin: 0 !important;
+  position: absolute !important;
+  /*pointer-events: none;Full Auto-show/hide Theme*/
+  /*z-index: 0;*/
+
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+
+  /*width: unset !important;
+  height: unset !important;*/
+
+  /*opacity: 0.5;*/
+
+  /* underline */
+  top: auto !important;
+  left: 0.5em !important;
+  right: 0.5em !important;
+  bottom: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+  max-width: none !important;
+  height: calc(var(--favicon-size) / 10) !important;
+}
+
+/* needed for underlined container highlight */
+:root.group-tab li {
+  position: relative;
+}
+
+/* tab counting */
+#tabbar {
+  counter-reset: vtabs atabs tabs;
+  /* vtabs tracks visible tabs, atabs tracks active tabs, tabs tracks all tabs */
+}
+tab-item:not(.collapsed):not(.discarded) {
+  counter-increment: vtabs atabs tabs;
+}
+tab-item:not(.collapsed) {
+  counter-increment: vtabs tabs;
+}
+tab-item:not(.discarded) {
+  counter-increment: atabs tabs;
+}
+tab-item {
+  counter-increment: tabs;
+}
+
+/* numbered tabs */
+tab-item .extra-items-container.behind {
+  z-index: unset !important;
+}
+tab-item .extra-items-container.behind::after {
+  background: Highlight;
+  color: HighlightText;
+  content: counter(vtabs);
+  font-size: x-small;
+  right: 0.2em;
+  padding: 0.2em;
+  pointer-events: none;
+  position: absolute;
+  bottom: 0.2em;
+
+  z-index: 1000;
+}
+
+/* TODO: hide favicon except only on all but parent tabs */
+/*tab-item:not(.faviconized):not(.loading) tab-favicon {
+  display: none;
+}*/
+
+/* move new tab button to bottom of window */
+#tabbar:not(.overflow) .after-tabs {
+  display: none;
+}
+#tabbar:not(.overflow) ~ .after-tabs {
+  display: block;
+}
+
+/* hide tab close button except on hover */
+#tabbar tab-item:not(:hover) tab-closebox {
+  display: none;
+}
+
+/* move tab close button to left side */
+/*:root.left tab-item tab-twisty {
+  order: 10000;
+}
+:root.left tab-item tab-closebox {
+  order: -1;
+}*/
+
+/* hide the stock tab bar */
+#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .toolbar-items {
+  opacity: 0;
+  pointer-events: none;
+}
+#main-window:not([tabsintitlebar="true"]) #TabsToolbar {
+  visibility: collapse !important;
+}
+
+/* hide sidebar title */
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] #sidebar-header {
+  display: none;
+}
+
+/* sidebar should be allowed to be tiny! */
+#sidebar {
+  min-width: 100px !important;
+}
+
+/* auto-hide sidebar */
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] {
+  overflow: hidden;
+  min-width: 40px;
+  max-width: 40px;
+  transition: all 0.2s ease;
+  border-right: 1px solid #0c0c0d;
+  z-index: 2;
+}
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"]:hover,
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] #sidebar {
+  min-width: 260px !important;
+  max-width: 260px !important;
+  z-index: 1;
+}
