@@ -43,9 +43,6 @@ in {
     } (mkIf config.programs.firefox.enable firefoxFiles) ];
     home.shell = {
       functions = {
-        mradio = mkIf config.home.profiles.trusted ''
-          PULSE_PROP="media.role=music" ${mpv} --cache=no --cache-backbuffer=0 --cache-seek-min=0 --cache-secs=1 http://shanghai:32101
-        '';
         mpa = ''
           PULSE_PROP="media.role=music" ${mpv} --no-video "$@"
         '';
@@ -59,7 +56,7 @@ in {
           nix run nixpkgs.flashplayer-standalone -c flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
         '';
         monstercatfm = ''
-          mpa http://twitch.tv/monstercat
+          mplay ytdl://http://twitch.tv/monstercat
         '';
       };
     };
@@ -499,6 +496,7 @@ in {
         };
       };
     };
+    services.playerctld.enable = true;
     xdg.dataFile = {
       "mozilla/native-messaging-hosts".source = mkOutOfStoreSymlink "${config.programs.firefox.package}/lib/mozilla/native-messaging-hosts";
     };

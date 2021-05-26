@@ -41,6 +41,10 @@ def_key "d"
 def_key "w"
 	save_playlist
 
+def_key "H"
+	volume_up
+def_key "L"
+	volume_down
 def_key "ctrl-k"
 	previous
 def_key "ctrl-j"
@@ -105,6 +109,11 @@ def_key "O"
 	show_outputs
 def_key "space"
 	toggle_output
+
+def_key "M"
+	show_lyrics
+def_key "r"
+	refetch_lyrics
 
 def_key "ctrl-l"
 	update_database

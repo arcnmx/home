@@ -6,6 +6,7 @@ mouse_support = yes
 mouse_list_scroll_whole_page = no
 cyclic_scrolling = no
 seek_time = 10
+external_editor = vim
 
 user_interface = alternative
 media_library_primary_tag = album_artist

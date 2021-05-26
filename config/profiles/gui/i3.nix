@@ -24,6 +24,7 @@
     sleep = "${pkgs.coreutils}/bin/sleep";
     xset = "${pkgs.xorg.xset}/bin/xset";
     pactl = "${config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio}/bin/pactl";
+    playerctl = "${config.services.playerctld.package}/bin/playerctl";
     pkill = "${pkgs.procps}/bin/pkill";
     mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
@@ -119,7 +120,18 @@
         "XF86AudioLowerVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ -5% ${bar-refresh}";
         "XF86AudioRaiseVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ +5% ${bar-refresh}";
         "XF86AudioMute" = "exec --no-startup-id ${pactl} set-sink-mute @DEFAULT_SINK@ toggle ${bar-refresh}";
-        "${mod}+XF86AudioMute" = "exec --no-startup-id ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle ${bar-refresh}";
+        "ctrl+XF86AudioMute" = "exec --no-startup-id ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle ${bar-refresh}";
+        "shift+XF86AudioMute" = "exec --no-startup-id ${playerctl} stop ${bar-refresh}";
+        "shift+XF86AudioLowerVolume" = "exec --no-startup-id ${playerctl} volume 0.05- ${bar-refresh}";
+        "shift+XF86AudioRaiseVolume" = "exec --no-startup-id ${playerctl} volume 0.05+ ${bar-refresh}";
+        "XF86AudioStop" = "exec --no-startup-id ${playerctl} stop ${bar-refresh}";
+        "shift+XF86AudioStop" = "exec --no-startup-id ${playerctl} --player=mpd,%any,mpv play-pause ${bar-refresh}";
+        "XF86AudioPlay" = "exec --no-startup-id ${playerctl} play-pause ${bar-refresh}";
+        "shift+XF86AudioPlay" = "exec --no-startup-id ${playerctl} --player=mpd,%any,mpv play-pause ${bar-refresh}";
+        "XF86AudioNext" = "exec --no-startup-id ${playerctl} next ${bar-refresh}";
+        "ctrl+XF86AudioNext" = "exec --no-startup-id ${playerctl} seek 10+ ${bar-refresh}";
+        "XF86AudioPrev" = "exec --no-startup-id ${playerctl} previous ${bar-refresh}";
+        "ctrl+XF86AudioPrev" = "exec --no-startup-id ${playerctl} seek 10- ${bar-refresh}";
 
         "--release ${mod}+p" = "exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off";
 

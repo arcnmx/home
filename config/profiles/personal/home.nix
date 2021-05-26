@@ -1,5 +1,14 @@
 { config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
+  mpc = pkgs.writeShellScriptBin "mpc" ''
+    export MPD_HOST=${escapeShellArg config.programs.ncmpcpp.mpdHost}
+    ${pkgs.mpc_cli}/bin/mpc "$@"
+  '';
+  mplay = pkgs.writeShellScriptBin "mplay" ''
+    COUNT=$#
+    ${mpc}/bin/mpc add "$@" &&
+      ${mpc}/bin/mpc play $(($(${mpc}/bin/mpc playlist | wc -l) - COUNT + 1))
+  '';
 in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
@@ -37,6 +46,7 @@ in {
       gnupg
       pass-arc
       bitwarden-cli arc.packages.personal.pass2bitwarden
+      playerctl
       awscli2
       ncmpcpp
       physlock
@@ -46,6 +56,7 @@ in {
       electrum-cli
       jq yq
       lorri
+      mpc mplay
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
@@ -53,6 +64,9 @@ in {
     home.shell = {
       aliases.vit = "task vit";
       functions = {
+        mradio = mkIf config.home.profiles.trusted ''
+          mplay http://shanghai:32101
+        '';
         lorri-init = ''
           echo 'use ${if config.services.lorri.useNix || !config.services.lorri.enable then "nix" else "lorri"}' > .envrc
         '' + optionalString config.services.lorri.enable ''
@@ -162,6 +176,15 @@ in {
           name "speaker"
         }
       '';
+    };
+    services.mpdris2.enable = mkDefault config.services.mpd.enable;
+    systemd.user.services.mpdris2 = mkIf config.services.mpdris2.enable {
+      Install = mkForce {
+        WantedBy = [ "mpd.service" ];
+      };
+      Unit = {
+        PartOf = [ "mpd.service" ];
+      };
     };
     programs.buku = {
       enable = true;
