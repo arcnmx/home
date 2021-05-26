@@ -27,7 +27,7 @@
     pkill = "${pkgs.procps}/bin/pkill";
     mosh = "${pkgs.mosh-client}/bin/mosh";
     ssh = "${pkgs.openssh}/bin/ssh";
-    browser = "${pkgs.luakit-develop}/bin/luakit";
+    browser = "${config.programs.firefox.package}/bin/firefox";
     bar-refresh = "&& ${pkill} -USR1 i3status";
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";

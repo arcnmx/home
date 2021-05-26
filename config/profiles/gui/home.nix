@@ -7,7 +7,6 @@
       "profiles.ini" = config.programs.firefox.profiles != {};
     } // foldAttrList (mapAttrsToList (_: profile: {
       "${profile.path}/chrome/userChrome.css" = profile.userChrome != "";
-      "${profile.path}/chrome/userChrome.xml" = profile.userChromeBindings != [];
       "${profile.path}/user.js" = profile.settings != {} || profile.extraConfig != "";
       "${profile.path}/containers.json" = profile.containers.identities != [];
     }) config.programs.firefox.profiles);
@@ -78,8 +77,7 @@ in {
       xorg.xinit
       xdg_utils-mimi
       rxvt-unicode-arc
-      mumble-speechd
-      luakit-develop
+      mumble-develop
       libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
     ] ++ optionals config.gtk.enable [
       evince
@@ -93,15 +91,13 @@ in {
       MOZ_USE_XINPUT2 = "1";
     };
     programs.weechat.config = {
-      urlgrab.default.localcmd = "${config.programs.firefox.packageWrapped}/bin/firefox '%s'";
+      urlgrab.default.localcmd = "${config.programs.firefox.package}/bin/firefox '%s'";
       # TODO: remotecmd?
     };
     programs.firefox = {
       enable = true;
-      enableAdobeFlash = true;
-      package = pkgs.firefox-bin-unwrapped;
+      packageUnwrapped = pkgs.firefox-bin-unwrapped;
       wrapperConfig = {
-        browserName = "firefox";
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
           bukubrow
@@ -230,7 +226,7 @@ in {
       xsel = "${pkgs.xsel}/bin/xsel";
       urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
       vim = "${config.programs.vim.package}/bin/vim";
-      firefox = "${config.programs.firefox.packageWrapped}/bin/firefox";
+      firefox = "${config.programs.firefox.package}/bin/firefox";
     in {
       enable = true;
       sanitise = {
@@ -504,14 +500,14 @@ in {
       };
     };
     xdg.dataFile = {
-      "mozilla/native-messaging-hosts".source = mkOutOfStoreSymlink "${config.programs.firefox.packageWrapped}/lib/mozilla/native-messaging-hosts";
+      "mozilla/native-messaging-hosts".source = mkOutOfStoreSymlink "${config.programs.firefox.package}/lib/mozilla/native-messaging-hosts";
     };
     xdg.configFile = {
       "mimeapps.list".text = ''
         [Default Applications]
-        text/html=luakit.desktop
-        x-scheme-handler/http=luakit.desktop
-        x-scheme-handler/https=luakit.desktop
+        text/html=firefox.desktop
+        x-scheme-handler/http=firefox.desktop
+        x-scheme-handler/https=firefox.desktop
         image/jpeg=feh.desktop
         image/png=feh.desktop
         image/gif=feh.desktop

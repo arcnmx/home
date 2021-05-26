@@ -39,7 +39,7 @@ in {
       "URxvt.fading" = 0;
 
       "URxvt.perl-ext-common" = "default,matcher,color-themes,osc-52,xresources-256";
-      "URxvt.url-launcher" = "${pkgs.luakit-develop}/bin/luakit";
+      "URxvt.url-launcher" = "${config.programs.firefox.package}/bin/firefox";
       "URxvt.matcher.button" = 3;
       "URxvt.colorUL" = "#86a2be";
       "URxvt.keysym.M-f" = "perl:matcher:list";

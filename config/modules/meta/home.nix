@@ -43,7 +43,6 @@
         disabledModules = [
           (/. + "${toString config.channels.paths.home-manager}/modules/programs/git.nix")
           (/. + "${toString config.channels.paths.home-manager}/modules/programs/vim.nix")
-          (/. + "${toString config.channels.paths.home-manager}/modules/programs/firefox.nix")
         ];
       })
     ];
