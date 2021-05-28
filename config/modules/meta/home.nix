@@ -48,8 +48,8 @@
       "${toString config.channels.paths.tf}/modules/home"
       ({
         config = {
-          home.username = config.home.username;
-          home.homeDirectory = config.home.homeDirectory;
+          home.username = mkDefault config.home.username;
+          home.homeDirectory = mkDefault config.home.homeDirectory;
         };
         # TODO: this better
         disabledModules = [
