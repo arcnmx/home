@@ -1,5 +1,13 @@
 { pkgs, lib, config, ... }: with lib; {
   options.home = {
+    username = mkOption {
+      type = types.str;
+      default = builtins.getEnv "USER";
+    };
+    homeDirectory = mkOption {
+      type = types.path;
+      default = builtins.getEnv "HOME";
+    };
     extraModules = mkOption {
       type = types.listOf types.unspecified;
       default = [ ];
@@ -39,6 +47,10 @@
       "${toString config.channels.paths.arc}/modules/home"
       "${toString config.channels.paths.tf}/modules/home"
       ({
+        config = {
+          home.username = mkDefault config.home.username;
+          home.homeDirectory = mkDefault config.home.homeDirectory;
+        };
         # TODO: this better
         disabledModules = [
           (/. + "${toString config.channels.paths.home-manager}/modules/programs/git.nix")

@@ -47,16 +47,6 @@ jobs:
       run: 'nix build -Lf. home.profiles.personal.deploy.home --show-trace
 
         '
-    - id: home-satorin
-      name: build home/satorin
-      run: 'nix build -Lf. home.profiles.satorin.deploy.home --show-trace
-
-        '
-    - id: home-shanghai
-      name: build home/shanghai
-      run: 'nix build -Lf. home.profiles.shanghai.deploy.home --show-trace
-
-        '
     - id: nixos-satorin
       name: build nixos/satorin
       run: 'nix build -Lf. network.nodes.satorin.deploy.system --show-trace

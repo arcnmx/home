@@ -110,7 +110,7 @@ in {
     };
     programs.firefox = {
       enable = true;
-      packageUnwrapped = pkgs.firefox-bin-unwrapped;
+      packageUnwrapped = pkgs.firefox-unwrapped;
       wrapperConfig = {
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
