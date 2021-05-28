@@ -1,4 +1,5 @@
-{ config, pkgs, lib, ... } @ args: let
+{ config, pkgs, lib, ... } @ args: with lib;
+let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
   shellAliases = (if pkgs.hostPlatform.isDarwin then {
@@ -29,6 +30,14 @@
 
     ${if config.home.mutableHomeDirectory != null then "up" else null} = "${config.home.mutableHomeDirectory}/update";
   };
+  shellFunAlias = command: replacement: ''
+    if [[ ! -t 0 ]]; then
+      command ${command} $@
+    else
+      echo 'use ${replacement}!'
+    fi
+  '';
+  shellFunAliases = mapAttrs shellFunAlias;
   shellInit = ''
     if [[ $TERM = rxvt-unicode* || $TERM = linux ]]; then
       TERM=linux ${pkgs.utillinux}/bin/setterm -regtabs 2
@@ -293,6 +302,10 @@ in {
               ;;
           esac
         '';
+      } // shellFunAliases {
+        sed = "sd";
+        find = "fd";
+        grep = "rg";
       };
     };
     programs.less = {
