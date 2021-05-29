@@ -463,9 +463,11 @@ in {
     programs.mpv = {
       enable = true;
       scripts = with pkgs.mpvScripts; [
-        sponsorblock mpris
+        sponsorblock mpris paused
       ];
       config = {
+        no-input-default-bindings = true;
+
         hwdec = mkDefault "auto";
 
         vo = mkDefault "gpu";
@@ -492,15 +494,75 @@ in {
           osc-seekrangestyle = "slider";
         });
       };
-      bindings = let
-        unbind = "keyup"; # dunno what's the best null command
-        #unbind = "stop";
-      in {
-        "Ctrl+c" = unbind; # defaults to quit and no I don't want that
-        "Ctrl+r" = "loadfile \${path}";
-        "R" = "video-reload";
-        "B" = "drop-buffers";
-      };
+    bindings = let vim = {
+          "l" = "seek 5";
+          "h" = "seek -5";
+          "k" = "seek 60";
+          "j" = "seek -60";
+          "Ctrl+l" = "seek 1 exact";
+          "Ctrl+h" = "seek -1 exact";
+          "Ctrl+L" = "sub-seek 1";
+          "Ctrl+H" = "sub-seek -1";
+          "Ctrl+k" = "add chapter 1";
+          "Ctrl+j" = "add chapter -1";
+          "Ctrl+K" = "playlist-next";
+          "Ctrl+J" = "playlist-prev";
+          "Alt+h" = "frame-back-step";
+          "Alt+l" = "frame-step";
+          "`" = "cycle mute";
+          "MBTN_RIGHT" = "cycle pause";
+          "w" = "screenshot";
+          "W" = "screenshot video";
+          "Ctrl+w" = "screenshot window";
+          "Ctrl+W" = "screenshot each-frame";
+          "o" = "show-progress";
+          "O" = "script-message show_osc_dur 5";
+          "F1" = "cycle sub";
+          "F2" = "cycle audio";
+          "Ctrl+p" = "cycle video";
+          "L" = "add volume 2";
+          "H" = "add volume -2";
+          "Alt+H" = "add audio-delay -0.100";
+          "Alt+L" = "add audio-delay 0.100";
+          "1" = "set volume 10";
+          "2" = "set volume 20";
+          "3" = "set volume 30";
+          "4" = "set volume 40";
+          "5" = "set volume 50";
+          "6" = "set volume 60";
+          "7" = "set volume 70";
+          "8" = "set volume 80";
+          "9" = "set volume 90";
+          ")" = "set volume 150";
+          "0" = "set volume 100";
+          "m" = "cycle mute";
+          "Ctrl+r" = "loadfile \${path}";
+          "Ctrl+R" = "drop-buffers loadfile \${path}";
+          "Ctrl+d" = "quit";
+        };
+        other = {
+          "RIGHT" = vim."l";
+          "LEFT" = vim."h";
+          "UP" = vim."j";
+          "DOWN" = vim."k";
+          "Ctrl+0" = "set speed 1.0";
+          "Ctrl+=" = "multiply speed 1.1";
+          "Ctrl+-" = "multiply speed 1/1.1";
+          "Ctrl+RIGHT" = vim."Ctrl+l";
+          "Ctrl+LEFT" = vim."Ctrl+h";
+          "Ctrl+Shift+LEFT" = vim."Ctrl+H";
+          "Ctrl+Shift+RIGHT" = vim."Ctrl+L";
+          "Ctrl+UP" = vim."Ctrl+k";
+          "Ctrl+DOWN" = vim."Ctrl+j";
+          "Ctrl+Shift+UP" = vim."Ctrl+K";
+          "Ctrl+Shift+DOWN" = vim."Ctrl+J";
+          "Alt+LEFT" = vim."Alt+h";
+          "Alt+RIGHT" = vim."Alt+l";
+          "SPACE" = vim."MBTN_RIGHT";
+          "m" = vim."`";
+          "WHEEL_UP" = vim."L";
+          "WHEEL_DOWN" = vim."H";
+        }; in vim // other;
     };
     programs.syncplay = {
       enable = true;
