@@ -466,7 +466,7 @@ in {
         sponsorblock mpris paused
       ];
       config = {
-        no-input-default-bindings = true;
+        input-default-bindings = true;
 
         hwdec = mkDefault "auto";
 
@@ -494,7 +494,8 @@ in {
           osc-seekrangestyle = "slider";
         });
       };
-    bindings = let vim = {
+      bindings = let
+        vim = {
           "l" = "seek 5";
           "h" = "seek -5";
           "k" = "seek 60";
@@ -537,17 +538,20 @@ in {
           "0" = "set volume 100";
           "m" = "cycle mute";
           "Ctrl+r" = "loadfile \${path}";
-          "Ctrl+R" = "drop-buffers loadfile \${path}";
+          "Ctrl+R" = "video-reload";
+          "d" = "drop-buffers";
           "Ctrl+d" = "quit";
         };
-        other = {
-          "RIGHT" = vim."l";
-          "LEFT" = vim."h";
-          "UP" = vim."j";
-          "DOWN" = vim."k";
+        common = {
           "Ctrl+0" = "set speed 1.0";
           "Ctrl+=" = "multiply speed 1.1";
           "Ctrl+-" = "multiply speed 1/1.1";
+        };
+        directional = {
+          "RIGHT" = vim."l";
+          "LEFT" = vim."h";
+          "UP" = vim."k";
+          "DOWN" = vim."j";
           "Ctrl+RIGHT" = vim."Ctrl+l";
           "Ctrl+LEFT" = vim."Ctrl+h";
           "Ctrl+Shift+LEFT" = vim."Ctrl+H";
@@ -562,7 +566,8 @@ in {
           "m" = vim."`";
           "WHEEL_UP" = vim."L";
           "WHEEL_DOWN" = vim."H";
-        }; in vim // other;
+        };
+      in vim // common // optionalAttrs false directional;
     };
     programs.syncplay = {
       enable = true;
