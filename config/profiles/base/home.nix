@@ -306,6 +306,7 @@ in {
         sed = "sd";
         find = "fd";
         grep = "rg";
+        feh = "imv";
       };
     };
     programs.less = {

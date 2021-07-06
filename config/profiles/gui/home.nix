@@ -66,7 +66,7 @@ in {
       fi
     '';
     home.packages = with pkgs; [
-      feh
+      imv
       ffmpeg
       youtube-dl
       scrot
