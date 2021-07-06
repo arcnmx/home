@@ -618,6 +618,7 @@ in {
             imap_esc_timeout = "100";
             search_vim = true;
             user_mappings = builtins.toJSON {
+              "`," = "a/go<CR>";
               "," = "/buffer #{1}<CR>"; # TODO: start getting used to a different key for this instead?
               "``" = "/input jump_last_buffer_displayed<CR>";
               "`n" = "/input jump_smart<CR>";
