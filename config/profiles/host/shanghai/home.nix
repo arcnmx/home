@@ -54,6 +54,9 @@ in {
       _paswitch = ''
         _alternative 'preset:preset:(headphones speakers)' 'sink:sink:($(_paswitch_sinks))'
       '';
+      ryzen-watch = ''
+        sudo watch -ctn1 'ryzen_monitor -u0'
+      '';
     };
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
