@@ -57,6 +57,10 @@
         inherit (config.systemd.network.links.eth) matchConfig;
         bridge = ["br"];
       };
+      networks.eno2 = {
+        inherit (config.systemd.network.links.eth25) matchConfig;
+        bridge = ["br"];
+      };
       netdevs.br = {
         netdevConfig = {
           Name = "br";
