@@ -84,6 +84,7 @@
         criteria = [
           { title = "^run$"; }
           { title = "^pinentry$"; }
+          { title = "^streamlaunch: "; }
         ];
       };
       focus = {

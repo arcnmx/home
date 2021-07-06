@@ -264,6 +264,7 @@
     };
 
     boot = {
+      extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
       modprobe.modules = {
         vfio-pci = let
           vfio-pci-ids = [
@@ -273,6 +274,10 @@
           ];
         in mkIf (config.home.profiles.vfio && vfio-pci-ids != [ ]) {
           options.ids = concatStringsSep "," vfio-pci-ids;
+        };
+        v4l2loopback.options = {
+          # https://github.com/umlaeute/v4l2loopback/blob/main/README.md
+          devices = 8;
         };
       };
       loader = {

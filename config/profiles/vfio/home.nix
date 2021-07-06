@@ -17,9 +17,5 @@ in {
     home.packages = [
       windows
     ];
-
-    programs.obs-studio.plugins = [
-      pkgs.looking-glass-obs-develop
-    ];
   };
 }
