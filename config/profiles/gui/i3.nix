@@ -52,9 +52,9 @@
     extraConfig = ''
       ${workspaceBindingsStr}
 
-      workspace_auto_back_and_forth yes
     '';
     config = {
+      #workspaceAutoBackAndForth = true;
       bars = optional (!config.services.polybar.enable) {
         workspaceNumbers = false;
         fonts = {
