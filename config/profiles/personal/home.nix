@@ -53,7 +53,6 @@ in {
       physlock
       travis
       radare2
-      buku
       electrum-cli
       jq yq
       lorri

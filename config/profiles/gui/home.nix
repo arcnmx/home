@@ -114,8 +114,7 @@ in {
       wrapperConfig = {
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
-          bukubrow
-        ];
+        ] ++ optional config.programs.buku.enable bukubrow;
       };
       profiles = {
         arc = {
