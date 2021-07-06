@@ -6,6 +6,7 @@
       "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}" = config.programs.firefox.extensions != [];
       "profiles.ini" = config.programs.firefox.profiles != {};
     } // foldAttrList (mapAttrsToList (_: profile: {
+      "${profile.path}/.keep" = true;
       "${profile.path}/chrome/userChrome.css" = profile.userChrome != "";
       "${profile.path}/user.js" = profile.settings != {} || profile.extraConfig != "";
       "${profile.path}/containers.json" = profile.containers.identities != [];
