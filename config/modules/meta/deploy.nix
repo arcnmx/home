@@ -56,7 +56,7 @@ in {
           };
           config.tf = mkMerge (singleton {
             terraform = {
-              version = "0.13";
+              version = "1.0";
               logPath = cfg.dataDir + "/terraform-${config.name}.log";
               dataDir = cfg.dataDir + "/tfdata/${config.name}";
               environment.TF_CLI_ARGS_apply = "-backup=-";
