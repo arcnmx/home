@@ -21,6 +21,23 @@ in {
         type = types.bool;
         default = config.home.hostName == config.home.profileSettings.personal.primaryHost;
       };
+      weechat = {
+        # TODO: hiddenBuffers
+        autosortRules = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+        };
+        autosortShortNames = {
+          first = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+          };
+          last = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+          };
+        };
+      };
     };
     programs.ncmpcpp.mpdHost = mkOption {
       type = types.nullOr types.str;
@@ -60,7 +77,43 @@ in {
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
-    home.profileSettings.personal.primaryHost = "shanghai";
+    home.profileSettings.personal = {
+      primaryHost = "shanghai";
+      weechat.autosortRules = let
+        script_or_plugin = "\${if:\${script_name}?\${script_name}:\${plugin}}";
+      in mkMerge [
+        (mkBefore [
+          # core/plugins at top...
+          "\${if:\${buffer.full_name}!=core.weechat}" # core_first
+          "\${info:autosort_order,\${info:autosort_escape,${script_or_plugin}},core,highmon,*}"
+          "\${if:\${buffer.full_name}!=irc.irc_raw}" # irc_raw_first
+          "\${info:autosort_order,\${type},server,*}"
+        ])
+        (mkIf (cfg.weechat.autosortShortNames.first != [ ]) [ (
+          "\${"
+          + concatStringsSep "," ([
+            "info:autosort_order"
+            "\${info:autosort_escape,\${buffer.short_name}}"
+          ] ++ cfg.weechat.autosortShortNames.first ++ singleton "*")
+          + "}"
+        ) ])
+        (mkIf (cfg.weechat.autosortShortNames.last != [ ]) [ (
+          "\${"
+          + concatStringsSep "," ([
+            "info:autosort_order"
+            "\${info:autosort_escape,\${buffer.short_name}}"
+          ] ++ singleton "*" ++ cfg.weechat.autosortShortNames.last)
+          + "}"
+        ) ])
+        (mkAfter [
+          "\${info:autosort_order,\${type},*,channel,private}"
+          "\${cut:4,,\${rev:\${buffer.localvar_room_id}}}" # lazy rough server sort .-.
+          "\${info:autosort_replace,#,,\${info:autosort_escape,\${buffer.short_name}}}"
+          "\${info:autosort_replace,#,,\${info:autosort_escape,\${buffer.name}}}"
+          "\${buffer.full_name}"
+        ])
+      ];
+    };
     home.shell = {
       aliases.vit = "task vit";
       functions = {
@@ -606,6 +659,18 @@ in {
             short_names = true;
             merge_private = true;
             alignment = "nchannel,nick";
+          };
+        };
+        autosort = {
+          sorting = {
+            signals = toString [
+              # TODO: defaults, change these?
+              "buffer_opened" "buffer_merged" "buffer_unmerged" "buffer_renamed"
+            ];
+          };
+          v3 = mapAttrs (_: builtins.toJSON) {
+            rules = cfg.weechat.autosortRules;
+            helpers = { };
           };
         };
       };
