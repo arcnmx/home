@@ -465,7 +465,7 @@ in {
         sponsorblock mpris paused
       ];
       config = {
-        input-default-bindings = true;
+        input-default-bindings = false;
 
         hwdec = mkDefault "auto";
 
@@ -510,7 +510,7 @@ in {
           "Alt+h" = "frame-back-step";
           "Alt+l" = "frame-step";
           "`" = "cycle mute";
-          "MBTN_RIGHT" = "cycle pause";
+          "SPACE" = "cycle pause";
           "w" = "screenshot";
           "W" = "screenshot video";
           "Ctrl+w" = "screenshot window";
@@ -561,7 +561,7 @@ in {
           "Ctrl+Shift+DOWN" = vim."Ctrl+J";
           "Alt+LEFT" = vim."Alt+h";
           "Alt+RIGHT" = vim."Alt+l";
-          "SPACE" = vim."MBTN_RIGHT";
+          "MBTN_RIGHT" = vim."SPACE";
           "m" = vim."`";
           "WHEEL_UP" = vim."L";
           "WHEEL_DOWN" = vim."H";
