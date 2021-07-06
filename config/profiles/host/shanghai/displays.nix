@@ -1,5 +1,5 @@
-{ lib }: with lib; rec {
-  monitors = {
+{ lib }: with lib; let
+  layouts = {
     stacked = monitors: with monitors; {
       benq = { config, ... }: {
         output = "DP-0";
@@ -94,6 +94,11 @@
         y = 0;
       };
     };
+    gaming-vertical = monitors: mkMerge [ (layouts.gaming monitors) {
+      benq.rotation = "right";
+    } ];
   };
-  default = monitors.stacked;
+in {
+  monitors = layouts;
+  default = layouts.stacked;
 }
