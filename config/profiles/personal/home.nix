@@ -840,7 +840,7 @@ in {
       "efm-langserver/config.yaml".text = ''
         languages:
           markdown:
-            lint-command: '${pkgs.markdownlint-cli}/bin/markdownlint -s'
+            lint-command: '${pkgs.nodePackages.markdownlint-cli}/bin/markdownlint -s'
             lint-stdin: true
             lint-formats:
             - '%f: %l: %m'

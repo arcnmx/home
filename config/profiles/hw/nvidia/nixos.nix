@@ -3,6 +3,7 @@
     home.profiles.hw.nvidia = mkEnableOption "NVIDIA GPU";
     home.profileSettings.nvidia = {
       enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
+      patch = mkEnableOption "nvidia-patch" // { default = true; };
     };
   };
 
@@ -11,7 +12,10 @@
       modesetting.enable = true;
       package = let
         inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
-      in if versionAtLeast beta.version stable.version then beta else stable;
+        package = if versionAtLeast beta.version stable.version then beta else stable;
+      in if config.home.profileSettings.nvidia.patch
+        then pkgs.nvidia-patch.override { nvidia_x11 = package; }
+        else package;
     };
     hardware.display.nvidia.enable = true;
     hardware.opengl.extraPackages = with pkgs; [libvdpau-va-gl];

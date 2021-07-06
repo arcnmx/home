@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }: with lib; {
   options = {
     home.profiles.vfio = mkEnableOption "VFIO";
+    hardware.vfio = {
+      acsOverride = mkEnableOption "ACS IOMMU Override";
+      i915arbiter = mkEnableOption "i915 VGA Arbiter";
+    };
   };
 
   config = mkIf config.home.profiles.vfio {
@@ -16,13 +20,9 @@
         };
       };
       extraModulePackages = with config.boot.kernelPackages; [ forcefully-remove-bootfb looking-glass-kvmfr ];
-      kernelPatches = mkIf false [
-        {
-          name = "efifb-nobar";
-          patch = ./files/efifb-nobar.patch;
-        }
-        # TODO: i915-vga-arbiter? https://aur.archlinux.org/cgit/aur.git/plain/i915-vga-arbiter.patch?h=linux-vfio
-        # TODO: asc/iommu override? https://gitlab.com/Queuecumber/linux-acs-override/raw/master/workspaces/4.17/acso.patch
+      kernelPatches = with pkgs.kernelPatches; [
+        (mkIf config.hardware.vfio.i915arbiter i915-vga-arbiter)
+        (mkIf config.hardware.vfio.acsOverride acs-override)
       ];
     };
     environment.etc."qemu/bridge.conf".text = "allow br";

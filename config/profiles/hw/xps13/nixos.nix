@@ -25,8 +25,8 @@ in {
     fonts.fontconfig.dpi = if cfg.lieDpi then 96 else 166;
 
     boot = {
-      kernelPackages = mkIf (config.home.hw.xps13.wifi == "ax210")
-        (assert versionOlder pkgs.linuxPackages_testing.kernel.version "5.13"; pkgs.linuxPackages_testing);
+      kernelArch = "broadwell";
+      kernelPackages = mkIf (config.home.hw.xps13.wifi == "ax210") pkgs.linuxPackages_bleeding;
       initrd.availableKernelModules = [
         "xhci_pci" "ehci_pci" "ahci" "sd_mod" "rtsx_pci_sdmmc"
       ];

@@ -39,7 +39,7 @@ in {
       packages = [pkgs.tamzen];
       font = "Tamzen7x14";
       earlySetup = true;
-      mingetty = {
+      getty = {
         greetingPrefix =
           ''\e[H\e[2J'' + # topleft
           ''\e[9;10]''; # setterm blank/powersave = 10 minutes
@@ -72,23 +72,6 @@ in {
         };
         kvm_amd.options.avic = true;
       };
-      kernelPatches = mkIf false [
-        {
-          name = "ubuntu-unprivileged-overlayfs";
-          patch = ./files/ubuntu-unprivileged-overlayfs.patch;
-        }
-        {
-          name = "cpu-optimizations";
-          patch = (pkgs.fetchurl {
-            name = "enable_additional_cpu_optimizations.patch";
-            url = "https://raw.githubusercontent.com/graysky2/kernel_gcc_patch/master/more-uarches-for-kernel-5.8%2B.patch";
-            sha256 = "16jbknjlg12jxbj8cjkk01djvr01n9zz7qlzxppcqizmz55vk0wh";
-          });
-          # TODO: this needs the associated kernel config option set
-        }
-        # TODO: nvidia-i2c-workaround? (only if nvidia profile)
-        # TODO: move these into arc channel or something so they're standard and cached
-      ];
       kernel.sysctl = {
         "net.ipv6.conf.all.accept_ra_rt_info_max_plen" = 128;
         "net.ipv6.conf.default.accept_ra_rt_info_max_plen" = 128;
