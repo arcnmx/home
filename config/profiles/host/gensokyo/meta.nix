@@ -15,8 +15,8 @@ in {
         };
         ca.pem = tf.resources.taskserver_ca.importAttr "cert_pem";
       };
-      bitwarden_rs = {
-        public = with acme.certs.${domains.bitwarden_rs.public.fqdn}; {
+      vaultwarden = {
+        public = with acme.certs.${domains.vaultwarden.public.fqdn}; {
           pem = out.importFullchainPem;
           keyName = name;
         };
@@ -75,7 +75,7 @@ in {
         vanity = { protocol = mkDefault "https"; bind = mkDefault bindAny; };
         federation = { protocol = mkDefault "https"; bind = mkDefault bindAny; port = mkDefault 8448; };
       };
-      bitwarden_rs = {
+      vaultwarden = {
         private = { protocol = mkDefault "http"; port = mkDefault 0; bind = mkDefault bindLocal; };
         private-websocket = { protocol = mkDefault "http"; port = mkDefault 0; bind = mkDefault bindLocal; };
         public = { protocol = mkDefault "https"; bind = mkDefault bindAny; };
@@ -92,7 +92,7 @@ in {
           dnsNames = singleton domain;
         }) [
           taskserver.public.fqdn
-          bitwarden_rs.public.fqdn
+          vaultwarden.public.fqdn
           prosody.vanity.fqdn
           prosody.public.fqdn
           matrix-synapse.vanity.fqdn

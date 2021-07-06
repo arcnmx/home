@@ -52,7 +52,7 @@ in {
             host = config.networking.domain;
           };
         };
-        bitwarden_rs_token = mkIf config.services.bitwarden_rs.enable {
+        vaultwarden_token = mkIf config.services.vaultwarden.enable {
           provider = "random";
           type = "string";
           inputs = {
@@ -92,13 +92,13 @@ in {
       gitolite = {
         enableGitAnnex = mkDefault true;
       };
-      bitwarden_rs.config = {
+      vaultwarden.config = {
         webVaultEnabled = mkDefault true;
         signupsAllowed = mkDefault false;
         websocketEnabled = mkDefault true;
         rocketEnv = mkDefault "production";
         dataFolder = "/var/lib/bitwarden_rs";
-        databaseUrl = mkDefault "${config.services.bitwarden_rs.config.dataFolder}/db.sqlite3";
+        databaseUrl = mkDefault "${config.services.vaultwarden.config.dataFolder}/db.sqlite3";
       };
       matrix-synapse = {
         rc_messages_per_second = mkDefault "0.1";
@@ -156,7 +156,7 @@ in {
             };
           };
         })
-        (mkIf (config.services.bitwarden_rs.enable && config.services.bitwarden_rs.dbBackend == "postgresql") {
+        (mkIf (config.services.vaultwarden.enable && config.services.vaultwarden.dbBackend == "postgresql") {
           ensureDatabases = singleton "bitwarden_rs";
           ensureUsers = singleton {
             name = "bitwarden_rs";
@@ -188,10 +188,10 @@ in {
         };
         database_type = mkIf config.services.postgresql.enable "psycopg2";
       };
-      bitwarden_rs = {
+      vaultwarden = {
         dbBackend = mkIf config.services.postgresql.enable "postgresql";
         config = {
-          #adminToken = tf.resources.bitwarden_rs_token.getAttr "result"; # NOTE: keep unset unless admin page is needed
+          #adminToken = tf.resources.vaultwarden_token.getAttr "result"; # NOTE: keep unset unless admin page is needed
           databaseUrl = mkIf config.services.postgresql.enable "postgresql://bitwarden_rs@/bitwarden_rs";
         };
       };
@@ -229,7 +229,7 @@ in {
       };
     } {
       # domains, routes and cert garbage ahead
-      bitwarden_rs.config = with domains.bitwarden_rs; {
+      vaultwarden.config = with domains.vaultwarden; {
         domain = public.url;
         rocketPort = private.port;
         rocketAddress = private.bind;
@@ -296,7 +296,7 @@ in {
         } ];
       };
       nginx.virtualHosts = with domains; {
-        ${bitwarden_rs.public.url} = with bitwarden_rs; mkIf config.services.bitwarden_rs.enable {
+        ${vaultwarden.public.url} = with vaultwarden; mkIf config.services.vaultwarden.enable {
           serverName = public.fqdn;
           onlySSL = true;
           sslCertificate = public.certPath;
@@ -314,7 +314,7 @@ in {
               proxyPass = private.url;
             };
             "/admin" = {
-              proxyPass = mkIf (config.services.bitwarden_rs.config ? adminToken) private.url;
+              proxyPass = mkIf (config.services.vaultwarden.config ? adminToken) private.url;
             };
           };
         };
@@ -406,7 +406,7 @@ in {
     } ];
     networking.firewall.allowedTCPPorts = singleton 80 ++ map (domain: domain.port) (with domains; [
       taskserver.public
-      bitwarden_rs.public
+      vaultwarden.public
       matrix-synapse.public matrix-synapse.federation
       prosody.client prosody.federation prosody.upload prosody.muc
     ]);
@@ -418,7 +418,7 @@ in {
         $PSQL -tAc 'CREATE USER "matrix-synapse"'
       $PSQL -tAc 'GRANT ALL PRIVILEGES ON DATABASE "matrix-synapse" TO "matrix-synapse"'
     '');
-    systemd.services.bitwarden_rs = mkIf (config.services.bitwarden_rs.enable && config.services.bitwarden_rs.dbBackend == "postgresql") {
+    systemd.services.vaultwarden = mkIf (config.services.vaultwarden.enable && config.services.vaultwarden.dbBackend == "postgresql") {
       requires = [ "postgresql.service" ];
       after = [ "postgresql.service" ];
     };
@@ -446,7 +446,7 @@ in {
       text = config.deploy.tf.import.common.acme.certs.${fqdn.name}.out.importPrivateKeyPem;
     }) (filter (item: item.value) [
       (nameValuePair taskserver.public.fqdn config.services.taskserver.enable)
-      (nameValuePair bitwarden_rs.public.fqdn config.services.bitwarden_rs.enable)
+      (nameValuePair vaultwarden.public.fqdn config.services.vaultwarden.enable)
       (nameValuePair prosody.vanity.fqdn config.services.prosody.enable)
       (nameValuePair prosody.public.fqdn config.services.prosody.enable)
       (nameValuePair matrix-synapse.vanity.fqdn config.services.matrix-synapse.enable)

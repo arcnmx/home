@@ -179,7 +179,7 @@
       #bitlbee.enable = true;
       prosody.enable = true;
       taskserver.enable = true;
-      bitwarden_rs.enable = true;
+      vaultwarden.enable = true;
       nginx.enable = true;
       postgresql.enable = true;
       matrix-synapse = {

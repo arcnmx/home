@@ -103,10 +103,10 @@ in {
         paths = singleton config.services.matrix-synapse.dataDir;
       };
       bitwarden_rs = {
-        enable = mkDefault config.services.bitwarden_rs.enable;
-        databases.postgresql = mkIf (config.services.bitwarden_rs.dbBackend == "postgresql" && config.services.postgresql.enable) [ "bitwarden_rs" ];
+        enable = mkDefault config.services.vaultwarden.enable;
+        databases.postgresql = mkIf (config.services.vaultwarden.dbBackend == "postgresql" && config.services.postgresql.enable) [ "bitwarden_rs" ];
         paths = singleton {
-          path = config.services.bitwarden_rs.config.dataFolder; # TODO: module doesn't expose this anymore???
+          path = config.services.vaultwarden.config.dataFolder; # TODO: module doesn't expose this anymore???
           exclude = [
             "icon_cache"
           ];
