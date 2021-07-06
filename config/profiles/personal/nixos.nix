@@ -222,6 +222,7 @@ in {
     };
     services.physlock.enable = true;
     security.sudo.wheelNeedsPassword = false;
+    systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = -100;
     systemd.mounts = let
       hugepages = { where, options }: {
         before = ["sysinit.target"];

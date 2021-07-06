@@ -59,11 +59,20 @@ in {
     } (mkIf config.programs.firefox.enable firefoxFiles) ];
     home.shell = {
       functions = {
+        firefox = ''
+          ( # subshell important!
+            echo 200 > /proc/self/oom_score_adj
+            exec ${config.programs.firefox.package}/bin/firefox "$@"
+          )
+        '';
         mpa = ''
           PULSE_PROP="media.role=music" ${mpv} --no-video "$@"
         '';
         mpv = ''
-          PULSE_PROP="media.role=video" ${mpv} "$@"
+          ( # subshell important!
+            echo 200 > /proc/self/oom_score_adj
+            PULSE_PROP="media.role=video" ${mpv} --force-window=immediate "$@"
+          )
         '';
         discord = ''
           PULSE_PROP="media.role=phone" nix run nixpkgs.discord -c Discord "$@"
