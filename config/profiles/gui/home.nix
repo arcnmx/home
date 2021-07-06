@@ -621,7 +621,8 @@ in {
     };
     home.shell.aliases = {
       konawall = "systemctl --user restart konawall.service";
-      oryx = "nix run nixpkgs.google-chrome -c google-chrome-stable https://configure.ergodox-ez.com/train";
+      chrome = "nix run nixpkgs.google-chrome -c google-chrome-stable";
+      oryx = "chrome https://configure.ergodox-ez.com/train";
     };
 
     xsession = {

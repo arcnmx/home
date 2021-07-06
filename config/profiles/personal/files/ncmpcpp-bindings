@@ -42,9 +42,9 @@ def_key "w"
 	save_playlist
 
 def_key "H"
-	volume_up
-def_key "L"
 	volume_down
+def_key "L"
+	volume_up
 def_key "ctrl-k"
 	previous
 def_key "ctrl-j"

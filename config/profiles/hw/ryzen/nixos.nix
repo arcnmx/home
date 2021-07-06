@@ -7,7 +7,7 @@
     boot = {
       customKernel = mkDefault true;
       kernelPackages = pkgs.linuxPackages_bleeding;
-      kernelParams = ["amd_iommu=on"];
+      kernelParams = [ "amd_iommu=on" ];
       kernelModules = [
         "msr" # for zenstates
         "ryzen_smu" # for ryzen-monitor

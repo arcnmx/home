@@ -9,6 +9,7 @@
     ${mpc}/bin/mpc add "$@" &&
       ${mpc}/bin/mpc play $(($(${mpc}/bin/mpc playlist | wc -l) - COUNT + 1))
   '';
+  cfg = config.home.profileSettings.personal;
 in {
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
@@ -19,7 +20,7 @@ in {
       };
       isPrimary = mkOption {
         type = types.bool;
-        default = config.home.hostName == config.home.profileSettings.personal.primaryHost;
+        default = config.home.hostName == cfg.primaryHost;
       };
       weechat = {
         # TODO: hiddenBuffers
@@ -794,7 +795,7 @@ in {
         };
       };
 
-      config = let cfg = config.programs.taskwarrior; in {
+      config = {
         default.command = "short";
         list.all = {
           projects = "yes";
@@ -805,7 +806,7 @@ in {
           tags = "yes";
         };
         reserved.lines = "2";
-        recurrence = if config.home.profileSettings.personal.isPrimary then {
+        recurrence = if cfg.isPrimary then {
           confirmation = "no";
         } else "off"; # https://github.com/GothenburgBitFactory/taskserver/issues/46
         bulk = 7;
