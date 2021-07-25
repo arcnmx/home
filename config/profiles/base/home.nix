@@ -239,6 +239,9 @@ in {
       templates = "$HOME/templates";
       documents = "$HOME/projects";
     };
+    xdg.mimeApps = {
+      enable = true;
+    };
     home.language = {
       base = "en_US.UTF-8";
     };
