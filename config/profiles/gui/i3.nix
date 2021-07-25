@@ -46,6 +46,7 @@
       map (mapAttrsToList bindsym) workspaceBindings;
     workspaceBindingsStr =
       concatStringsSep "\n" (flatten workspaceBindings');
+    colours = mapAttrs (_: b: "#${b.hex.rgb}") config.lib.arc.base16.schemeForAlias.dark.alias;
     #vm = "${pkgs.arc.vm.exec}";
   in mkIf config.home.profiles.gui {
     enable = true;
@@ -72,6 +73,45 @@
           };
         };
         statusCommand = "${pkgs.i3status}/bin/i3status";
+      };
+      colors = with colours; {
+        background = background;
+        unfocused = {
+          background = background;
+          text = comment;
+          border = background_status;
+          childBorder = background;
+          indicator = background;
+        };
+        focusedInactive = {
+          background = background_selection;
+          text = foreground_alt;
+          border = background_light;
+          childBorder = comment;
+          indicator = background_light;
+        };
+        focused = {
+          background = background_selection;
+          text = foreground;
+          border = keyword;
+          childBorder = keyword;
+          indicator = heading;
+        };
+        urgent = {
+          #background = link;
+          background = background_light;
+          text = foreground;
+          border = link;
+          childBorder = url;
+          indicator = url;
+        };
+        placeholder = {
+          background = background_light;
+          text = foreground_status;
+          border = caret;
+          childBorder = caret;
+          indicator = caret;
+        };
       };
       fonts = {
         names = [ "monospace" ];
