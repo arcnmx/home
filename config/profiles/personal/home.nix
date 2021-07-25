@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   mpc = pkgs.writeShellScriptBin "mpc" ''
-    export MPD_HOST=${escapeShellArg config.programs.ncmpcpp.mpdHost}
+    export MPD_HOST=${escapeShellArg config.programs.ncmpcpp.settings.mpd_host}
     ${pkgs.mpc_cli}/bin/mpc "$@"
   '';
   mplay = pkgs.writeShellScriptBin "mplay" ''
@@ -11,6 +11,9 @@
   '';
   cfg = config.home.profileSettings.personal;
 in {
+  imports = [
+    ./ncmpcpp.nix
+  ];
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
     home.profileSettings.personal = {
@@ -40,10 +43,6 @@ in {
         };
       };
     };
-    programs.ncmpcpp.mpdHost = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-    };
   };
 
   config = mkIf config.home.profiles.personal {
@@ -67,7 +66,6 @@ in {
       weechat-matrix
       playerctl
       awscli2
-      ncmpcpp
       physlock
       travis
       radare2
@@ -833,11 +831,6 @@ in {
 
     xdg.configFile = {
       "electrum/.keep".text = "";
-      "ncmpcpp/bindings".source = ./files/ncmpcpp-bindings;
-      "ncmpcpp/config".source = pkgs.substituteAll {
-        inherit (config.programs.ncmpcpp) mpdHost;
-        src = ./files/ncmpcpp-config;
-      };
       "efm-langserver/config.yaml".text = ''
         languages:
           markdown:
