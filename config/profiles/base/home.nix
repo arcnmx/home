@@ -615,6 +615,23 @@ in {
     programs.fzf = {
       enable = !config.home.minimalSystem;
       enableZshIntegration = true;
+      defaultCommand = "${pkgs.fd}/bin/fd --type f --type l";
+      defaultOptions = [
+        "--height 40%"
+        "--border"
+      ];
+      historyWidgetOptions = [
+        "--sort"
+        "--exact"
+      ];
+      fileWidgetCommand = "${pkgs.fd}/bin/fd --type f";
+      fileWidgetOptions = [
+        "--prefix 'head {}'"
+      ];
+      changeDirWidgetCommand = "${pkgs.fd}/bin/fd --type d";
+      changeDirWidgetOptions = [
+        "--preview 'tree -C {} | head -n256'"
+      ];
     };
     programs.man.enable = !config.home.minimalSystem;
 
