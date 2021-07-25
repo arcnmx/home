@@ -404,6 +404,9 @@ in {
         };
       };
     } ];
+    users.users.vaultwarden = mkIf config.services.vaultwarden.enable {
+      name = "bitwarden_rs";
+    };
     networking.firewall.allowedTCPPorts = singleton 80 ++ map (domain: domain.port) (with domains; [
       taskserver.public
       vaultwarden.public
