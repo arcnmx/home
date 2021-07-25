@@ -73,6 +73,7 @@ in {
       xsel
       xorg.xinit
       xdg_utils-mimi
+      arc.packages.personal.emxc
       rxvt-unicode-arc
       mumble-develop
       libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;

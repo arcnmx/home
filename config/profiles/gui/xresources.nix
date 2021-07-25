@@ -17,6 +17,8 @@
       } > $out/Xresources.$style
     done
   '';
+  emxc = "${pkgs.arc.packages.personal.emxc}/bin/emxc";
+  escapeRegex = lib.replaceStrings [ ''\'' "/" " " ] [ ''\\'' ''\\/'' ''\\ '' ];
 in {
   # TODO: set up https://github.com/sos4nt/dynamic-colors
   xresources = lib.mkIf config.home.profiles.gui {
@@ -43,6 +45,12 @@ in {
       "URxvt.matcher.button" = 3;
       "URxvt.colorUL" = "#86a2be";
       "URxvt.keysym.M-f" = "perl:matcher:list";
+      "URxvt.matcher.pattern.1" = escapeRegex ''[^/]\bwww\.[\w-]+\.[\w./?&@#-]*[\w/-]'';
+      "URxvt.matcher.pattern.2" = escapeRegex ''(?<!\[)emxc://[\w/:?=%&._\-]+'';
+      "URxvt.matcher.pattern.3" = escapeRegex ''<([^>]+)> \[(emxc://[^\]]+)\]'';
+      "URxvt.matcher.launcher.2" = "${emxc} $0";
+      "URxvt.matcher.launcher.3" = "${emxc} $2 $1";
+      #"URxvt.matcher.pattern.4" = ''\\B(/\\S+?):(\\d+)(?=:|$)'';
       "URxvt.cutchars" = ''\\'"'&()*,;<=>?@[]^{|│└┼┴┬├─┤}·↪»'';
 
       "URxvt.color-themes.themedir" = config.xdg.configHome + "/urxvt/themes";
