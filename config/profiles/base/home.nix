@@ -440,6 +440,8 @@ in {
       enable = true;
       enableAutosuggestions = true;
       enableCompletion = true;
+      enableSyntaxHighlighting = true;
+      autocd = true;
       defaultKeymap = "viins";
       dotDir = ".config/zsh";
       history = {
