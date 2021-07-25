@@ -259,12 +259,20 @@ in {
       };
     };
     programs.ncpamixer = {
-      enable = true;
+      enable = false;
       keybinds = {
         "48" = "set_volume_100"; # 0
         "96" = "set_volume_0"; # `
         "74" = "tab_next"; # J
         "75" = "tab_prev"; # K
+      };
+    };
+    programs.pulsemixer = {
+      enable = config.home.nixosConfig.hardware.pulseaudio.enable or pkgs.hostPlatform.isLinux || config.home.nixosConfig.services.pipewire.enable or false;
+      configContent.keys = {
+        next-mode = "J";
+        prev-mode = "K";
+        mute = "m, `";
       };
     };
     programs.filebin = {

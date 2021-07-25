@@ -332,6 +332,7 @@ in {
         find = "fd";
         grep = "rg";
         feh = "imv";
+        ncpamixer = "pulsemixer";
       };
     };
     programs.less = {
