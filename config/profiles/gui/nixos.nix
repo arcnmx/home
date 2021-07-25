@@ -50,6 +50,12 @@ in
       '';
       inputClassSections = [
         ''
+          Identifier "adcignore"
+          MatchDevicePath "/dev/input/event*"
+          MatchUSBID "f213:1a0a"
+          Option "Ignore" "true"
+        '' # this "HD  microphone" thing spams media keys
+        ''
           Identifier "Natural Scrolling"
           MatchIsPointer "on"
           Option "VertScrollDelta" "-1"
