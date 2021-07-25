@@ -52,23 +52,27 @@
           label in6 "DRAM A/B"
       '';
     };
-    systemd.network = {
+    systemd.network = let inherit (config.systemd.network) links; in {
       networks.eno1 = {
-        inherit (config.systemd.network.links.eth) matchConfig;
+        inherit (links.eth) matchConfig;
         bridge = ["br"];
       };
       networks.eno2 = {
-        inherit (config.systemd.network.links.eth25) matchConfig;
+        inherit (links.eth25) matchConfig;
         bridge = ["br"];
       };
       netdevs.br = {
         netdevConfig = {
           Name = "br";
           Kind = "bridge";
-          inherit (config.systemd.network.links.eth.matchConfig) MACAddress;
+          inherit (links.eth.matchConfig) MACAddress;
         };
       };
       links = {
+        "10-wlan" = {
+          inherit (links.wlan) matchConfig;
+          linkConfig.NamePolicy = "";
+        };
         wlan = {
           matchConfig = {
             MACAddress = "a4:b1:c1:d9:14:df";
@@ -76,6 +80,10 @@
           linkConfig = {
             Name = "wlan";
           };
+        };
+        "10-eth" = {
+          inherit (links.eth) matchConfig;
+          linkConfig.NamePolicy = "";
         };
         eth = {
           matchConfig = {
@@ -85,6 +93,10 @@
           linkConfig = {
             Name = "eth";
           };
+        };
+        "10-eth25" = {
+          inherit (links.eth25) matchConfig;
+          linkConfig.NamePolicy = "";
         };
         eth25 = {
           matchConfig = {
