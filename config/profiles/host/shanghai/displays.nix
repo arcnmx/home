@@ -1,101 +1,86 @@
 { lib }: with lib; let
+  _4k = {
+    width = 3840;
+    height = 2160;
+  };
+  defaults = {
+    common = { config, ... }: {
+      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
+    };
+    spectrum = { config, ... }: {
+      imports = [ defaults.common ];
+      output = mkDefault "DP-0";
+      xserver.sectionName = mkDefault "Monitor[1]";
+      refreshRate = mkDefault 144;
+    } // mapAttrs (_: mkDefault) _4k;
+    dell = { config, ... }: {
+      imports = [ defaults.common ];
+      output = mkDefault "HDMI-0";
+      xserver.sectionName = mkDefault "Monitor[0]";
+      primary = mkDefault true;
+    } // mapAttrs (_: mkDefault) _4k;
+    lg = { config, ... }: {
+      imports = [ defaults.common ];
+      output = mkDefault "DP-2";
+      xserver.sectionName = mkDefault "Monitor[2]";
+      rotation = mkDefault "right";
+    } // mapAttrs (_: mkDefault) _4k;
+  };
   layouts = {
     stacked = monitors: with monitors; {
-      benq = { config, ... }: {
-        output = "DP-0";
-        xserver.sectionName = "Monitor[1]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        width = 2560;
-        height = 1440;
+      spectrum = { config, ... }: {
+        imports = [ defaults.spectrum ];
         x = lg.x - config.viewport.width;
         y = dell.y - config.viewport.height;
       };
       dell = { config, ... }: {
-        output = "HDMI-0";
-        xserver.sectionName = "Monitor[0]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        primary = true;
-        width = 3840;
-        height = 2160;
+        imports = [ defaults.dell ];
         x = 0;
-        y = lg.viewport.height - config.viewport.height;
+        y = lg.y + lg.viewport.height - config.viewport.height;
       };
       lg = { config, ... }: {
-        output = "DP-2";
-        xserver.sectionName = "Monitor[2]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        rotation = "right";
-        width = 3840;
-        height = 2160;
+        imports = [ defaults.lg ];
         x = dell.x + dell.viewport.width;
-        y = 0;
+        y = max 0 ((spectrum.viewport.height + dell.viewport.height) - config.viewport.height);
       };
     };
     linear = monitors: with monitors; {
-      benq = { config, ... }: {
-        output = "DP-0";
-        xserver.sectionName = "Monitor[1]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        width = 2560;
-        height = 1440;
+      spectrum = { config, ... }: {
+        imports = [ defaults.spectrum ];
         x = 0;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
       dell = { config, ... }: {
-        output = "HDMI-0";
-        xserver.sectionName = "Monitor[0]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        primary = true;
-        width = 3840;
-        height = 2160;
-        x = benq.x + benq.viewport.width;
+        imports = [ defaults.dell ];
+        x = spectrum.x + spectrum.viewport.width;
         y = lg.viewport.height - config.viewport.height;
       };
       lg = { config, ... }: {
-        output = "DP-2";
-        xserver.sectionName = "Monitor[2]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        rotation = "right";
-        width = 3840;
-        height = 2160;
+        imports = [ defaults.lg ];
         x = dell.x + dell.viewport.width;
         y = 0;
       };
     };
     gaming = monitors: with monitors; {
-      # linear but with benq in the middle
-      benq = { config, ... }: {
-        output = "DP-0";
-        xserver.sectionName = "Monitor[1]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        width = 2560;
-        height = 1440;
+      # linear but with spectrum in the middle
+      spectrum = { config, ... }: {
+        imports = [ defaults.spectrum ];
         x = dell.x + dell.viewport.width;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
       dell = { config, ... }: {
-        output = "HDMI-0";
-        xserver.sectionName = "Monitor[0]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        primary = true;
-        width = 3840;
-        height = 2160;
+        imports = [ defaults.dell ];
         x = 0;
         y = lg.viewport.height - config.viewport.height;
       };
       lg = { config, ... }: {
-        output = "DP-2";
-        xserver.sectionName = "Monitor[2]";
-        nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
-        rotation = "right";
-        width = 3840;
-        height = 2160;
-        x = benq.x + benq.viewport.width;
+        imports = [ defaults.lg ];
+        x = spectrum.x + spectrum.viewport.width;
         y = 0;
       };
     };
     gaming-vertical = monitors: mkMerge [ (layouts.gaming monitors) {
-      benq.rotation = "right";
+      spectrum.rotation = "right";
     } ];
   };
 in {

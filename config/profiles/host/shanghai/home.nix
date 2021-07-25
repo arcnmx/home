@@ -71,11 +71,11 @@ in {
     xsession.windowManager.i3 = with config.home.nixosConfig.hardware.display.monitors; {
       extraConfig = ''
         workspace 1:1 output ${dell.output}
-        workspace 2:2 output ${benq.output}
+        workspace 2:2 output ${spectrum.output}
         workspace 3:3 output ${lg.output}
 
         workspace 11:F1 output ${dell.output}
-        workspace 12:F2 output ${benq.output}
+        workspace 12:F2 output ${spectrum.output}
       '';
       config = {
         assigns = {
@@ -83,7 +83,7 @@ in {
             { class = "^screenstub$"; instance = "Dell"; }
           ];
           "number 12:F2" = [
-            { class = "^screenstub$"; instance = "BenQ"; }
+            { class = "^screenstub$"; instance = "Spectrum"; }
           ];
         };
       };
