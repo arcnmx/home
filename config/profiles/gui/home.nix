@@ -435,7 +435,7 @@ in {
     };
     programs.firefox = {
       enable = true;
-      packageUnwrapped = pkgs.firefox-unwrapped;
+      packageUnwrapped = pkgs.firefox-bin-unwrapped;
       wrapperConfig = {
         extraPolicies = {
           DisableAppUpdate = true;
