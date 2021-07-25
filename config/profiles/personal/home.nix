@@ -237,6 +237,13 @@ in {
         PartOf = [ "mpd.service" ];
       };
     };
+    programs.zsh = {
+      dirHashes = {
+        gen = "${config.xdg.userDirs.documents}/gensokyo";
+        fork = "${config.xdg.userDirs.documents}/fork";
+        nix = "${config.xdg.userDirs.documents}/nix";
+      };
+    };
     programs.buku = {
       enable = true;
       bookmarks = {

@@ -105,6 +105,10 @@ bindkey -M vicmd "b" backward-word-normal
 bindkey -M viopp "e" forward-end-viopp-word-normal
 bindkey -M viopp "E" forward-end-viopp-word-parameter
 
+bindkey "^_" fzf-history-widget # Ctrl+/
+bindkey "^P" fzf-file-widget
+bindkey "^Z" fzf-cd-widget
+
 zstyle ':zle:*-viopp-*' virangeflag 1
 zstyle ':zle:*-word-parameter' word-style shell
 

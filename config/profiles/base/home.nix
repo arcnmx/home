@@ -128,8 +128,6 @@ in {
 
       rxvt-unicode-cvs-unwrapped.terminfo
 
-      fzf fd # for fzf-z zsh plugin
-
       (if config.home.profiles.gui
         then clip.override { enableWayland = false; } # TODO: check config for wayland somehow?
         else clip.override { enableX11 = false; enableWayland = false; })
@@ -357,39 +355,19 @@ in {
         extended = true;
         expireDuplicatesFirst = true;
       };
+      dirHashes = mapAttrs (_: mkDefault) rec {
+        dl = config.xdg.userDirs.download;
+        music = config.xdg.userDirs.music;
+        share = config.xdg.userDirs.publicShare;
+        docs = config.xdg.userDirs.documents;
+        pro = docs;
+      };
       plugins = [
-        {
-          name = "z";
-          file = "z.sh";
-          src = pkgs.fetchFromGitHub {
-            owner = "rupa";
-            repo = "z";
-            rev = "9d5a3fe0407101e2443499e4b95bca33f7a9a9ca";
-            sha256 = "0aghw6zmd3851xpzgy0jkh25wzs9a255gxlbdr3zw81948qd9wb1";
-          };
-        }
-        {
-          name = "fzf-z";
-          src = pkgs.fetchFromGitHub {
-            owner = "andrewferrier";
-            repo = "fzf-z";
-            rev = "089ba6cacd3876c349cfb6b65dc2c3e68b478fd0";
-            sha256 = "1lvvkz0v4xibq6z3y8lgfkl9ibcx0spr4qzni0n925ar38s20q81";
-          };
-        }
-        {
-          name = "zsh-abduco-completion";
-          src = pkgs.fetchFromGitHub {
-            owner = "arcnmx";
-            repo = "zsh-abduco-completion";
-            rev = "d8df9f1343d33504d43836d02f0022c1b2b21c0b";
-            sha256 = "1n40c2dk7hcpf0vjj6yk0d8lvppsk2jb02wb0zwlq5r72p2pydxf";
-          };
-        }
-        (with pkgs.zsh-syntax-highlighting; {
-          name = "zsh-syntax-highlighting";
+        (with pkgs.zsh-z; {
+          name = pname;
           inherit src;
         })
+        pkgs.zsh-plugins.evil-registers.zshPlugin
       ];
       localVariables = {
         ZSH_HIGHLIGHT_HIGHLIGHTERS = [ "main" "brackets" ];
@@ -402,8 +380,10 @@ in {
         KEYTIMEOUT = 1;
         DEFAULT_USER = "${config.home.username}";
         ZSH_AUTOSUGGEST_USE_ASYNC = 1;
-        _Z_DATA = "${config.xdg.dataHome}/z/data";
-        #_Z_OWNER = "arc";
+        ZSHZ_DATA = "${config.xdg.dataHome}/z/data";
+        ZSHZ_TILDE = 1;
+        ZSHZ_UNCOMMON = 1;
+        ZSHZ_CASE = "smart";
       };
       loginExtra = ''
         ${shellLogin}
@@ -412,6 +392,10 @@ in {
         ${shellInit}
         ${zshInit}
       '';
+    };
+    programs.fzf = {
+      enable = true;
+      enableZshIntegration = true;
     };
 
     programs.kakoune = {
