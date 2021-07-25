@@ -301,6 +301,7 @@ in {
           esac
         '';
       } // shellFunAliases {
+        yes = "no";
         sed = "sd";
         find = "fd";
         grep = "rg";
