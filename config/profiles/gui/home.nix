@@ -67,7 +67,6 @@ in {
       fi
     '';
     home.packages = with pkgs; [
-      imv
       ffmpeg
       youtube-dl
       scrot
@@ -590,6 +589,20 @@ in {
           showdurationnotification = false;
           chatoutputrelativefontsize = config.lib.gui.fontSize 13.0;
         };
+      };
+    };
+    programs.imv = {
+      enable = true;
+      config = {
+        scaling_mode = "shrink";
+      };
+      configContent.binds = {
+        "<Ctrl+0>" = "zoom actual";
+        "<Ctrl+minus>" = "zoom -10";
+        "<Ctrl+equal>" = "zoom 10";
+        "<Ctrl+h>" = "prev";
+        "<Ctrl+l>" = "next";
+        "O" = "overlay";
       };
     };
     services.playerctld.enable = true;
