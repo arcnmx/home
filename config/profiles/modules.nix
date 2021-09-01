@@ -7,6 +7,7 @@
     ./trusted
     ./vfio
     ./laptop
+    hw/cross
     hw/intel
     hw/ryzen
     hw/nvidia

@@ -11,6 +11,7 @@
     home.profiles.vfio = true;
     home.profiles.hw.nvidia = true;
     home.profiles.hw.x570am = true;
+    home.profiles.hw.cross = true;
 
     networking = {
       hostId = "a1184652";
