@@ -11,6 +11,7 @@
       tfModule
       "${toString config.channels.paths.tf}/modules"
     ];
+    shorthandOnlyDefinesConfig = true;
   };
 in {
   imports = [

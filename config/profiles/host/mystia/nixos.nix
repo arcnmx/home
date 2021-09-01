@@ -102,57 +102,6 @@
           } ];
         };
       };
-      dns = {
-        records = with meta.deploy.domains; let
-          domains'' = concatMap (domain: [ (domain.public or null) (domain.vanity or null) ]) (attrValues meta.deploy.domains)
-            ++ [
-              meta.deploy.domains.misc.mystia
-              meta.deploy.domains.prosody.federation meta.deploy.domains.prosody.client
-              meta.deploy.domains.matrix-synapse.federation
-            ];
-          domains' = filter (domain: domain != null) domains'';
-          domains = unique (map (domain: { inherit (domain) tld domain fqdn; }) domains');
-        in mkMerge [ (listToAttrs (map (domain: nameValuePair domain.fqdn {
-          inherit (domain) tld domain;
-          a.address = tf.resources.server.refAttr "ipv4_address";
-        }) domains)) {
-          prosody-server = mkIf config.services.prosody.enable {
-            inherit (prosody.vanity) tld domain;
-            srv = {
-              service = "xmpp-server";
-              proto = "tcp";
-              target = prosody.federation.fqdn;
-              port = prosody.federation.port;
-            };
-          };
-          prosody-client = mkIf config.services.prosody.enable {
-            inherit (prosody.vanity) tld domain;
-            srv = {
-              service = "xmpp-client";
-              proto = "tcp";
-              target = prosody.client.fqdn;
-              port = prosody.client.port;
-            };
-          };
-          prosody-upload = mkIf config.services.prosody.enable {
-            inherit (prosody.upload) tld domain;
-            cname.target = prosody.client.fqdn;
-          };
-          prosody-muc = mkIf config.services.prosody.enable {
-            inherit (prosody.muc) tld domain;
-            cname.target = prosody.client.fqdn;
-          };
-          matrix-synapse = mkIf config.services.matrix-synapse.enable {
-            inherit (matrix-synapse.vanity) tld domain;
-            srv = {
-              service = "matrix";
-              proto = "tcp";
-              target = matrix-synapse.federation.fqdn;
-              port = matrix-synapse.federation.port;
-            };
-          };
-        } ];
-      };
     };
 
     nix.gc = {
@@ -184,12 +133,12 @@
       postgresql.enable = true;
       matrix-synapse = {
         enable = true;
-        bridges = with config.services.matrix-synapse.bridges; {
-          hangouts.enable = true;
-          puppet-discord.enable = true;
-          whatsapp.enable = true;
-          #irc.enable = true;
-        };
+      };
+      matrix-appservices = {
+        mautrix-hangouts.enable = true;
+        mautrix-whatsapp.enable = true;
+        mx-puppet-discord.enable = true;
+        #matrix-appservice-irc.enable = true;
       };
     };
     deploy.mutableState.matrix-synapse.backup.frequency.days = 7; # too massive to do too regularly :<

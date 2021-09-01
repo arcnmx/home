@@ -2,6 +2,7 @@
   cfg = config.deploy.personal;
   inherit (tf) resources;
   inherit (config.deploy.tf.import) common;
+  inherit (config.networking) domains;
   userType = { config, ... }: let
     userConfig = config;
   in {
@@ -25,7 +26,7 @@
         };
         taskwarrior.taskd = {
           # NOTE: not sure why providing the LE CA is necessary here, but the client fails to verify otherwise
-          authorityCertificate = pkgs.writeText "taskd-ca.pem" (common.acme.certs.${meta.deploy.domains.taskserver.public.fqdn}.out.resource.importAttr "issuer_pem");
+          authorityCertificate = pkgs.writeText "taskd-ca.pem" (meta.deploy.targets.cirno.tf.acme.certs.${domains.taskserver.fqdn}.out.resource.importAttr "issuer_pem");
           clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
           clientKey = userConfig.secrets.files.taskserver-client.path;
         };
@@ -103,13 +104,14 @@ in {
             };
           };
         };
+        taskserver_ca_key_ref.enable = true;
         taskserver_client_cert = {
           provider = "tls";
           type = "locally_signed_cert";
           inputs = {
             cert_request_pem = resources.taskserver_client_csr.refAttr "cert_request_pem";
             ca_key_algorithm = common.resources.taskserver_ca_key.importAttr "algorithm";
-            ca_private_key_pem = common.resources.taskserver_ca_key.importAttr "private_key_pem";
+            ca_private_key_pem = resources.taskserver_ca_key_ref.refAttr "content";
             ca_cert_pem = common.resources.taskserver_ca.importAttr "cert_pem";
 
             allowed_uses = [
