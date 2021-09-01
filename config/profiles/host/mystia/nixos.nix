@@ -124,22 +124,6 @@
       udev.extraRules = ''
         SUBSYSTEM=="misc", DEVNAME="/dev/loop-control", TAG+="systemd"
       '';
-      #gitolite.enable = true;
-      #bitlbee.enable = true;
-      prosody.enable = true;
-      taskserver.enable = true;
-      vaultwarden.enable = true;
-      nginx.enable = true;
-      postgresql.enable = true;
-      matrix-synapse = {
-        enable = true;
-      };
-      matrix-appservices = {
-        mautrix-hangouts.enable = true;
-        mautrix-whatsapp.enable = true;
-        mx-puppet-discord.enable = true;
-        #matrix-appservice-irc.enable = true;
-      };
     };
     deploy.mutableState.matrix-synapse.backup.frequency.days = 7; # too massive to do too regularly :<
     systemd.services.matrix-synapse.environment = {
