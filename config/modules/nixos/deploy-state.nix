@@ -41,12 +41,6 @@
         default = false;
         description = "Set if the service may be deployed to multiple machines in a network";
       };
-      backup = {
-        frequency.days = mkOption {
-          type = types.int;
-          default = 3;
-        };
-      };
       name = mkOption {
         type = types.str;
         default = name;
@@ -77,8 +71,8 @@
     };
     config = {
       serviceNames = mkIf (config'.systemd.services ? ${name}) [ name ];
-      owner = mkIf (config'.users ? ${name}) (mkDefault name);
-      group = mkIf (config'.groups ? ${name}) (mkDefault name);
+      owner = mkIf (config'.users.users ? ${name}) (mkDefault name);
+      group = mkIf (config'.users.groups ? ${name}) (mkDefault name);
     };
   });
 in {
@@ -102,11 +96,12 @@ in {
         databases.postgresql = mkIf (config.services.matrix-synapse.database_type == "psycopg2" && config.services.postgresql.enable) [ "matrix-synapse" ];
         paths = singleton config.services.matrix-synapse.dataDir;
       };
-      bitwarden_rs = {
+      vaultwarden = {
         enable = mkDefault config.services.vaultwarden.enable;
-        databases.postgresql = mkIf (config.services.vaultwarden.dbBackend == "postgresql" && config.services.postgresql.enable) [ "bitwarden_rs" ];
+        name = mkDefault "vaultwarden";
+        databases.postgresql = mkIf (config.services.vaultwarden.dbBackend == "postgresql" && config.services.postgresql.enable) [ "vaultwarden" ];
         paths = singleton {
-          path = config.services.vaultwarden.config.dataFolder; # TODO: module doesn't expose this anymore???
+          path = config.services.vaultwarden.config.dataFolder or "/var/lib/bitwarden_rs";
           exclude = [
             "icon_cache"
           ];

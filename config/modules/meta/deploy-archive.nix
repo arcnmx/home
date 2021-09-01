@@ -6,11 +6,13 @@
   borg = "${repo.package}/bin/borg";
   borgArgs = [
     "--warning"
-    "--ignore-inode"
-    "--files-cache=mtime,size" "-p" "-s"
-    "-C" "lzma"
     "-e" "tmp.*"
   ];
+  borgArgsBackup = borgArgs ++ [
+    "--files-cache=mtime,size" "-p" "-s"
+    "-C" "lzma"
+  ];
+  borgArgsRestore = borgArgs;
   exportPassphrase = passphraseShellCommand: optionalString (passphraseShellCommand != null)
     ''BORG_PASSPHRASE="''${BORG_PASSPHRASE-$(${passphraseShellCommand})}"'' + "\nexport BORG_PASSPHRASE";
   archiveNameFor = state: path:
@@ -46,42 +48,80 @@
     ${sshFor target} true # check connectivity
 
     ${exportPassphrase repo.passphraseShellCommand}
-    BORG_ARGS=(${escapeShellArgs borgArgs})
 
-    MOUNT_DIR=$(mktemp -d)
+    # a stable path is important for the borg file cache to work
+    MOUNT_DIR="''${TMPDIR-/tmp}/archive-${state.name}.mount"
+
+    if [[ -d $MOUNT_DIR ]]; then
+      rmdir "$MOUNT_DIR"
+    fi
+    mkdir "$MOUNT_DIR"
+
+    restore-readkey() {
+      local STATE_KEY
+      STATE_KEY=$1
+      ${sshFor target} "cat '${system.deploy.stateDirectory}/$STATE_KEY' 2> /dev/null || true"
+    }
+
+    restore-writekey() {
+      local STATE_KEY STATE_VALUE
+      STATE_KEY=$1
+      STATE_VALUE=$2
+      ${sshFor target} "mkdir -p ${system.deploy.stateDirectory} && printf %s '$STATE_VALUE' > '${system.deploy.stateDirectory}/$STATE_KEY'"
+    }
+
+    unmount() {
+      fusermount -u "$MOUNT_DIR"
+    }
     cleanup() {
-      fusermount -u "$MOUNT_DIR" || true
+      unmount || true
       rmdir "$MOUNT_DIR" || true
     }
     trap cleanup EXIT
   '' + optionalString (state.serviceNames != []) ''
-    ${sshFor target} systemctl stop ${escapeShellArgs state.serviceNames}
+    if ${sshFor target} systemctl is-active ${escapeShellArgs state.serviceNames} > /dev/null; then
+      ${sshFor target} systemctl stop ${escapeShellArgs state.serviceNames}
+      STOP_SERVICES=1
+    fi
   '';
   scriptFooter = {
     system
   , target
   , state
   }: optionalString (state.serviceNames != []) ''
-    ${sshFor target} systemctl start ${escapeShellArgs state.serviceNames} || true
+    if [[ -n ''${STOP_SERVICES-} ]]; then
+      ${sshFor target} systemctl start ${escapeShellArgs state.serviceNames} || true
+    fi
   '';
   scriptRestorePath = {
     path
+  , state
   , target
   , borgArchive
-  }: ''
-    BORG_EXCLUDES=(
-      "''${BORG_ARGS[@]}"
-      ${concatMapStringsSep " " (p: "-e ${escapeShellArg p}") (path.exclude ++ path.excludeExtract)}
-    )
-    ${borg} mount -o nonempty,uid=$(id -u) "''${BORG_EXCLUDES[@]}" "${toString repo.repoDir}::${borgArchive}" "$MOUNT_DIR"
+  }: let
+    archiveKey = archiveNameFor state path;
+  in ''
+    RESTORE_KEY=$(restore-readkey "${archiveKey}")
+    if [[ -n $RESTORE_KEY ]]; then
+      echo "skipping restore of ${borgArchive}" >&2
+    else
+      BORG_EXCLUDES=(
+        "''${BORG_ARGS[@]}"
+        ${concatMapStringsSep " " (p: "-e ${escapeShellArg p}") (path.exclude ++ path.excludeExtract)}
+      )
+      ${borg} mount -o nonempty,uid=$(id -u) "''${BORG_EXCLUDES[@]}" "${toString repo.repoDir}::${borgArchive}" "$MOUNT_DIR"
 
-    # wow rsync is bad with globs?
-    ${pkgs.rsync}/bin/rsync --progress -e "${sshFor target}" -rav --usermap=\\\*:${path.owner} --groupmap=\\\*:${path.group} "$MOUNT_DIR/" ":${toString path.path}/"
+      # wow rsync is bad with globs?
+      ${pkgs.rsync}/bin/rsync --progress -e "${sshFor target}" -rav --usermap=\\\*:${path.owner} --groupmap=\\\*:${path.group} "$MOUNT_DIR/" ":${toString path.path}/"
 
-    cleanup
+      restore-writekey "${archiveKey}" "${borgArchive}"
+
+      unmount
+    fi
   '';
   scriptBackupPath = {
     path
+  , state
   , target
   , borgArchive
   }: ''
@@ -95,23 +135,50 @@
 
     (cd "$MOUNT_DIR" && ${borg} create "''${BORG_EXCLUDES[@]}" "${toString repo.repoDir}::${borgArchive}" .)
 
-    cleanup
+    restore-writekey "${archiveNameFor state path}" "${borgArchive}"
+
+    unmount
   '';
   scriptRestoreDatabasePostgresql = {
     dbName
+  , system
+  , state
   , target
   , borgArchive
-  , fileName ? "stdin" # "postgresql.sql" when --stdin-name is supported?
-  }: ''
-    ${borg} extract --stdout "${toString repo.repoDir}::${borgArchive}" ${fileName} | ${sshFor target} -CT sudo -u postgres psql --set ON_ERROR_STOP=on "${dbName}"
+  #, fileName ? "stdin" # "postgresql.sql" when --stdin-name is supported?
+  }: let
+    archiveKey = archiveNameForDatabase "postgresql" state dbName;
+    psql = "${sshFor target} -CT sudo -u postgres psql --set ON_ERROR_STOP=on";
+    ensureUsers = filter (u: u.ensurePermissions ? "DATABASE ${dbName}") system.services.postgresql.ensureUsers;
+  in ''
+    RESTORE_KEY=$(restore-readkey "${archiveKey}")
+    if [[ -n $RESTORE_KEY ]]; then
+      echo "skipping restore of ${borgArchive}" >&2
+    else
+      # ensureDatabases ahead of switch
+      ${psql} -tAc "\"SELECT 1 FROM pg_database WHERE datname = '${dbName}'\"" | grep -q 1 ||
+        ${psql} -tAc "'CREATE DATABASE \"${dbName}\"'" # TODO: some services like matrix need special settings
+      ${concatMapStringsSep "\n" (user: ''
+        ${psql} -tAc "\"SELECT 1 FROM pg_roles WHERE rolname='${user.name}'\"" | grep -q 1 ||
+          ${psql} -tAc "'CREATE USER \"${user.name}\"'"
+        #${psql} -tAc "'GRANT ${user.ensurePermissions."DATABASE ${dbName}"} ON DATABASE \"${dbName}\" TO \"${user.name}\"'"
+      '') ensureUsers}
+
+      ${borg} extract --stdout "${toString repo.repoDir}::${borgArchive}" | ${psql} "${dbName}"
+
+      restore-writekey "${archiveKey}" "${borgArchive}"
+    fi
   '';
   scriptBackupDatabasePostgresql = {
     dbName
+  , state
   , target
   , borgArchive
-  , fileName ? null # "postgresql.sql" when --stdin-name is supported?
+  , fileName ? "postgresql.sql"
   }: ''
     ${sshFor target} -CT sudo -u postgres pg_dump "${dbName}" | ${borg} create "''${BORG_ARGS[@]}" ${optionalString (fileName != null) "--stdin-name ${escapeShellArg fileName}"} "${toString repo.repoDir}::${borgArchive}" -
+
+    restore-writekey "${archiveNameForDatabase "postgresql" state dbName}" "${borgArchive}"
   '';
   restoreScript = {
     system
@@ -119,11 +186,12 @@
   , state
   , borgArchiveFor
   }: ''
+    BORG_ARGS=(${escapeShellArgs borgArgsRestore})
     ${scriptHeader { inherit system target state; }}
   '' + concatMapStringsSep "\n" (path: let
     borgArchive = borgArchiveFor { inherit state path; };
   in if borgArchive == null then "" else scriptRestorePath {
-    inherit path target borgArchive;
+    inherit state path target borgArchive;
   }) state.paths + concatMapStringsSep "\n" (dbName: let
     borgArchive = borgArchiveFor {
       inherit state;
@@ -133,7 +201,7 @@
       };
     };
   in if borgArchive == null then "" else scriptRestoreDatabasePostgresql {
-    inherit dbName target borgArchive;
+    inherit system state dbName target borgArchive;
   }) state.databases.postgresql + ''
     ${scriptFooter { inherit system target state; }}
   '';
@@ -143,14 +211,15 @@
   , state
   , borgArchiveFor
   }: ''
+    BORG_ARGS=(${escapeShellArgs borgArgsBackup})
     ${scriptHeader { inherit system target state; }}
   '' + concatMapStringsSep "\n" (path: let
   in scriptBackupPath {
-    inherit path target;
+    inherit state path target;
     borgArchive = borgArchiveFor { inherit state path; };
   }) state.paths + concatMapStringsSep "\n" (dbName: let
   in scriptBackupDatabasePostgresql {
-    inherit dbName target;
+    inherit state dbName target;
     borgArchive = borgArchiveFor {
       inherit state;
       db = {
@@ -161,11 +230,31 @@
   }) state.databases.postgresql + ''
     ${scriptFooter { inherit system target state; }}
   '';
-  nixosModule = { config, target, ... }: {
+  mutableStateModule = { config, ... }: {
+    options = {
+      backup = {
+        frequency.days = mkOption {
+          type = types.int;
+          default = 3;
+        };
+      };
+      restore = {
+        enable = mkEnableOption "restore on enable" // { default = true; };
+      };
+    };
+  };
+  nixosModule = { name, config, target, tf, ... }: {
+    options.deploy.stateDirectory = mkOption {
+      type = types.path;
+      default = "/var/lib/arc/archive";
+    };
+    options.deploy.mutableState = mkOption {
+      type = types.attrsOf (types.submodule mutableStateModule);
+    };
     config.runners.run = mkMerge (mapAttrsToList (name: state: let
       system = config;
     in {
-      "state-${name}-restore".command = let
+      "state-${state.name}-restore".command = let
         borgArchiveFor = { state, db ? null, path ? null }: let
           dbArchive = latestArchiveForDatabase db.type state db.name;
           archive = latestArchiveFor state path;
@@ -176,7 +265,7 @@
 
         exec ${pkgs.writeShellScript "state-${name}-restore" script} "$@"
       '';
-      "state-${name}-backup".command = let
+      "state-${state.name}-backup".command = let
         borgArchiveFor = { state, db ? null, path ? null }: let
           postfix = "$POSTFIX";
           dbArchive = "${archiveNameForDatabase db.type state db.name}-${postfix}";
@@ -193,6 +282,38 @@
         exec ${pkgs.writeShellScript "state-${name}-backup" script}
       '';
     }) config.deploy.mutableState);
+    config.deploy.tf = mkMerge (mapAttrsToList (k: state: mkIf (state.enable && state.restore.enable) {
+      resources."restore-${state.name}" = {
+        provider = "null";
+        type = "resource";
+        inputs.triggers = removeAttrs (tf.deploy.systems.${name}.triggers.common // tf.deploy.systems.${name}.triggers.copy) [ "system" ];
+        provisioners = [
+          {
+            local-exec = {
+              command = escapeShellArgs config.runners.lazy.run."state-${state.name}-restore".out.runArgs;
+            };
+          }
+        ];
+      };
+      deploy.systems.${name}.triggers.switch = {
+        "restore-${state.name}" = tf.resources."restore-${state.name}".refAttr "id";
+      };
+    }) config.deploy.mutableState);
+    config.system.activationScripts.restore = let
+      enabledState = filterAttrs (_: s: s.enable && s.restore.enable) config.deploy.mutableState;
+      mapPath = path: ''
+        ARCHIVE_RESTORE_PATHS=(${path.path}/*)
+        if [[ $(stat --format '%U' "''${ARCHIVE_RESTORE_PATHS[0]}") != "${path.owner}" ]]; then
+          chown -R "${path.owner}:${path.group}" "${path.path}"
+        fi
+      '';
+      mapState = key: state: ''
+        # ${key} restore archive
+      '' + concatMapStringsSep "\n" mapPath state.paths;
+    in mkIf (enabledState != { }) {
+      text = mkMerge (mapAttrsToList mapState enabledState);
+      deps = [ "users" ];
+    };
   };
   activeStates' = concatMap (node: map (state: {
     inherit node state;
@@ -228,7 +349,7 @@
       };
       provisioners = mkIf state.enable [ {
         local-exec = {
-          command = escapeShellArgs node.runners.lazy.run."state-${state.name}-backup".out.runArgs + " ${tf.lib.tf.terraformSelf "id"}";
+          command = escapeShellArgs (node.runners.lazy.run."state-${state.name}-backup".out.runArgs ++ singleton (tf.lib.tf.terraformSelf "id"));
         };
       } ];
     };
