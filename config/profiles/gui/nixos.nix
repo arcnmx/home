@@ -14,6 +14,8 @@ in
   config = mkIf config.home.profiles.gui {
     # TODO: alsa fallback to pulse mixer (see shanghai /etc/asound.conf)
 
+    nixpkgs.overlays = mkIf false [ (import ./xkb-overlay.nix) ];
+
     xdg.portal = {
       enable = false; # true?
       #gtkUsePortal = true;
@@ -39,10 +41,18 @@ in
         # pkgs.iosevka # fancy monospace font?
       ];
     };
-    services.xserver = {
+    services.xserver = mkMerge [ {
       enable = true;
       exportConfiguration = true;
       displayManager.startx.enable = true;
+      layout = "us";
+      xkbVariant = "altgr-intl";
+      xkbOptions = mkMerge [
+        "terminate:ctrl_alt_bksp"
+        "numpad:microsoft"
+        "numpad:shift3"
+        "ctrl:nocaps"
+      ];
 
       serverLayoutSection = ''
         Option "StandbyTime" "0"
@@ -86,6 +96,12 @@ in
         ''
       ];
       libinput.touchpad.naturalScrolling = true;
+    } (mkIf false {
+      xkbDir = "${pkgs.xkeyboard-config-arc}/share/X11/xkb";
+      xkbModel = "qmk";
+    }) ];
+    environment.sessionVariables = {
+      XKB_CONFIG_ROOT = config.services.xserver.xkbDir;
     };
     systemd.services.display-manager.serviceConfig.OOMScoreAdjust = -500;
     services.udev.extraRules = ''

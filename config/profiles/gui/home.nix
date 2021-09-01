@@ -1086,15 +1086,11 @@ in {
       enable = true;
       profileExtra = ''
         export XDG_CURRENT_DESKTOP=i3
-        ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option numpad:microsoft
-        ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option numpad:shift3
-        ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option ctrl:nocaps
 
         ${pkgs.rxvt-unicode-arc}/bin/urxvtd &
 
         export LESS=''${LESS//F}
       '';
-        #${pkgs.xorg.xrandr}/bin/xrandr > /dev/null 2>&1
     };
     gtk = {
       enable = true;
