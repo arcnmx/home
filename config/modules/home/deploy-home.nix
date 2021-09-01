@@ -2,13 +2,7 @@
   collectFailed = cfg:
     map (x: x.message) (filter (x: !x.assertion) cfg.assertions);
 
-  showWarnings = res:
-    let
-      f = w: x: builtins.trace "[1;31mwarning: ${w}[0m" x;
-    in
-      fold f res res.warnings;
-
-  config' = showWarnings (
+  config' = (
     let
       failed = collectFailed config;
       failedStr = concatStringsSep "\n" (map (x: "- ${x}") failed);
@@ -17,6 +11,7 @@
       then config
       else throw "\nFailed assertions:\n${failedStr}"
   );
+  config'' = showWarnings config'.warnings config';
   cfg = config.deploy;
 in {
   options.deploy = {
@@ -28,7 +23,7 @@ in {
     };
   };
   config.deploy = {
-    config = config';
+    config = config'';
     home = cfg.config.home.activationPackage;
   };
 }
