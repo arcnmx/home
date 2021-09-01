@@ -1,13 +1,9 @@
 { target, meta, config, lib, ... }: with lib; let
   cfg = config.deploy.tf;
-  unmergedValues = types.mkOptionType {
-    name = "unmergedValues";
-    merge = loc: defs: map (def: def.value) defs;
-  };
 in {
   options.deploy.tf = mkOption {
     type = types.submodule {
-      freeformType = types.attrsOf unmergedValues;
+      inherit (unmerged) freeformType;
 
       options = {
         import = mkOption {

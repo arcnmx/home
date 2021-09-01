@@ -79,7 +79,7 @@ in {
               };
             };
             continue.envVar = "TF_NIX_CONTINUE_${replaceStrings [ "-" ] [ "_" ] config.name}";
-          } ++ map (nodeName: mapAttrs (_: mkMerge) meta.network.nodes.${nodeName}.deploy.tf.out.set) config.nodeNames);
+          } ++ map (nodeName: unmerged.mergeAttrs meta.network.nodes.${nodeName}.deploy.tf.out.set) config.nodeNames);
         });
       in mkOption {
         type = types.attrsOf type;
