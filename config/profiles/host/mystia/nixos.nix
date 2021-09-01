@@ -197,5 +197,6 @@
       # default is 0.5; see https://github.com/matrix-org/synapse#help-synapse-is-slow-and-eats-all-my-ramcpu
       SYNAPSE_CACHE_FACTOR = "0.25";
     };
+    system.stateVersion = "19.09";
   };
 }

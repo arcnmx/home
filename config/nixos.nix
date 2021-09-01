@@ -11,7 +11,7 @@ let
     };
   };
 in {
-  system.stateVersion = "19.09"; # this setting seems like a mess
+  system.stateVersion = lib.mkDefault "21.11";
 
   imports = [
     profiles/nixos.nix
