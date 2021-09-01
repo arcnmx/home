@@ -1,27 +1,9 @@
-{ config, pkgs, lib, ... }: let
-  solarized = pkgs.fetchFromGitHub {
-    owner = "solarized";
-    repo = "xresources";
-    rev = "025ceddbddf55f2eb4ab40b05889148aab9699fc";
-    sha256 = "0lxv37gmh38y9d3l8nbnsm1mskcv10g3i83j0kac0a2qmypv1k9f";
-  };
-  solarizedPreprocessed = pkgs.runCommand "solarized" { inherit solarized; inherit (pkgs.stdenv) cc; } ''
-    install -d $out
-    declare -A backgrounds
-    backgrounds[dark]=rgba:0000/22bb/3366/ee00
-    backgrounds[light]=rgba:ffdd/ff66/ee33/ee88
-    for style in light dark; do
-      {
-        $cc/bin/cpp -P -Dbackground=__disable < $solarized/Xresources.$style
-        echo "*background: ''${backgrounds[$style]}"
-      } > $out/Xresources.$style
-    done
-  '';
+{ config, pkgs, lib, ... }: with lib; let
   emxc = "${pkgs.arc.packages.personal.emxc}/bin/emxc";
-  escapeRegex = lib.replaceStrings [ ''\'' "/" " " ] [ ''\\'' ''\\/'' ''\\ '' ];
+  escapeRegex = replaceStrings [ ''\'' "/" " " ] [ ''\\'' ''\\/'' ''\\ '' ];
 in {
   # TODO: set up https://github.com/sos4nt/dynamic-colors
-  xresources = lib.mkIf config.home.profiles.gui {
+  xresources = mkIf config.home.profiles.gui {
     properties = {
       # Stolen from http://www.netswarm.net/misc/urxvt-xtermcompat.txt
       "*URxvt*keysym.Home" = ''\033OH'';
@@ -74,7 +56,10 @@ in {
       "Xft.hintstyle" = "hintfull";
       "Xft.autohint" = config.home.nixosConfig.fonts.fontconfig.hinting.autohint;
       "Xft.lcdfilter" = config.home.nixosConfig.fonts.fontconfig.subpixel.lcdfilter;*/
-    } // (with lib; let
+    } // optionalAttrs config.services.picom.enable {
+      "URxvt.depth" = 32;
+      "URxvt.fading" = 12; # 0 = none out of 100
+    } // (let
       normal = 710;
       bold = 711;
       italic = 712;
@@ -132,12 +117,8 @@ in {
       "URxvt.keysym.C-minus" = commands (fontcommands fontsTamzen 12);
       "URxvt.keysym.C-equal" = commands (fontcommands (fontsTtf monospace) (fontSize 12));
       #"URxvt*background" = "rgba:ffdd/ff66/ee33/ee88"; # light
-      "URxvt*background" = "rgba:0000/22bb/3366/ee00"; # dark
+      #"URxvt*background" = "rgba:0000/22bb/3366/ee00"; # dark
     });
-    #extraConfig = builtins.readFile "${solarized}/Xresources.light";
-    extraConfig = builtins.readFile "${solarized}/Xresources.dark";
   };
-  xdg.configFile."urxvt/themes/solarized_light".source = "${solarizedPreprocessed}/Xresources.light";
-  xdg.configFile."urxvt/themes/solarized_dark".source = "${solarizedPreprocessed}/Xresources.dark";
   xdg.dataFile."urxvt/.keep".text = "";
 }
