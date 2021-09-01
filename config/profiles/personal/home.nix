@@ -190,7 +190,6 @@ in {
 
     home.sessionVariables = {
       TASKRC = "${config.xdg.configHome}/taskrc";
-      SSH_AUTH_SOCK = mkForce "\${SSH_AUTH_SOCK:-$(${pkgs.gnupg}/bin/gpgconf --list-dirs agent-ssh-socket)}"; # allow ssh agent forwarding to override this
     };
     #services.lorri.enable = true;
     services.gpg-agent = {
