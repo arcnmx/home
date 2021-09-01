@@ -1,7 +1,7 @@
 { config, lib, ... }: with lib; let
   cfg = config.programs.ncmpcpp;
 in {
-  config.programs.ncmpcpp = {
+  config.programs.ncmpcpp = mkIf config.home.profiles.personal {
     enable = mkDefault true;
     mpdHost = mkIf config.services.mpd.enable "/run/user/1000/mpd/socket";
     settings = mapAttrs (_: mkDefault) {
