@@ -57,7 +57,7 @@ in {
   users.groups = {
     builders = { };
   };
-  programs.zsh.enable = true; # what does this do exactly?
+  programs.zsh.enable = true;
 
   home.profiles = {
     base = lib.mkDefault true;

@@ -40,6 +40,5 @@
         source = "${pkgs.qemu-vfio or pkgs.qemu}/libexec/qemu-bridge-helper";
       };
     };
-    # TODO: arcnmx/arch-forcefully-remove-bootfb-dkms
   };
 }

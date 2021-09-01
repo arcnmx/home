@@ -15,7 +15,6 @@ in {
       enableGlobalCompInit = false;
     };
     environment = {
-      pathsToLink = ["/share/zsh" "/share/bash-completion"];
       systemPackages = with pkgs; [
         pciutils
         iputils
@@ -59,7 +58,7 @@ in {
       extraOptions = ''
         builders-use-substitutes = true
       '' + lib.optionalString (lib.versionAtLeast builtins.nixVersion "2.4") ''
-        experimental-features = nix-command
+        experimental-features = nix-command flakes
       '';
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
