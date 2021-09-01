@@ -46,7 +46,10 @@ in {
       pkgs.paswitch
       config.home.programs.paswitch.patoggle
     ];
-    services.konawall.tags = ["score:>=200" "width:>=1600" "rating:safe"];
+    services.konawall = {
+      commonTags = [ "width:>=1600" ];
+      tags = [ "score:>=200" "rating:safe" ];
+    };
     home.shell.functions = {
       _paswitch_sinks = ''
         ${pactl} list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
