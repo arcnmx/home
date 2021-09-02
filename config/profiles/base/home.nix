@@ -260,6 +260,28 @@ in {
     };
     base16 = {
       shell.enable = true;
+      vim.template = data: let
+        drv = pkgs.base16-templates.vim.withTemplateData data;
+      in drv.overrideAttrs (old: {
+        src = pkgs.fetchFromGitHub {
+          repo = "base16-vim";
+          owner = "fnune";
+          rev = "52e4ce93a6234d112bc88e1ad25458904ffafe61";
+          sha256 = "10y8z0ycmdjk47dpxf6r2pc85k0y19a29aww99vgnxp31wrkc17h";
+        };
+        patches = old.patches or [ ] ++ [
+          (pkgs.fetchurl {
+            # base16background=none
+            url = "https://github.com/arcnmx/base16-vim/commit/fe16eaaa1de83b649e6867c61494276c1f35c3c3.patch";
+            sha256 = "0xh0s6ajd4d8bjgiykrh6imxknqkj4mk3ly5mpzbahl8mkmxza6w";
+          })
+          (pkgs.fetchurl {
+            # fix unreadable error highlights under cursor
+            url = "https://github.com/arcnmx/base16-vim/commit/807e442d95c57740dd3610c9f9c07c9aae8e0995.patch";
+            sha256 = "0ypz047l0wxj91rldqiiifq9vajq646pydf70lghr08i41ll53rx";
+          })
+        ];
+      });
     };
     home.shell = {
       aliases = shellAliases;
@@ -490,7 +512,6 @@ in {
         "rust-vim"
         "vim-nix"
         "vim-osc52"
-        "base16-vim"
       ];
       settings = {};
       extraConfig = ''
@@ -516,6 +537,8 @@ in {
         imap <C-l> <C-O>:redr!<CR>
 
         set cmdheight=2 updatetime=300 shortmess+=c
+
+        let base16background='none' " activate patch to disable solid backgrounds
       '';
     };
 
