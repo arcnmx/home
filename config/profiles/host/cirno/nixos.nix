@@ -255,9 +255,7 @@ in {
       vaultwarden.enable = true;
       nginx.enable = true;
       postgresql.enable = true;
-      matrix-synapse = {
-        enable = true;
-      };
+      matrix-synapse.enable = true;
       matrix-appservices = {
         mautrix-hangouts.enable = true;
         mx-puppet-discord.enable = true;
