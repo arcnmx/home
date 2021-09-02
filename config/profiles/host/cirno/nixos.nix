@@ -6,10 +6,10 @@
   inherit (config.deploy.tf.import) common;
   inherit (tf.lib.tf) terraformExpr;
   compartment_id = common.resources.oci_homedeploy_compartment.importAttr "id";
-  addr_ipv6 = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "ipv6cidr_block"}", 7)'';
+  addr_ipv6 = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "ipv6cidr_block"}", 9)'';
   addr_ipv6_nix = let
     prefix = head (splitString "/" (common.resources.oci_homedeploy_subnet.importAttr "ipv6cidr_block"));
-  in assert hasSuffix "::" prefix; prefix + "7";
+  in assert hasSuffix "::" prefix; prefix + "9";
   addr_ipv4_private = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "cidr_block"}", 7)'';
 in {
   options.home = {
