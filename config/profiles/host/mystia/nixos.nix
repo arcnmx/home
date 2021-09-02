@@ -125,7 +125,6 @@
         SUBSYSTEM=="misc", DEVNAME="/dev/loop-control", TAG+="systemd"
       '';
     };
-    deploy.mutableState.matrix-synapse.backup.frequency.days = 7; # too massive to do too regularly :<
     systemd.services.matrix-synapse.environment = {
       # default is 0.5; see https://github.com/matrix-org/synapse#help-synapse-is-slow-and-eats-all-my-ramcpu
       SYNAPSE_CACHE_FACTOR = "0.25";

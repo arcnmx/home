@@ -248,7 +248,7 @@
       type = types.path;
       default = "/var/lib/arc/archive";
     };
-    options.deploy.mutableState = mkOption {
+    options.system.mutableState.services = mkOption {
       type = types.attrsOf (types.submodule mutableStateModule);
     };
     config.runners.run = mkMerge (mapAttrsToList (name: state: let
@@ -281,7 +281,7 @@
 
         exec ${pkgs.writeShellScript "state-${name}-backup" script}
       '';
-    }) config.deploy.mutableState);
+    }) config.system.mutableState.services);
     config.deploy.tf = mkMerge (mapAttrsToList (k: state: mkIf (state.enable && state.restore.enable) {
       resources."restore-${state.name}" = {
         provider = "null";
@@ -298,9 +298,9 @@
       deploy.systems.${name}.triggers.switch = {
         "restore-${state.name}" = tf.resources."restore-${state.name}".refAttr "id";
       };
-    }) config.deploy.mutableState);
+    }) config.system.mutableState.services);
     config.system.activationScripts.restore = let
-      enabledState = filterAttrs (_: s: s.enable && s.restore.enable) config.deploy.mutableState;
+      enabledState = filterAttrs (_: s: s.enable && s.restore.enable) config.system.mutableState.services;
       mapPath = path: ''
         ARCHIVE_RESTORE_PATHS=(${path.path}/*)
         if [[ $(stat --format '%U' "''${ARCHIVE_RESTORE_PATHS[0]}") != "${path.owner}" ]]; then
@@ -317,7 +317,7 @@
   };
   activeStates' = concatMap (node: map (state: {
     inherit node state;
-  }) (filter (s: s.enable) (attrValues node.deploy.mutableState))) (attrValues config.network.nodes);
+  }) (filter (s: s.enable) (attrValues node.system.mutableState.services))) (attrValues config.network.nodes);
   activeStates = activeStates' ++ map (name: {
     state = {
       inherit name;

@@ -71,7 +71,7 @@ in {
       requires = [ "postgresql.service" ];
       after = [ "postgresql.service" ];
     };
-    deploy.mutableState.vaultwarden = {
+    system.mutableState.services.vaultwarden = {
       name = "bitwarden_rs";
       owner = "bitwarden_rs";
       databases.postgresql = mkIf (config.services.vaultwarden.dbBackend == "postgresql" && config.services.postgresql.enable) (mkForce [ "bitwarden_rs" ]);
