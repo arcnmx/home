@@ -501,17 +501,17 @@ in {
     programs.vim = {
       enable = true;
       packageConfigurable = pkgs.vim_configurable-pynvim;
-      plugins = [
-        "vim-cool"
-        "vim-ledger"
-        "vim-dispatch"
-        "vim-lastplace"
-        "vim-toml"
-        "kotlin-vim"
-        "swift-vim"
-        "rust-vim"
-        "vim-nix"
-        "vim-osc52"
+      plugins = with pkgs.vimPlugins; [
+        vim-cool
+        vim-ledger
+        vim-dispatch
+        vim-lastplace
+        vim-toml
+        kotlin-vim
+        swift-vim
+        rust-vim
+        vim-nix
+        vim-osc52
       ];
       settings = {};
       extraConfig = ''

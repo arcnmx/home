@@ -349,23 +349,23 @@ in {
       search.excludeTags = [ "deleted" "trash" "junk" ];
     };
     programs.vim = {
-      plugins = [
-        "notmuch-vim"
-        "editorconfig-vim"
-        "vim-fugitive"
-        "vim-hexokinase"
-        "coc-nvim"
-        "coc-json"
-        "coc-yaml"
-        #"coc-rls"
-        "coc-rust-analyzer"
-        "coc-git"
-        "coc-yank"
-        "echodoc-vim"
-        #"LanguageClient-neovim"
-        #"deoplete-nvim"
-        "nvim-yarp"
-        "vim-hug-neovim-rpc"
+      plugins = with pkgs.vimPlugins; [
+        notmuch-vim
+        editorconfig-vim
+        vim-fugitive
+        vim-hexokinase
+        coc-nvim
+        coc-json
+        coc-yaml
+        #coc-rls
+        coc-rust-analyzer
+        coc-git
+        coc-yank
+        echodoc-vim
+        #LanguageClient-neovim
+        #deoplete-nvim
+        nvim-yarp
+        vim-hug-neovim-rpc
       ];
       extraConfig = ''
         source ${./files/vimrc-coc}

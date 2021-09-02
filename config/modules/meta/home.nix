@@ -54,7 +54,6 @@
         # TODO: this better
         disabledModules = [
           (/. + "${toString config.channels.paths.home-manager}/modules/programs/git.nix")
-          (/. + "${toString config.channels.paths.home-manager}/modules/programs/vim.nix")
         ];
       })
     ];
