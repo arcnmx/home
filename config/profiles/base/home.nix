@@ -77,6 +77,10 @@ let
     source ${files/zshrc-prompt}
   '';
 in {
+  imports = [
+    ./base16.nix
+  ];
+
   options.home = {
     profiles.base = lib.mkEnableOption "home profile: base";
     mutableHomeDirectory = lib.mkOption {
@@ -254,9 +258,7 @@ in {
         ''''${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}''
       );
     };
-    base16 = (if config.home.nixosConfig != null then {
-      inherit (config.home.nixosConfig.base16) schemes alias;
-    } else import ./base16.nix { inherit config; }) // {
+    base16 = {
       shell.enable = true;
     };
     home.shell = {
@@ -289,9 +291,9 @@ in {
             light|dark)
               export TERM_THEME=$1
               if [[ $TERM_THEME = dark ]]; then
-                source ${config.lib.arc.base16.shellScriptForAlias.dark}
+                ${config.base16.shell.activate.dark}
               else
-                source ${config.lib.arc.base16.shellScriptForAlias.light}
+                ${config.base16.shell.activate.light}
               fi
               ;;
             *)

@@ -1,6 +1,10 @@
 { config, pkgs, lib, ... }:
 let
 in {
+  imports = [
+    ./base16.nix
+  ];
+
   options = {
     home.profiles.base = lib.mkEnableOption "home profile: base";
   };
@@ -64,8 +68,6 @@ in {
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
       package = pkgs.nix-readline;
     };
-
-    base16 = import ./base16.nix { inherit config; };
 
     # TODO: initrd compression
 

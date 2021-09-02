@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: with lib; let
+{ base16, config, pkgs, lib, ... }: with lib; let
   emxc = "${pkgs.arc.packages.personal.emxc}/bin/emxc";
   escapeRegex = replaceStrings [ ''\'' "/" " " ] [ ''\\'' ''\\/'' ''\\ '' ];
 in {
@@ -25,7 +25,6 @@ in {
       "URxvt.perl-ext-common" = "default,matcher,color-themes,osc-52,xresources-256";
       "URxvt.url-launcher" = "${config.programs.firefox.package}/bin/firefox";
       "URxvt.matcher.button" = 3;
-      "URxvt.colorUL" = "#86a2be";
       "URxvt.keysym.M-f" = "perl:matcher:list";
       "URxvt.matcher.pattern.1" = escapeRegex ''[^/]\bwww\.[\w-]+\.[\w./?&@#-]*[\w/-]'';
       "URxvt.matcher.pattern.2" = escapeRegex ''(?<!\[)emxc://[\w/:?=%&._\-]+'';

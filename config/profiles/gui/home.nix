@@ -1,4 +1,4 @@
-{ meta, config, pkgs, lib, ... } @ args: with lib; let
+{ meta, base16, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   mpv = "${config.programs.mpv.finalPackage}/bin/mpv";
   firefoxFiles = let

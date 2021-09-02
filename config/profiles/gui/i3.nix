@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: with lib; {
+{ base16, config, pkgs, lib, ... }: with lib; {
   services.i3gopher.enable = config.xsession.windowManager.i3.enable;
   xsession.windowManager.i3 = let
     run = pkgs.writeShellScriptBin "run" ''
@@ -46,7 +46,7 @@
       map (mapAttrsToList bindsym) workspaceBindings;
     workspaceBindingsStr =
       concatStringsSep "\n" (flatten workspaceBindings');
-    colours = mapAttrs (_: b: "#${b.hex.rgb}") config.lib.arc.base16.schemeForAlias.dark.alias;
+    colours = base16.map.hash.rgb;
     #vm = "${pkgs.arc.vm.exec}";
   in mkIf config.home.profiles.gui {
     enable = true;

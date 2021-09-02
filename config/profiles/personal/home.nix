@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib; let
+{ base16, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   mpc = pkgs.writeShellScriptBin "mpc" ''
     export MPD_HOST=${escapeShellArg config.programs.ncmpcpp.settings.mpd_host}
@@ -422,7 +422,7 @@ in {
           /window 1
         ''
       ];
-      config = with mapAttrs (_: toString) pkgs.base16.shell.shell256; let
+      config = with base16.map.ansiStr; let
         nothighmon.conditions = "\${window.buffer.full_name} != perl.highmon";
         # base16-shell colour names
       in {
@@ -528,13 +528,13 @@ in {
           color = {
             bar_more = base0E;
             chat = base05;
-            chat_bg = base00;
+            chat_bg = "default";
             chat_buffer = base08;
             chat_channel = base08;
             chat_day_change = base03;
             chat_delimiters = base06;
             chat_highlight = base0E;
-            chat_highlight_bg = base00;
+            chat_highlight_bg = "default";
             chat_host = base0A;
             chat_inactive_buffer = base0F;
             chat_inactive_window = base0F;
@@ -542,7 +542,7 @@ in {
             chat_nick_colors = "${base08},${base09},${base0A},${base0B},${base0C},${base0D},${base0E}";
             chat_nick_offline = base0F;
             #chat_nick_offline_highlight = ?
-            chat_nick_offline_highlight_bg = base00;
+            chat_nick_offline_highlight_bg = "default";
             chat_nick_other = base0C;
             chat_nick_prefix = base0A;
             chat_nick_self = base06;
@@ -683,8 +683,7 @@ in {
     };
     programs.taskwarrior = let
       theme = import ./taskwarrior-theme.nix {
-        inherit lib;
-        colours = pkgs.base16.shell.shell256;
+        inherit pkgs lib base16;
       };
     in {
       enable = true;

@@ -1,7 +1,7 @@
-{ lib, colours }: with lib; let
-  colourNames = mapAttrs (_: v: "color${toString v}") colours;
+{ pkgs, lib, base16 }: with lib; let
+  colourNames = base16.map (b: "color${b.ansiStr}");
   # source: https://github.com/Cutuchiqueno/base16-monokai-themes
-in with colourNames; builtins.toFile "taskwarrior-base16-dark.theme" ''
+in with colourNames; pkgs.writeText "taskwarrior-base16-dark.theme" ''
   color=on
   fontunderline=off
 
