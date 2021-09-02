@@ -89,6 +89,8 @@ in {
           locations."/" = {
             return = "307 http://sator.in";
           };
+          # TODO: hacking around duplicate listeners
+          listen = mkForce (mapAttrsToList (_: binding: binding.nginx.out.listen) domains.frontpage.bindings);
         };
       };
     };
