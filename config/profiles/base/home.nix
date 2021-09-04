@@ -565,7 +565,7 @@ in {
         skip_children = true;
         wrap_comments = true;
         hard_tabs = true;
-        tab_spaces = 4;
+        tab_spaces = 2;
         max_width = 120;
         comment_width = 100;
         condense_wildcard_suffixes = true;
@@ -575,6 +575,7 @@ in {
         #match_block_trailing_comma = true;
         overflow_delimited_expr = true;
         merge_imports = true;
+        imports_granularity = "One";
         reorder_impl_items = true;
         newline_style = "Unix";
         normalize_comments = true;
