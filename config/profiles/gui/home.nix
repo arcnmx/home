@@ -67,6 +67,7 @@ in {
       fi
     '';
     home.packages = with pkgs; [
+      config.services.konawall.konashow
       ffmpeg
       youtube-dl
       scrot
