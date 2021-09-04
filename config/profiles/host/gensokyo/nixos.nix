@@ -94,6 +94,7 @@ in {
     };
     networking.domains.frontpage = {
       enable = config.home.profileSettings.gensokyo.frontpage;
+      nginx.extraParameters = [ "reuseport" "deferred" ];
     };
   };
 }
