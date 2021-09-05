@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib;
+{ options, config, pkgs, lib, ... } @ args: with lib;
 let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
@@ -500,7 +500,6 @@ in {
     };
     programs.vim = {
       enable = true;
-      packageConfigurable = pkgs.vim_configurable-pynvim;
       plugins = with pkgs.vimPlugins; [
         vim-cool
         vim-ledger
@@ -540,6 +539,8 @@ in {
 
         let base16background='none' " activate patch to disable solid backgrounds
       '';
+    } // optionalAttrs (options ? programs.vim.packageConfigurable) {
+      packageConfigurable = pkgs.vim_configurable-pynvim;
     };
 
     programs.rustfmt = {

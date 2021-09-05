@@ -51,10 +51,6 @@
           home.username = mkDefault config.home.username;
           home.homeDirectory = mkDefault config.home.homeDirectory;
         };
-        # TODO: this better
-        disabledModules = [
-          (/. + "${toString config.channels.paths.home-manager}/modules/programs/git.nix")
-        ];
       })
     ];
   };
