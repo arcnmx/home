@@ -70,11 +70,14 @@
   };
   config.network = {
     nixos = {
-      extraModules = [
-        "${toString config.channels.paths.home-manager}/nixos"
-        "${toString config.channels.paths.arc}/modules/nixos"
-        "${toString config.channels.paths.tf}/modules/nixos"
-        "${toString config.channels.paths.tf}/modules/run.nix"
+      extraModules = let
+        tf = import (config.channels.paths.tf + "/modules");
+        arc = import (config.channels.paths.arc + "/modules");
+        hm = config.channels.paths.home-manager + "/nixos";
+      in [
+        (toString hm)
+        arc.nixos
+        tf.nixos tf.run
       ];
       specialArgs = {
         inherit (config.network) nodes;
