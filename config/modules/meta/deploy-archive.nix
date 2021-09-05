@@ -277,7 +277,7 @@
       in ''
         set -eu
 
-        export POSTFIX=$1
+        export POSTFIX=''${1-$(date +%Y%m%d%H%M%S)}
 
         exec ${pkgs.writeShellScript "state-${name}-backup" script}
       '';
