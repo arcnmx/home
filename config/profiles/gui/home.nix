@@ -59,6 +59,9 @@ in {
         monstercatfm = ''
           mplay ytdl://http://twitch.tv/monstercat
         '';
+        imv = ''
+          command imv "$@" &
+        '';
       };
     };
     programs.zsh.loginExtra = ''
