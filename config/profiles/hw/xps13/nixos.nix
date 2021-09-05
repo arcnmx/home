@@ -9,6 +9,10 @@ in {
         default = true;
         description = "Lie about the screen's DPI";
       };
+      dpi = mkOption {
+        type = types.int;
+        default = if cfg.lieDpi then 96 else 166;
+      };
       wifi = mkOption {
         type = types.enum [ "7265" "ax210" ];
         default = "7265";
@@ -21,8 +25,6 @@ in {
     home.profiles.hw.intel = true;
     home.profiles.laptop = true;
     home.profiles.personal = true;
-
-    fonts.fontconfig.dpi = if cfg.lieDpi then 96 else 166;
 
     boot = {
       kernelArch = "broadwell";
