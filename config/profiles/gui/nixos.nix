@@ -4,6 +4,7 @@
 
     exec $HOME/.xinitrc
   '';
+  inherit (pkgs.arc.packages.personal) openrazer-dpi;
 in
 {
   options = {
@@ -88,15 +89,9 @@ in
       ];
       libinput.touchpad.naturalScrolling = true;
     };
-    services.udev.extraRules = let
-      openrazerDpi = pkgs.writeShellScript "openrazer-dpi" ''
-        set -xeu
-
-        printf %04x $1 | ${pkgs.xxd}/bin/xxd -r -p > /sys/$DEVPATH/dpi
-      '';
-    in ''
-      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazerDpi} 5900"
-      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazerDpi} 3100"
+    services.udev.extraRules = ''
+      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazer-dpi} 5900"
+      ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazer-dpi} 3100"
     '';
     hardware.openrazer = {
       devicesOffOnScreensaver = false;
@@ -139,6 +134,7 @@ in
         black=
       '';
     };
+    environment.systemPackages = [ openrazer-dpi ];
 
     hardware.pulseaudio = {
       enable = true;

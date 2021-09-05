@@ -59,10 +59,9 @@ in {
     home.packages = with pkgs; [
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
       hub
-      nixos-option
       gnupg
       pass-arc
-      bitwarden-cli arc.packages.personal.pass2bitwarden
+      bitwarden-cli
       weechat-matrix
       playerctl
       awscli2
