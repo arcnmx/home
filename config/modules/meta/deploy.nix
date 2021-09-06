@@ -56,6 +56,10 @@ in {
             };
           };
           config.tf = mkMerge (singleton {
+            deploy.gcroot = {
+              name = mkDefault "${meta.deploy.idTag}-${config.name}";
+              user = mkIf (builtins.getEnv "HOME_USER" != "") (mkDefault (builtins.getEnv "HOME_USER"));
+            };
             terraform = {
               version = "1.0";
               logPath = cfg.dataDir + "/terraform-${config.name}.log";
