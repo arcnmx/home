@@ -513,7 +513,9 @@ in {
         vim-osc52
       ];
       settings = {};
-      extraConfig = ''
+      extraConfig = mkMerge [ (mkBefore ''
+        let base16background='none' " activate patch to disable solid backgrounds
+      '') ''
         source ${./files/vimrc}
 
         " alt-hjkl for moving around word-wrapped lines
@@ -536,9 +538,7 @@ in {
         imap <C-l> <C-O>:redr!<CR>
 
         set cmdheight=2 updatetime=300 shortmess+=c
-
-        let base16background='none' " activate patch to disable solid backgrounds
-      '';
+      '' ];
     } // optionalAttrs (options ? programs.vim.packageConfigurable) {
       packageConfigurable = pkgs.vim_configurable-pynvim;
     };
