@@ -155,6 +155,7 @@ in {
           };
           lifecycle.ignoreChanges = [
             "source_details[0].source_id"
+            "metadata"
           ];
           connection = {
             type = "ssh";
