@@ -203,9 +203,7 @@ in {
       use = "web, web=https://ipv4.nsupdate.info/myip";
     };
     services.physlock.enable = true;
-    security.sudo.extraRules = mkAfter [
-      { commands = [ { command = "ALL"; options = ["NOPASSWD"]; } ]; groups = [ "wheel" ]; }
-    ];
+    security.sudo.wheelNeedsPassword = false;
     systemd.mounts = let
       hugepages = { where, options }: {
         before = ["sysinit.target"];
