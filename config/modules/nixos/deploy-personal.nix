@@ -37,6 +37,15 @@
           '';
         };
       };
+      services = {
+        mpd = mkIf config.home.profiles.trusted {
+          extraConfig = ''
+            password "${resources.mpd_password.refAttr "result"}@read,add,control"
+            password "${resources.mpd_password_admin.refAttr "result"}@read,add,control,admin"
+          '';
+          configPath = userConfig.secrets.files.mpd-config.path;
+        };
+      };
       xdg.configFile."cargo/config" = mkIf config.home.profiles.trusted {
         source = mkOutOfStoreSymlink userConfig.secrets.files.cargo-config.path;
       };
@@ -56,6 +65,9 @@
             [registry]
             token = "${variables.CRATES_TOKEN_ARC.ref}"
           '';
+        };
+        mpd-config = mkIf (config.home.profiles.trusted && userConfig.services.mpd.enable) {
+          text = userConfig.services.mpd.configText;
         };
       } ++ map (ghUser: {
         "github_${ghUser}_ssh_key".text =
@@ -141,6 +153,25 @@ in {
 
             validity_period_hours = 365 * 4 * 24;
             early_renewal_hours = 365 * 24;
+          };
+        };
+
+        mpd_password = {
+          enable = any (u: u.services.mpd.enable) (attrValues config.home-manager.users);
+          provider = "random";
+          type = "password";
+          inputs = {
+            length = 12;
+            special = false;
+          };
+        };
+        mpd_password_admin = {
+          enable = any (u: u.services.mpd.enable) (attrValues config.home-manager.users);
+          provider = "random";
+          type = "password";
+          inputs = {
+            length = 16;
+            special = false;
           };
         };
       } ++ map (ghUser: {
