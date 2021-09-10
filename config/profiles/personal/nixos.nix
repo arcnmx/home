@@ -29,6 +29,8 @@
     ${pkgs.python3.withPackages (p: with p; [ dbus-python /*pygobject3*/ ])}/bin/python ${./files/bluephone.py} "$@"
   '';
 in {
+  imports = [ ./ddclient.nix ];
+
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
   };
@@ -197,10 +199,6 @@ in {
     services.resolved = {
       enable = true;
       dnssec = "false";
-    };
-    services.ddclient = {
-      quiet = true;
-      use = "web, web=https://ipv4.nsupdate.info/myip";
     };
     services.physlock.enable = true;
     security.sudo.wheelNeedsPassword = false;
