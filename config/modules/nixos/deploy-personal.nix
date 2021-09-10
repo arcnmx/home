@@ -1,10 +1,11 @@
 { tf, meta, config, pkgs, lib, ... }: with lib; let
   cfg = config.deploy.personal;
-  inherit (tf) resources;
+  inherit (tf) resources variables;
   inherit (config.deploy.tf.import) common;
   inherit (config.networking) domains;
   userType = { config, ... }: let
     userConfig = config;
+    inherit (config.lib.file) mkOutOfStoreSymlink;
   in {
     options.programs.git.gitHub.users = mkOption {
       type = types.attrsOf (types.submodule ({ name, config, ... }: {
@@ -24,19 +25,38 @@
             IdentityFile ${userConfig.secrets.files.ssh_key.path}
           '';
         };
-        taskwarrior.taskd = {
-          # NOTE: not sure why providing the LE CA is necessary here, but the client fails to verify otherwise
-          authorityCertificate = pkgs.writeText "taskd-ca.pem" (meta.deploy.targets.cirno.tf.acme.certs.${domains.taskserver.fqdn}.out.resource.importAttr "issuer_pem");
-          clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
-          clientKey = userConfig.secrets.files.taskserver-client.path;
+        taskwarrior = {
+          taskd = {
+            # NOTE: not sure why providing the LE CA is necessary here, but the client fails to verify otherwise
+            authorityCertificate = pkgs.writeText "taskd-ca.pem" (meta.deploy.targets.cirno.tf.acme.certs.${domains.taskserver.fqdn}.out.resource.importAttr "issuer_pem");
+            clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
+            clientKey = userConfig.secrets.files.taskserver-client.path;
+          };
+          extraConfig = mkIf config.home.profiles.trusted ''
+            include ${userConfig.secrets.files.taskserver-creds.path}
+          '';
         };
+      };
+      xdg.configFile."cargo/config" = mkIf config.home.profiles.trusted {
+        source = mkOutOfStoreSymlink userConfig.secrets.files.cargo-config.path;
       };
       secrets.files = mkMerge (singleton {
         taskserver-client = mkIf userConfig.programs.taskwarrior.enable {
           text = resources.taskserver_client_key.refAttr "private_key_pem";
         };
+        taskserver-creds = mkIf (config.home.profiles.trusted && userConfig.programs.taskwarrior.enable) {
+          text = ''
+            taskd.credentials=arc/arc/${variables.TASKD_CREDS_ARC.ref}
+          '';
+        };
         iam_ssh_key.text = resources.personal_aws_ssh_key.refAttr "private_key_pem";
         ssh_key.text = resources.personal_ssh_key.refAttr "private_key_pem";
+        cargo-config = mkIf config.home.profiles.trusted {
+          text = ''
+            [registry]
+            token = "${variables.CRATES_TOKEN_ARC.ref}"
+          '';
+        };
       } ++ map (ghUser: {
         "github_${ghUser}_ssh_key".text =
           resources."personal_github_ssh_key_${ghUser}".refAttr "private_key_pem";
@@ -143,6 +163,10 @@ in {
           };
         };
       }) (unique (concatMap (home: attrNames home.programs.git.gitHub.users) (attrValues config.home-manager.users))));
+      variables = mkIf config.home.profiles.trusted {
+        TASKD_CREDS_ARC.bitw.name = "taskd-arc";
+        CRATES_TOKEN_ARC.bitw.name = "crates-arcnmx";
+      };
     };
   };
 }
