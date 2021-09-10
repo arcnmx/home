@@ -2,8 +2,33 @@
   cfg = config.deploy;
   meta = config;
   tfModule = { lib, ... }: with lib; {
+    options = {
+      variables = mkOption {
+        type = types.attrsOf (types.submodule secretModule);
+      };
+    };
     config._module.args = {
       pkgs = mkDefault pkgs;
+    };
+  };
+  secretModule = { config, ... }: {
+    options.bitw = {
+      name = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+      };
+      field = mkOption {
+        type = types.str;
+        default = "notes";
+      };
+      isSecret = mkOption {
+        type = types.bool;
+        default = true;
+      };
+    };
+    config = mkIf (config.bitw.name != null) {
+      sensitive = mkDefault config.bitw.isSecret;
+      value.shellCommand = mkDefault "bitw get tokens/${escapeShellArg config.bitw.name} -f ${escapeShellArg config.bitw.field}";
     };
   };
   tfType = types.submoduleWith {
