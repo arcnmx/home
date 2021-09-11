@@ -91,6 +91,7 @@ in {
               dataDir = cfg.dataDir + "/tfdata/${config.name}";
               environment.TF_CLI_ARGS_apply = "-backup=-";
               environment.TF_CLI_ARGS_taint = "-backup=-";
+              prettyJson = true;
             };
             state = {
               file = cfg.dataDir + "/${config.name}.tfstate";
