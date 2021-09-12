@@ -7,6 +7,10 @@ in {
 
   options = {
     home.profiles.base = lib.mkEnableOption "home profile: base";
+    home.minimalSystem = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
   config = lib.mkIf config.home.profiles.base {
@@ -57,6 +61,11 @@ in {
     powerManagement = {
       cpuFreqGovernor = lib.mkDefault "schedutil";
     };
+    documentation.enable = lib.mkDefault (!config.home.minimalSystem);
+    documentation.info.enable = lib.mkDefault false;
+    documentation.man.enable = lib.mkDefault (!config.home.minimalSystem);
+    programs.command-not-found.enable = lib.mkDefault false;
+    services.udisks2.enable = lib.mkDefault (!config.home.minimalSystem);
 
     nix = {
       distributedBuilds = true;
@@ -67,10 +76,8 @@ in {
       '';
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
-      package = pkgs.nix-readline;
+      package = lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline;
     };
-
-    # TODO: initrd compression
 
     services.openssh = {
       enable = true;

@@ -81,6 +81,7 @@ in {
       rxvt-unicode-arc
       mumble-develop
       libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
+      (clip.override { enableWayland = config.wayland.windowManager.sway.enable; })
     ] ++ optionals config.gtk.enable [
       evince
       gnome3.adwaita-icon-theme

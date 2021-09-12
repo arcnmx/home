@@ -25,12 +25,18 @@
     nodes = let
       nixosModule = { name, config, meta, modulesPath, lib, ... }: with lib; {
         imports = [ ../nixos ];
+        options.nixpkgs = {
+          crossOverlays = mkOption {
+            type = types.listOf types.unspecified;
+            default = [ ];
+          };
+        };
         config = {
           nixpkgs = {
             system = mkDefault pkgs.system;
             pkgs = let
               pkgsReval = import pkgs.path {
-                inherit (config.nixpkgs) config localSystem crossSystem;
+                inherit (config.nixpkgs) config localSystem crossSystem crossOverlays;
                 inherit (meta.channels.config.nixpkgs) overlays;
               };
             in mkDefault (if config.nixpkgs.config == pkgs.config && config.nixpkgs.localSystem.system == pkgs.buildPlatform.system && config.nixpkgs.crossSystem == null then pkgs else pkgsReval);

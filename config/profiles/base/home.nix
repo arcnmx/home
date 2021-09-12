@@ -8,12 +8,6 @@ let
     cp = "cp --reflink=auto --sparse=auto";
     ls = "ls --color=auto";
   }) // {
-    exa = "exa --time-style long-iso";
-    ls = "exa -G";
-    la = "exa -Ga";
-    ll = "exa -l";
-    lla = "exa -lga";
-
     sys = "systemctl";
     log = "journalctl";
 
@@ -21,14 +15,26 @@ let
     grep = "grep --color=auto";
 
     make = "make -j$(cpucount)";
-    tnew = "tmux new -s";
-    tatt = "tmux att -t";
-    tmain = "tatt main";
     open = "xdg-open";
     clear = "clear && printf '\\e[3J'";
     bell = "tput bel";
 
     ${if config.home.mutableHomeDirectory != null then "up" else null} = "${config.home.mutableHomeDirectory}/update";
+  } // optionalAttrs (!config.home.minimalSystem) {
+    exa = "exa --time-style long-iso";
+    ls = "exa -G";
+    la = "exa -Ga";
+    ll = "exa -l";
+    lla = "exa -lga";
+  } // optionalAttrs config.home.minimalSystem {
+    la = "ls -A";
+    ll = "ls -lh";
+    lla = "ls -lhA";
+    grep = "grep --color=auto";
+  } // optionalAttrs config.programs.tmux.enable {
+    tnew = "tmux new -s";
+    tatt = "tmux att -t";
+    tmain = "tatt main";
   };
   shellFunAlias = command: replacement: ''
     if [[ ! -t 0 ]]; then
@@ -83,6 +89,10 @@ in {
 
   options.home = {
     profiles.base = lib.mkEnableOption "home profile: base";
+    minimalSystem = mkOption {
+      type = types.bool;
+      default = false;
+    };
     mutableHomeDirectory = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
@@ -105,39 +115,32 @@ in {
       text = "";
       target = "${config.xdg.cacheHome}/${path}/.keep";
     });
-    home.packages = with pkgs; [
-      nix-readline
-
-      bash # bash-completion
-      zsh zsh-completions
-      mosh-client
-      tmux
+    home.packages = with pkgs; mkMerge [ [
       abduco
-      openssh
-      calc
       socat
-      vimpager-latest
 
-      coreutils
-      file
-      exa fd ripgrep hyperfine hexyl tokei
-
-      wget
       curl
       rsync
 
-      gitAndTools.git-fixup
+      buildPackages.rxvt-unicode-cvs-unwrapped.terminfo
+    ] (mkIf (!config.home.minimalSystem) [
+      file
 
       p7zip
       unzip
       zip
 
-      rxvt-unicode-cvs-unwrapped.terminfo
-
-      (if config.home.profiles.gui
-        then clip.override { enableWayland = false; } # TODO: check config for wayland somehow?
-        else clip.override { enableX11 = false; enableWayland = false; })
-    ] ++ lib.optional (!config.home.profiles.personal) gitMinimal;
+      nix-readline
+      mosh-client
+      calc
+      exa fd ripgrep hyperfine hexyl tokei
+    ]) (mkIf config.programs.git.enable [
+      gitAndTools.git-fixup
+    ]) (mkIf config.programs.vim.enable [
+      vimpager-latest
+    ]) (mkIf (!config.home.profiles.gui) [
+      (clip.override { enableX11 = false; enableWayland = false; })
+    ]) ];
     home.nix.nixPath.ci = {
       type = "url";
       path = "https://github.com/arcnmx/ci/archive/master.tar.gz";
@@ -237,29 +240,25 @@ in {
     home.language = {
       base = "en_US.UTF-8";
     };
-    home.sessionVariables = {
+    home.sessionVariables = mkMerge [ {
       INPUTRC = "${config.xdg.configHome}/inputrc";
 
-      EDITOR = "${config.programs.vim.package}/bin/vim";
-
-      #PAGER = "${pkgs.less}/bin/less";
-      PAGER = "${pkgs.vimpager-latest}/bin/vimpager";
+      PAGER = if config.programs.vim.enable
+        then "${pkgs.vimpager-latest}/bin/vimpager"
+        else"${pkgs.less}/bin/less";
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
       #LC_COLLATE = "C";
 
-      TERMINFO_DIRS = "\${TERMINFO_DIRS:-${config.home.homeDirectory}/.nix-profile/share/terminfo:/usr/share/terminfo}";
+      TERMINFO_DIRS = "\${TERMINFO_DIRS:-${config.home.profileDirectory}/share/terminfo:/usr/share/terminfo}";
 
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       CARGO_TARGET_DIR = "${config.xdg.cacheHome}/cargo/target";
       TIME_STYLE = "long-iso";
-
-      # workaround home-manager bug improperly escaping this
-      TMUX_TMPDIR = lib.mkIf (config.programs.tmux.enable && config.programs.tmux.secureSocket) (lib.mkForce
-        ''''${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}''
-      );
-    };
+    } (mkIf config.programs.vim.enable {
+      EDITOR = "${config.programs.vim.package}/bin/vim";
+    }) ];
     base16 = {
       shell.enable = true;
       vim.template = data: let
@@ -326,14 +325,17 @@ in {
               ;;
           esac
         '';
-      } // shellFunAliases {
+      } // shellFunAliases ({
         yes = "no";
+      } // optionalAttrs config.home.profiles.personal {
+        ncpamixer = "pulsemixer";
+      } // optionalAttrs config.home.profiles.gui {
+        feh = "imv";
+      } // optionalAttrs (!config.home.minimalSystem) {
         sed = "sd";
         find = "fd";
         grep = "rg";
-        feh = "imv";
-        ncpamixer = "pulsemixer";
-      };
+      });
     };
     programs.less = {
       enable = true;
@@ -390,7 +392,7 @@ in {
         docs = config.xdg.userDirs.documents;
         pro = docs;
       };
-      plugins = [
+      plugins = lib.mkIf (!config.home.minimalSystem) [
         (with pkgs.zsh-z; {
           name = pname;
           inherit src;
@@ -422,12 +424,13 @@ in {
       '';
     };
     programs.fzf = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       enableZshIntegration = true;
     };
+    programs.man.enable = !config.home.minimalSystem;
 
     programs.kakoune = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       config = {
         tabStop = 2;
         indentWidth = 0; # default = 4, 0 = tabs
@@ -543,7 +546,14 @@ in {
         set cmdheight=2 updatetime=300 shortmess+=c
       '' ];
     } // optionalAttrs (options ? programs.vim.packageConfigurable) {
-      packageConfigurable = pkgs.vim_configurable-pynvim;
+      # TODO: remove condition if https://github.com/nix-community/home-manager/pull/2307 is merged
+      packageConfigurable = if config.home.minimalSystem
+        then pkgs.vim_configurable.override {
+          guiSupport = "no";
+          luaSupport = false;
+          multibyteSupport = true;
+          ftNixSupport = false;
+        } else pkgs.vim_configurable-pynvim;
     };
 
     programs.rustfmt = {
@@ -579,7 +589,7 @@ in {
     };
 
     programs.git = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       package = if config.home.profiles.personal then pkgs.git else pkgs.gitMinimal;
       aliases = {
         logs = "log --stat --pretty=medium --graph";
@@ -621,7 +631,7 @@ in {
     };
 
     programs.direnv = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       enableFishIntegration = false;
       #config = { };
       #stdlib = "";
