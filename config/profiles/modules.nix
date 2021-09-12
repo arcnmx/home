@@ -21,6 +21,7 @@
     host/flandre
     host/mystia
     host/cirno
+    host/aya
   ];
   homeImports = (builtins.filter builtins.pathExists
     (map (name: name + "/home.nix") importNames)) ++ sharedImports;
