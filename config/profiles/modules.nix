@@ -14,6 +14,7 @@
     hw/x370gpc
     hw/x570am
     hw/xps13
+    hw/pinecube
     host/gensokyo
     host/satorin
     host/shanghai
