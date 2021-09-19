@@ -53,7 +53,7 @@ in {
     };
     services.polybar.settings = {
       "module/fs-root" = {
-        mount = mkAfter [ "/nix" "/mnt/data" ];
+        mount = mkAfter [ "/mnt/enc" "/nix" "/mnt/data" ];
       };
     };
     services.dunst.iconTheme.size = "64x64";
