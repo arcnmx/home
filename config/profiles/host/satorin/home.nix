@@ -6,8 +6,10 @@
   config = mkMerge [
     (mkIf config.home.profiles.host.satorin {
       home.profiles.trusted = true;
+      home.profiles.personal = true;
       home.profiles.gui = true;
       home.profiles.hw.xps13 = true;
+      home.profiles.host.gensokyo = true;
 
       xdg.configFile = {
         "i3status/config".source = ./files/i3status;

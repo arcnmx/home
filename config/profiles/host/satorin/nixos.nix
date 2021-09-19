@@ -5,6 +5,7 @@
 
   config = mkIf config.home.profiles.host.satorin {
     home.profiles.trusted = true;
+    home.profiles.personal = true;
     home.profiles.gui = true;
     home.profiles.hw.xps13 = true;
     home.profiles.host.gensokyo = true;

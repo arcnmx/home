@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib; {
+{ base16, config, pkgs, lib, ... } @ args: with lib; {
   options = {
     home.profiles.laptop = mkEnableOption "a laptop";
   };
