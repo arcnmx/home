@@ -351,7 +351,7 @@ in {
         HISTIGNORE = "[bf]g:exit: *";
         #TIMEFORMAT = ''"$'time\n%lS kernel, %lU userspace\n%lR elapsed (%P%% CPU)'"'';
         TIMEFORMAT = "time\n%lS kernel, %lU userspace\n%lR elapsed (%P%% CPU)";
-        PS1 = ''"'\[\e[0;31m\]\u\[\e[1;39m\]@\[\e[0;31m\]\h \[\e[1;34m\]\w\n\[\e[1;37m\]:; \[\e[0m\]'"'';
+        PS1 = ''"'\e[0;31m\u\e[1;39m@\e[0;31m\h \e[1;34m\w\n\e[1;37m:; \e[0m'"'';
       };
       profileExtra = ''
         ${shellLogin}
