@@ -33,7 +33,7 @@
                 inherit (config.nixpkgs) config localSystem crossSystem;
                 inherit (meta.channels.config.nixpkgs) overlays;
               };
-            in mkDefault (if config.nixpkgs.config == pkgs.config && config.nixpkgs.localSystem.system == pkgs.targetPlatform.system then pkgs else pkgsReval);
+            in mkDefault (if config.nixpkgs.config == pkgs.config && config.nixpkgs.localSystem.system == pkgs.buildPlatform.system && config.nixpkgs.crossSystem == null then pkgs else pkgsReval);
             inherit (meta.channels.config.nixpkgs) config; # TODO: mkDefault?
           };
           nix = {
