@@ -10,7 +10,7 @@
   addr_ipv6_nix = let
     prefix = head (splitString "/" (common.resources.oci_homedeploy_subnet.importAttr "ipv6cidr_block"));
   in assert hasSuffix "::" prefix; prefix + "9";
-  addr_ipv4_private = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "cidr_block"}", 7)'';
+  addr_ipv4_private = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "cidr_block"}", 9)'';
 in {
   options.home = {
     profiles.host.cirno = mkEnableOption "hostname: cirno";
@@ -129,6 +129,7 @@ in {
               ssh_authorized_keys = tf.resources.ssh_home.refAttr "public_key_openssh";
               user_data = tf.resources.cloudinit.refAttr "rendered";
             };
+            display_name = config.networking.hostName;
             shape = "VM.Standard.A1.Flex";
             shape_config = {
               memory_in_gbs = 24; # up to 24GB free
@@ -143,6 +144,7 @@ in {
               {
                 assign_public_ip = true;
                 hostname_label = config.networking.hostName;
+                display_name = config.networking.hostName;
                 inherit freeform_tags;
                 subnet_id = common.resources.oci_homedeploy_subnet.importAttr "id";
                 private_ip = addr_ipv4_private;
@@ -161,7 +163,7 @@ in {
             type = "ssh";
             user = "root";
             host = tf.lib.tf.terraformSelf "public_ip";
-            timeout = "5m";
+            timeout = "10m";
             ssh = {
               privateKey = tf.resources.ssh_home.refAttr "private_key_pem";
               privateKeyFile = tf.resources.ssh_home_file.refAttr "filename";
