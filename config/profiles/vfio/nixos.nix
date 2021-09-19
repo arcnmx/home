@@ -38,6 +38,8 @@
       # TODO: remove this, keep the VM network config entirely within the system nixos config instead?
       qemu-bridge-helper = {
         source = "${pkgs.qemu-vfio or pkgs.qemu}/libexec/qemu-bridge-helper";
+        owner = "root";
+        group = "root";
       };
     };
   };

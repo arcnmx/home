@@ -5,8 +5,10 @@ in {
 
   config = mkMerge [
     (mkIf cfg.enable {
+      users.groups.nixbld = { };
       users.users.nixbld = {
         isSystemUser = true;
+        group = "nixbld";
         extraGroups = ["builders"];
         useDefaultShell = true;
         openssh.authorizedKeys.keyFiles = [
