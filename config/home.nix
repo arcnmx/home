@@ -1,6 +1,12 @@
-{ pkgs, lib, config, ... }: with lib; {
+{ meta, pkgs, lib, config, ... }: with lib; {
   imports = [
     profiles/home.nix
+  ];
+
+  disabledModules = [
+    # h-m pulls in a 200MB package unconditionally..?
+    "config/i18n.nix"
+    (/. + "${toString meta.channels.paths.home-manager}/modules/config/i18n.nix")
   ];
 
   config = {

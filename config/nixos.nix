@@ -27,6 +27,7 @@ in {
   home-manager = {
     useUserPackages = true;
     useGlobalPkgs = true;
+    extraSpecialArgs = config.home.specialArgs;
     users = {
       arc = user;
       root = { lib, ... }: {
