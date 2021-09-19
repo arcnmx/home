@@ -6,6 +6,10 @@ in {
       type = types.unspecified;
       readOnly = true;
     };
+    pkgs = mkOption {
+      type = types.unspecified;
+      readOnly = true;
+    };
     network = let
       networkType = kind: types.submodule ({ config, ... }: {
         options = {
@@ -76,7 +80,8 @@ in {
   };
   config = {
     deploy = {
-      system = config.system.build.toplevel;
+      system = mkOverride modules.defaultPriority config.system.build.toplevel;
+      pkgs = mkOverride modules.defaultPriority pkgs;
       targetName = mkIf (meta.deploy.targets ? ${name}) (mkDefault name);
       tf.deploy = {
         isRoot = meta.deploy.local.isRoot;
