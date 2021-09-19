@@ -28,7 +28,9 @@
         taskwarrior = {
           taskd = {
             # NOTE: not sure why providing the LE CA is necessary here, but the client fails to verify otherwise
-            authorityCertificate = pkgs.writeText "taskd-ca.pem" (meta.deploy.targets.cirno.tf.acme.certs.${domains.taskserver.fqdn}.out.resource.importAttr "issuer_pem");
+            authorityCertificate = mkIf meta.network.nodes.cirno.services.taskserver.enable (
+              pkgs.writeText "taskd-ca.pem" (meta.deploy.targets.cirno.tf.acme.certs.${domains.taskserver.fqdn}.out.resource.importAttr "issuer_pem")
+            );
             clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
             clientKey = userConfig.secrets.files.taskserver-client.path;
           };

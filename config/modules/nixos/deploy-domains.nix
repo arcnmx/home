@@ -14,7 +14,7 @@
     config = {
       enable = mkDefault true;
       secret = {
-        owner = mkIf domain.nginx.enable nixosConfig.services.nginx.user;
+        owner = mkIf (domain.nginx.enable && nixosConfig.services.nginx.enable) nixosConfig.services.nginx.user;
       };
     };
   };
