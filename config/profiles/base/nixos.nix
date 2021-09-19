@@ -44,7 +44,8 @@ in {
       kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
       tmpOnTmpfs = true;
       initrd = {
-        compressor = lib.mkDefault "${pkgs.zstd}/bin/zstd -19";
+        compressor = lib.mkDefault (pkgs: "${pkgs.zstd}/bin/zstd");
+        compressorArgs = lib.mkDefault [ "-19" ];
       };
       modprobe.modules.msr.options = {
         allow_writes = lib.mkDefault "on";
