@@ -19,6 +19,7 @@ in {
   config = mkIf config.home.profiles.host.cirno {
     home.profiles.trusted = true;
     home.profiles.host.gensokyo = true;
+    home.minimalSystem = true;
 
     nixpkgs.localSystem = systems.examples.aarch64-multiplatform // {
       system = "aarch64-linux";
