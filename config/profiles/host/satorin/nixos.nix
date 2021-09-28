@@ -39,6 +39,7 @@
         requestEncryptionCredentials = true;
       };
     };
+    systemd.watchdog.enable = false;
     home.hw.xps13.wifi = "ax210";
     hardware.pulseaudio = {
       loadModule = [
