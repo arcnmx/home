@@ -119,14 +119,19 @@ in {
         lib.mkDefault [ "8.8.8.8" "1.0.0.1" ]
       );
     };
-    systemd.extraConfig = ''
-      DefaultStandardError=journal
-      DefaultTimeoutStartSec=40s
-      DefaultTimeoutStopSec=40s
-      DefaultLimitMEMLOCK=infinity
-      RuntimeWatchdogSec=60s
-      ShutdownWatchdogSec=5min
-    '';
+
+    systemd = {
+      watchdog = {
+        enable = lib.mkDefault true;
+        rebootTimeout = lib.mkDefault "5min";
+      };
+      extraConfig = ''
+        DefaultStandardError=journal
+        DefaultTimeoutStartSec=40s
+        DefaultTimeoutStopSec=40s
+        DefaultLimitMEMLOCK=infinity
+      '';
+    };
     #systemd.services."getty@tty1".wantedBy = ["getty.target"];
     #systemd.targets."getty".wants = ["getty@tty1.service"]; # TODO: how do I use template units???
 
