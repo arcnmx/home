@@ -2,10 +2,9 @@
   windows = pkgs.writeShellScriptBin "windows" ''
     tmux new-session -d -s windows \
       "cd ~/projects/arc.github/vfio; echo vm windows run; $SHELL -i" \; \
-      split-window -h "top -H" \; \
-      split-window -v "watch -t 'cat /proc/cpuinfo|grep MHz'" \; \
+      split-window -h "$SHELL -ic ryzen-watch" \; \
       select-pane -L \; \
-      split-window -dv "watch -t sensors -c /etc/sensors3.conf 'nct6795-*' 'k10temp-pci-*'" \; \
+      split-window -dv "top -H" \; \
       attach
   '';
 in {
