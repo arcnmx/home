@@ -102,7 +102,6 @@ in {
 
     networking = {
       firewall.enable = false;
-      nameservers = mkDefault [ "1.1.1.1" "1.0.0.1" ];
       nftables = {
         enable = true;
         ruleset = mkMerge [

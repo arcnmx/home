@@ -114,6 +114,11 @@ in {
     services.timesyncd.enable = true;
     services.fstrim.enable = true;
 
+    networking = {
+      nameservers = lib.mkIf (!config.networking.useDHCP || config.home.profiles.personal) (
+        lib.mkDefault [ "8.8.8.8" "1.0.0.1" ]
+      );
+    };
     systemd.extraConfig = ''
       DefaultStandardError=journal
       DefaultTimeoutStartSec=40s
