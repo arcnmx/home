@@ -7,6 +7,7 @@
     home.profiles.hw.ryzen = true;
 
     boot = {
+      kernelParams = [ "acpi_enforce_resources=lax" ];
       kernelModules = [ "it87" ];
       extraModulePackages = with config.boot.kernelPackages; [ it87 ];
       initrd.availableKernelModules = [
