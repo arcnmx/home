@@ -97,6 +97,7 @@ in
       devicesOffOnScreensaver = false;
       mouseBatteryNotifier = false;
       #syncEffectsEnabled = false;
+      users = [ "arc" ];
     };
 
     # TODO: gui/usr/lib/firefox overrides
