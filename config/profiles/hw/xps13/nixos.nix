@@ -38,7 +38,7 @@ in {
     # boot.kernelParams = ["i915.enable_psr=1"]; # try for powersaving
     # boot.kernelParams = ["intel_idle.max_cstate=1"]; # try to fix baytrail freeze?
 
-    systemd.network.links.wlan = {
+    systemd.network.links."10-wlan" = mkIf (!config.networking.wireless.iwd.enable) {
       matchConfig = {
         MACAddress = mkMerge [
           (mkIf (config.home.hw.xps13.wifi == "7265") "00:15:00:ec:c6:51")
@@ -47,6 +47,7 @@ in {
       };
       linkConfig = {
         Name = "wlan";
+        NamePolicy = "";
       };
     };
 

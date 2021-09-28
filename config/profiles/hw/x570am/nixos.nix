@@ -54,57 +54,48 @@
     };
     systemd.network = let inherit (config.systemd.network) links; in {
       networks.eno1 = {
-        inherit (links.eth) matchConfig;
+        inherit (links."10-eth") matchConfig;
         bridge = ["br"];
       };
       networks.eno2 = {
-        inherit (links.eth25) matchConfig;
+        inherit (links."10-eth25") matchConfig;
         bridge = ["br"];
       };
       netdevs.br = {
         netdevConfig = {
           Name = "br";
           Kind = "bridge";
-          inherit (links.eth.matchConfig) MACAddress;
+          inherit (links."10-eth".matchConfig) MACAddress;
         };
       };
       links = {
         "10-wlan" = {
-          inherit (links.wlan) matchConfig;
-          linkConfig.NamePolicy = "";
-        };
-        wlan = {
           matchConfig = {
             MACAddress = "a4:b1:c1:d9:14:df";
           };
           linkConfig = {
             Name = "wlan";
+            NamePolicy = "";
           };
         };
         "10-eth" = {
-          inherit (links.eth) matchConfig;
-          linkConfig.NamePolicy = "";
-        };
-        eth = {
           matchConfig = {
             MACAddress = "18:c0:4d:08:87:bd";
             Type = "ether";
           };
           linkConfig = {
             Name = "eth";
+            NamePolicy = "";
           };
         };
         "10-eth25" = {
-          inherit (links.eth25) matchConfig;
-          linkConfig.NamePolicy = "";
-        };
-        eth25 = {
           matchConfig = {
             MACAddress = "18:c0:4d:08:87:bc";
             Type = "ether";
           };
           linkConfig = {
             Name = "eth25";
+            NamePolicy = "";
           };
         };
       };

@@ -88,10 +88,6 @@ in {
 
     systemd.network.links = {
       "10-b2b128" = {
-        inherit (config.systemd.network.links.b2b128) matchConfig;
-        linkConfig.NamePolicy = "";
-      };
-      b2b128 = {
         matchConfig = {
           MACAddress = "00:50:b6:14:85:e0";
         };
@@ -99,6 +95,7 @@ in {
         linkConfig = {
           Description = "Belkin B2B128 USB Ethernet";
           Name = "ethb2b";
+          NamePolicy = "";
         };
       };
     };
