@@ -124,15 +124,5 @@ in {
         demuxer-max-back-bytes = "250MiB";
       };
     };
-
-    systemd.user.services.getquote = {
-      Unit = {
-        Description = "getquote";
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${config.home.homeDirectory}/projects/gensokyo/ledger/update_prices";
-      };
-    };
   }) ];
 }
