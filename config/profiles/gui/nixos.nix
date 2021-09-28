@@ -57,6 +57,12 @@ in
           Option "Ignore" "true"
         '' # this "HD  microphone" thing spams media keys
         ''
+          Identifier "screenstubignore"
+          MatchDevicePath "/dev/input/event*"
+          MatchUSBID "16c0:05df"
+          Option "Ignore" "true"
+        ''
+        ''
           Identifier "Natural Scrolling"
           MatchIsPointer "on"
           Option "VertScrollDelta" "-1"
@@ -65,18 +71,11 @@ in
           Option "NaturalScrolling" "true"
         ''
         ''
-          Identifier "screenstubignore"
-          MatchDevicePath "/dev/input/event*"
-          MatchUSBID "16c0:05df"
-          Option "Ignore" "true"
-        ''
-        ''
           Identifier "nagatrinity"
           MatchIsPointer "on"
           MatchUSBID "1532:0067"
           Option "SampleRate" "1000"
           Option "Resolution" "5900"
-          #Option "Sensitivity" "0.525"
         ''
         ''
           Identifier "naga2014"
@@ -84,7 +83,6 @@ in
           MatchUSBID "1532:0040"
           Option "SampleRate" "1000"
           Option "Resolution" "3100"
-          #Option "Sensitivity" "1.0"
         ''
       ];
       libinput.touchpad.naturalScrolling = true;
