@@ -545,8 +545,6 @@ in {
 
         set cmdheight=2 updatetime=300 shortmess+=c
       '' ];
-    } // optionalAttrs (options ? programs.vim.packageConfigurable) {
-      # TODO: remove condition if https://github.com/nix-community/home-manager/pull/2307 is merged
       packageConfigurable = if config.home.minimalSystem
         then pkgs.vim_configurable.override {
           guiSupport = "no";
