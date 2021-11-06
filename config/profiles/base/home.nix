@@ -145,6 +145,7 @@ in {
       type = "url";
       path = "https://github.com/arcnmx/ci/archive/master.tar.gz";
     };
+    home.keyboard = mkDefault null;
     xdg.enable = true;
     xdg.configFile = {
       "vim/after/indent/rust.vim".text = ''
