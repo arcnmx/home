@@ -146,6 +146,7 @@ in {
         DefaultTimeoutStopSec=40s
         DefaultLimitMEMLOCK=infinity
       '';
+      services.mdmonitor.enable = false;
     };
     #systemd.services."getty@tty1".wantedBy = ["getty.target"];
     #systemd.targets."getty".wants = ["getty@tty1.service"]; # TODO: how do I use template units???
