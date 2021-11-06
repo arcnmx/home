@@ -1,9 +1,6 @@
 { name, meta, tf, pkgs, config, lib, ... }: with lib; let
   inherit (config.networking) enableIPv6;
   cfg = config.services.ddclient;
-  tokenPlaceholder = "@PASSWORD@";
-  replaceSecret = token: replaceStrings [ tokenPlaceholder ] [ token ];
-  confText = config.environment.etc."ddclient.conf".text;
   zoneId = tf.dns.zones.${cfg.zone}.cloudflare.id;
   isCloudflare = cfg.protocol == "cloudflare";
   domainName = domain: "dyndns_" + replaceStrings [ "-" "." ] [ "" "" ] domain;
@@ -70,10 +67,10 @@ in {
         (nameValuePair "dyndns-${domain}-aaaa" (mkIf recordAAAA.enable (recordAAAA.out.resource.refAttr "id")))
       ]) cfg.domains);
     };
-    secrets.files.ddclient-config = mkIf isCloudflare {
-      text = replaceSecret (tf.resources.ddclient-cloudflare-key.refAttr "value") confText;
+    secrets.files.ddclient-secret = mkIf isCloudflare {
+      text = tf.resources.ddclient-cloudflare-key.refAttr "value";
     };
-    services.ddclient = mkMerge [ {
+    services.ddclient = {
       package = pkgs.ddclient-develop;
       quiet = true;
       username = mkIf isCloudflare "token";
@@ -85,11 +82,9 @@ in {
         usev4=webv4, webv4=https://ipv4.nsupdate.info/myip
         max-interval=1d
       '' ];
-    } (mkIf tf.state.enable {
-      configFile = config.secrets.files.ddclient-config.path;
-      password = tokenPlaceholder;
-    }) ];
-    systemd.services.ddclient = {
+      passwordFile = mkIf (isCloudflare && tf.state.enable) config.secrets.files.ddclient-secret.path;
+    };
+    systemd.services.ddclient = mkIf cfg.enable {
       serviceConfig = {
         TimeoutStartSec = 90;
         ExecStart = mkForce "${cfg.package}/bin/ddclient -file /run/ddclient/ddclient.conf";
