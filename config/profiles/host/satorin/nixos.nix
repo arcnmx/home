@@ -39,6 +39,11 @@
         requestEncryptionCredentials = true;
       };
     };
+    nixpkgs.overlays = singleton (self: super: {
+      # enable zfsUnstable on unsupported kernel versions
+      linuxPackagesOverlays = super.linuxPackagesOverlays or [ ]
+      ++ singleton self.kernelPatches.overlays.zfsVersionOverride;
+    });
     systemd.watchdog.enable = false;
     home.hw.xps13.wifi = "ax210";
     hardware.pulseaudio = {
