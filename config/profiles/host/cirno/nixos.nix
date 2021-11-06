@@ -233,6 +233,7 @@ in {
       in listToAttrs (imap0 (i: rule: nameValuePair "firewall${toString i}" rule) rules)) ];
     };
 
+    boot.kernel.customBuild = mkForce false;
     nix.gc = {
       automatic = true;
       options = "-d"; # actually delete old things

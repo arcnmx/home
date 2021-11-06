@@ -265,7 +265,6 @@
     };
 
     boot = {
-      kernelArch = if versionAtLeast config.boot.kernelPackages.stdenv.cc.version "11" then "znver3" else "znver2";
       extraModulePackages = [ config.boot.kernelPackages.v4l2loopback.out ];
       modprobe.modules = {
         vfio-pci = let

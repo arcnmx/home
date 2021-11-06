@@ -7,6 +7,7 @@
     home.profiles.hw.ryzen = true;
 
     boot = {
+      kernel.arch = mkIf (versionAtLeast config.boot.kernelPackages.stdenv.cc.version "11") "znver3";
       kernelParams = [ "acpi_enforce_resources=lax" ];
       kernelModules = [ "it87" ];
       extraModulePackages = with config.boot.kernelPackages; [ it87 ];

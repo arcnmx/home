@@ -46,6 +46,14 @@ in {
 
     boot = {
       kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
+      kernel = {
+        customBuild = lib.mkMerge [
+          (lib.mkDefault config.boot.kernel.bleedingEdge)
+          # actions provides way too little disk space for compiling a kernel
+          (lib.mkIf (builtins.getEnv "CI_PLATFORM" == "gh-actions") (lib.mkForce false))
+        ];
+        arch = lib.mkIf (lib.versionAtLeast config.boot.kernelPackages.kernel.stdenv.cc.version "11.1") "x86-64-v3";
+      };
       tmpOnTmpfs = true;
       initrd = {
         compressor = lib.mkDefault (pkgs: "${pkgs.zstd}/bin/zstd");

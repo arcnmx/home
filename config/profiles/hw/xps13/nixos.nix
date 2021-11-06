@@ -27,8 +27,10 @@ in {
     home.profiles.personal = true;
 
     boot = {
-      kernelArch = "broadwell";
-      kernelPackages = mkIf (config.home.hw.xps13.wifi == "ax210") pkgs.linuxPackages_bleeding;
+      kernel = {
+        arch = "broadwell";
+        bleedingEdge = mkIf (config.home.hw.xps13.wifi == "ax210") true;
+      };
       initrd.availableKernelModules = [
         "xhci_pci" "ehci_pci" "ahci" "sd_mod" "rtsx_pci_sdmmc"
       ];

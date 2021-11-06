@@ -5,8 +5,10 @@
 
   config = mkIf config.home.profiles.hw.ryzen {
     boot = {
-      customKernel = mkDefault true;
-      kernelPackages = pkgs.linuxPackages_bleeding;
+      kernel = {
+        arch = mkDefault "znver2";
+        bleedingEdge = mkDefault true;
+      };
       kernelParams = [ "amd_iommu=on" ];
       kernelModules = [
         "msr" # for zenstates

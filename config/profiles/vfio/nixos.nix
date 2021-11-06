@@ -20,7 +20,7 @@
         };
       };
       extraModulePackages = with config.boot.kernelPackages; [ forcefully-remove-bootfb looking-glass-kvmfr ];
-      kernelPatches = with pkgs.kernelPatches; [
+      kernel.extraPatches = with pkgs.kernelPatches; [
         (mkIf config.hardware.vfio.i915arbiter i915-vga-arbiter)
         (mkIf config.hardware.vfio.acsOverride acs-override)
       ];
