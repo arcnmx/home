@@ -749,6 +749,9 @@ in {
         "searchurls.aur" = "https://aur.archlinux.org/packages/?K=%s";
         "searchurls.yt" = "https://www.youtube.com/results?search_query=%s";
         "searchurls.az" = "https://www.amazon.ca/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=%s";
+        "searchurls.gw2" = "https://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=%s&go=Go&ns0=1";
+        "searchurls.gw2i" = "https://gw2efficiency.com/account/overview?filter.name=%s";
+        "searchurls.gw2c" = "https://gw2efficiency.com/crafting/recipe-search?filter.orderBy=name&filter.search=%s";
 
         putfrom = "selection";
         # set yankto selection
