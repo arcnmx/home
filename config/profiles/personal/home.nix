@@ -58,7 +58,6 @@ in {
     };
     home.packages = with pkgs; [
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
-      hub
       gnupg
       pass-arc
       bitwarden-cli
@@ -242,6 +241,10 @@ in {
         fork = "${config.xdg.userDirs.documents}/fork";
         nix = "${config.xdg.userDirs.documents}/nix";
       };
+    };
+    programs.gh = {
+      enable = true;
+      settings.git_protocol = "ssh";
     };
     programs.buku = {
       enable = true;
