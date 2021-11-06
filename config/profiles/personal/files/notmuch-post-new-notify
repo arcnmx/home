@@ -1,0 +1,122 @@
+# vim: set ft=sh :
+
+export PATH="$PATH:@libnotify@/bin:@jq@/bin:@gnused@/bin:@coreutils@/bin"
+
+# listing icons: fd . $(nix eval --raw nixpkgs.gnome3.adwaita-icon-theme)|sed -e 's/^.*\///'|sed -e 's/\..*$//' |sort|uniq|less
+#NOTIFY_ICON=mail-unread
+NOTIFY_ICON=mail-message-new
+if true; then # depends on theme used?
+	NOTIFY_ICON="$NOTIFY_ICON-symbolic.symbolic"
+fi
+NOTIFY_CATEGORY="email.arrived"
+NOTIFY_TIMEOUT=30
+
+notify-send() {
+	# args: "title" "summary"
+	timeout $NOTIFY_TIMEOUT notify-send "$@"
+}
+
+NEW_QUERY=()
+for tag in "${TAGS_NEW[@]}"; do
+	NEW_QUERY+=("tag:$tag")
+done
+NEW_JQ='.[] | .thread, .timestamp, .date_relative, .matched, .total, .authors, (.subject | sub("\n"; ";")), (.query | join("||")), (.tags | join(" "))'
+
+while read -r em_thread; do
+	read -r em_timestamp
+	read -r em_date
+	read -r em_matched
+	read -r em_total
+	read -r em_authors # "a, b|c, d"
+	read -r em_subject
+	read -r em_query
+	read -r em_tags
+
+	em_authors_="$(printf %s "$em_authors" | sed -e 's/|.*$//')"
+	if [[ -z $em_authors_ ]]; then
+		em_authors_="$(printf %s "$em_authors" | sed -e 's/^.*|//')"
+	fi
+
+	em_author="$(printf %s "$em_authors_" | sed -e 's/,.*$//')"
+	if [[ -z $em_author ]]; then
+		em_author="$em_authors_"
+	fi
+
+	em_tags_filtered=()
+	em_account=
+	em_notif=
+	exclude=
+	for tag in $em_tags; do
+		ignore=
+		for atag in "${TAGS_ACCOUNT[@]}"; do
+			if [[ $tag = $atag ]]; then
+				em_account=$atag
+				ignore=1
+				break
+			fi
+		done
+		for xtag in "${TAGS_NEW[@]}" "${TAGS_NEW_HIDE[@]}"; do
+			if [[ $tag = $xtag ]]; then
+				ignore=1
+				break
+			fi
+		done
+		for xtag in "${TAGS_EXCLUDE[@]}"; do
+			if [[ $tag = $xtag ]]; then
+				exclude=1
+				break
+			fi
+		done
+		if [[ $tag = notif ]]; then
+			em_notif=1
+		elif [[ -z $ignore ]]; then
+			em_tags_filtered+=($tag)
+		fi
+	done
+	if [[ -n $exclude ]]; then
+		continue
+	fi
+
+	NOTIFY_ARGS=()
+
+	title="$em_subject"
+	if [[ -z $title ]]; then
+		title="<empty>"
+	fi
+	summary="from $em_author"
+	if [[ -n $em_account ]]; then
+		summary="$summary to $em_account"
+		NOTIFY_ARGS+=(
+			--hint="string:notmuch_account:$em_account"
+		)
+	fi
+	summary="$summary\non $em_date"
+	summary="$summary [$em_matched/$em_total]"
+	if [[ ${#em_tags_filtered[@]} -ne 0 ]]; then
+		summary="$summary\n(${em_tags_filtered[*]})"
+	fi
+
+	if [[ -n $em_notif ]]; then
+		NOTIFY_ARGS+=(
+			--category=presence.online
+			--icon=star-new-symbolic.symbolic # starred? emblem-urgent?
+			--urgency=critical # reconsider and make a separate tag for this!
+		)
+	else
+		NOTIFY_ARGS+=(
+			--icon="$NOTIFY_ICON" --category="$NOTIFY_CATEGORY"
+		)
+	fi
+	NOTIFY_ARGS+=(
+		--hint="string:notmuch_threadid:$em_thread"
+		--hint="int:notmuch_timestamp:$em_timestamp"
+		--hint="string:notmuch_query:$em_query"
+		--hint="string:notmuch_tags:$em_tags"
+	)
+
+	NOTIFY_ARGS+=(
+		"$title" "$summary"
+	)
+
+	notify-send "${NOTIFY_ARGS[@]}"
+done < <(notmuch search --format=json ${NEW_QUERY[@]} | jq -r "$NEW_JQ")

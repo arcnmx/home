@@ -1,0 +1,45 @@
+# vim: set ft=sh :
+set -eu
+
+NEW_TAG=new
+
+while getopts ":i" opt; do
+	case $opt in
+		i)
+			NEW_TAG=inbox
+			;;
+		*)
+			exit 1
+			;;
+	esac
+done
+shift $((OPTIND-1))
+
+tag() {
+	local OPTIND
+	OPT_UNTAG=-$NEW_TAG
+	while getopts ":n" opt; do
+		case $opt in
+			n)
+				OPT_UNTAG=
+				;;
+			*)
+				return 1
+				;;
+		esac
+	done
+	shift $((OPTIND-1))
+
+	COND="$1"
+	shift
+
+	if [ $# -gt 0 -o -n "$OPT_UNTAG" ]; then
+		echo "$OPT_UNTAG" "$@" -- "tag:$NEW_TAG and ($COND)"
+	fi
+}
+
+ACC_PATH="path:/^[a-zA-Z0-9]+\\"
+PATH_END="\\//"
+acc_path() {
+	echo "$ACC_PATH/$1$PATH_END"
+}

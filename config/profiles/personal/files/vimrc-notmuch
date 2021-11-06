@@ -7,7 +7,7 @@ let g:notmuch_folders = [
 \ ['work', 'tag:work and (tag:flagged or tag:unread) -tag:later'],
 \ ['all work', 'tag:work'],
 \ ['all', 'path:**'],
-\ ['junk', 'tag:junk'],
+\ ['junk', 'tag:junk or tag:spam'],
 \ ['trash', 'tag:trash'],
 \ ]
 let g:notmuch_folders_count_threads=0

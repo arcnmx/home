@@ -40,6 +40,7 @@ in {
     home.profiles.gui = true;
     home.profiles.hw.nvidia = true;
     home.profiles.hw.x570am = true;
+    accounts.email.enableSync = true;
 
     xdg.configFile."i3status/config".source = ./files/i3status;
 

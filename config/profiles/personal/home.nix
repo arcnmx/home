@@ -13,6 +13,7 @@
 in {
   imports = [
     ./ncmpcpp.nix
+    ./email.nix
   ];
   options = {
     home.profiles.personal = lib.mkEnableOption "used as a day-to-day personal system";
@@ -281,77 +282,6 @@ in {
         FILEBIN_S3_BUCKET=$(bitw get tokens/aws-filebin -f s3_bucket_name)
         FILEBIN_BOXCAR_KEY=$(bitw get tokens/boxcar-filebin -f notes)
       '';
-    };
-    services.offlineimap.enable = false; #config.programs.offlineimap.enable;
-    systemd.user.services.offlineimap = mkIf config.services.offlineimap.enable {
-      Service.Nice = "10"; # offlineimap is surprisingly wasteful :(
-    };
-    programs.offlineimap = {
-      extraConfig.general = {
-        maxsyncaccounts = 5;
-        fsync = false;
-      };
-      pythonFile = let
-        foldermapdir = "${config.xdg.dataHome}/offlineimap/folder_map";
-      in ''
-        import os
-        import subprocess
-        import json
-        import re
-
-        def get_pass(service, cmd):
-            return subprocess.check_output(cmd, )
-
-        def load_map(acct):
-            try:
-                with open('${foldermapdir}/%s.json' % acct, 'r') as f:
-                    return json.loads(f.read())
-            except:
-                return {}
-
-        def save_map(acct, data):
-            try:
-                os.makedirs('${foldermapdir}')
-            except:
-                pass
-            with open('${foldermapdir}/%s.json' % acct, 'w') as f:
-                f.write(json.dumps(data))
-
-        def remote_nametrans(acct, foldername, transname):
-            data = load_map(acct)
-            data[transname] = foldername
-            save_map(acct, data)
-            return transname
-
-        def local_nametrans(acct, foldername, transname):
-            data = load_map(acct)
-            try:
-                return data[foldername]
-            except:
-                return transname
-
-        def gmail_nametrans(foldername):
-            return (
-                re.sub('^gmail\.all_mail$', 'archive',
-                re.sub('^gmail\.drafts$', 'drafts',
-                re.sub('^gmail\.sent_mail$', 'sent',
-                re.sub('^gmail\.starred$', 'flagged',
-                re.sub('^gmail\.spam$', 'junk',
-                re.sub('^\[gmail\]\.', 'gmail.',
-                basic_nametrans(foldername)
-            )))))))
-
-        def basic_nametrans(foldername):
-            return (
-                re.sub(' ', '_',
-                re.sub('/', '.',
-                foldername.lower()
-            )))
-      '';
-    };
-    programs.notmuch = {
-      new.tags = [ "new" ];
-      search.excludeTags = [ "deleted" "trash" "junk" ];
     };
     programs.vim = {
       plugins = with pkgs.vimPlugins; [

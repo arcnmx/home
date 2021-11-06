@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -eu
+
+# for testing only
+TAGS_NEW=(flagged)
+TAGS_EXCLUDE=(junk spam trash deleted)
+TAGS_ACCOUNT=(arcnmx)
+TAGS_NEW_HIDE=(flagged)
+
+export PATH="$PATH:$(nix-build --no-out-link '<nixpkgs>' -A libnotify)/bin:$(nix-build --no-out-link '<nixpkgs>' -A jq)/bin"
+
+source $(dirname "$0")/notmuch-post-new-header
+
+source $(dirname "$0")/notmuch-post-new-notify
