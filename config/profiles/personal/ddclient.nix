@@ -5,10 +5,6 @@
   isCloudflare = cfg.protocol == "cloudflare";
   domainName = domain: "dyndns_" + replaceStrings [ "-" "." ] [ "" "" ] domain;
 in {
-  options.services.ddclient.package = mkOption {
-    type = types.package;
-    default = pkgs.ddclient;
-  };
   config = mkIf (config.home.profiles.personal && config.services.ddclient.enable) {
     deploy.tf = {
       dns.records = listToAttrs (concatMap (domain: [
@@ -87,7 +83,6 @@ in {
     systemd.services.ddclient = mkIf cfg.enable {
       serviceConfig = {
         TimeoutStartSec = 90;
-        ExecStart = mkForce "${cfg.package}/bin/ddclient -file /run/ddclient/ddclient.conf";
       };
     };
   };
