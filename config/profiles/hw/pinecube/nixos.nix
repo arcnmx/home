@@ -65,13 +65,6 @@ in {
         customBuild = true;
         bleedingEdge = true;
         extraPatches = [
-          # See: https://lore.kernel.org/patchwork/project/lkml/list/?submitter=22013&order=name
-          { name = "ks8551-fix-build";
-            patch = pkgs.fetchpatch {
-              url = "https://patches.linaro.org/series/97185/mbox/";
-              sha256 = "10vcfch1bfxbf9gdxycmi5gzp9gi9i6fxqqwbbs7ngcprlvy87i9";
-            };
-          }
           { name = "pine64-pinecube";
             patch = ./Pine64-PineCube-support.patch;
           }
