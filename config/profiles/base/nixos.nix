@@ -79,12 +79,17 @@ in {
       distributedBuilds = true;
       extraOptions = ''
         builders-use-substitutes = true
-      '' + lib.optionalString (lib.versionAtLeast builtins.nixVersion "2.4") ''
+      '' + lib.optionalString (lib.versionAtLeast config.nix.package.version "2.4") ''
         experimental-features = nix-command flakes
       '';
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
-      package = lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline;
+      package = let
+        nix = pkgs.nix_2_3;
+      in lib.mkMerge [
+        (lib.mkDefault nix)
+        (lib.mkIf (!config.home.minimalSystem) (pkgs.nix-readline.override { inherit nix; }))
+      ];
     };
 
     services.openssh = {

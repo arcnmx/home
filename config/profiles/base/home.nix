@@ -130,10 +130,11 @@ in {
       unzip
       zip
 
-      nix-readline
       mosh-client
       calc
       exa fd ripgrep hyperfine hexyl tokei
+    ]) (mkIf (!config.home.minimalSystem && ! config.home.nixosConfig ? nix.package) [
+      nix-readline
     ]) (mkIf config.programs.git.enable [
       gitAndTools.git-fixup
     ]) (mkIf config.programs.vim.enable [
