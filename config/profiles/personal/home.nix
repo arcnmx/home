@@ -410,7 +410,7 @@ in {
       ];
     };
     programs.rustfmt = {
-      package = pkgs.rustfmt;
+      package = pkgs.rustfmt-nightly;
     };
     programs.weechat = {
       enable = true;
@@ -914,7 +914,7 @@ in {
         #"rust.crate_blacklist" = ["cocoa","gleam","glium","idna","libc","openssl","rustc_serialize","serde","serde_json","typenum","unicode_normalization","unicode_segmentation","winapi"];
         # rust.sysroot, rust.target, rust.rustflags, rust.unstable_features, rust.build_on_save, rust.target_dir, rust.full_docs
         # rust.clippy_preference = enum [ off opt-in on ]
-        "rust.rustfmt_path" = "${pkgs.rustfmt}/bin/rustfmt";
+        "rust.rustfmt_path" = "${config.programs.rustfmt.package}/bin/rustfmt";
         "rust-analyzer.serverPath" = "rust-analyzer";
         "rust-analyzer.updates.prompt" = false;
         "rust-analyzer.notifications.cargoTomlNotFound" = false;
