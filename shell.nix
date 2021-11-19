@@ -1,8 +1,11 @@
 { }: let
   config = import ./default.nix { };
   inherit (config) pkgs;
+  hostname = pkgs.writeShellScriptBin "hostname" ''
+    exec ${pkgs.inetutils}/bin/hostname "$@"
+  '';
 in pkgs.mkShell {
-  nativeBuildInputs = with pkgs; [ inetutils ] ++ config.runners.lazy.nativeBuildInputs;
+  nativeBuildInputs = with pkgs; [ hostname ] ++ config.runners.lazy.nativeBuildInputs;
 
   HISTFILE = toString (config.deploy.dataDir + "/.history");
 
