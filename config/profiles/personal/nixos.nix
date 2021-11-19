@@ -189,8 +189,10 @@ in {
       permitRootLogin = "yes"; # "prohibit-password"
     };
     services.locate = {
-      enable = true;
-      interval = "05:00";
+      enable = mkDefault true;
+      locate = mkDefault pkgs.mlocate;
+      interval = mkDefault "05:00";
+      localuser = mkDefault null; # for `mlocate`
     };
     services.resolved = {
       enable = true;
