@@ -420,7 +420,7 @@ in {
         packages = [ "weechat-matrix" ];
       };
       scripts = with pkgs.weechatScripts; [
-        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-git weechat-matrix highmon
+        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-develop weechat-matrix highmon weechat-notify-send
         # TODO: add emoji script for :emoj<tab> completion
       ];
       init = mkMerge [
@@ -669,6 +669,13 @@ in {
             fuzzy_search = true;
             sort = "hotlist,number,beginning";
             #auto_jump = true;
+          };
+          var.python.notify_send = {
+            min_notification_delay = 0;
+            max_length = 0;
+            timeout = 0;
+            urgency = "critical";
+            icon = "chat-message-new-symbolic.symbolic";
           };
           var.perl.highmon = {
             output = "buffer";
