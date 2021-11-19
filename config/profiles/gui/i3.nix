@@ -159,6 +159,13 @@
 
         "${mod}+apostrophe" = "exec ${browser}";
 
+        "${mod}+BackSpace" = mkIf config.services.dunst.enable
+          "exec --no-startup-id ${config.services.dunst.package}/bin/dunstctl close";
+        "${mod}+control+BackSpace" = mkIf config.services.dunst.enable
+          "exec --no-startup-id ${config.services.dunst.package}/bin/dunstctl history-pop";
+        "${mod}+shift+BackSpace" = mkIf config.services.dunst.enable
+          "exec --no-startup-id ${config.services.dunst.package}/bin/dunstctl close-all";
+
         "${mod}+shift+r" = "reload";
 
         "XF86AudioLowerVolume" = "exec --no-startup-id ${pactl} set-sink-volume @DEFAULT_SINK@ -5% ${bar-refresh}";

@@ -55,6 +55,7 @@ in {
         mount = mkAfter [ "/nix" "/mnt/data" ];
       };
     };
+    services.dunst.iconTheme.size = "64x64";
     home.shell.functions = {
       _paswitch_sinks = ''
         ${pactl} list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
