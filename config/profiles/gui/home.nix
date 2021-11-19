@@ -415,6 +415,9 @@ in {
       enable = true;
       packageUnwrapped = pkgs.firefox-unwrapped;
       wrapperConfig = {
+        extraPolicies = {
+          DisableAppUpdate = true;
+        };
         extraNativeMessagingHosts = with pkgs; [
           tridactyl-native
         ] ++ optional config.programs.buku.enable bukubrow;
