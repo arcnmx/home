@@ -114,7 +114,7 @@ let
   ];
   zshInit = ''
     zmodload -i zsh/complist
-    zstyle ':completion:*' list-colors ""
+    #zstyle ':completion:*' list-colors ""
     zstyle ':completion:*:*:*:*:*' menu select
     zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
     zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'

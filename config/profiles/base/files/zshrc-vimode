@@ -26,6 +26,8 @@ bindkey -M menuselect "^[" undo
 
 # silence bell when pressing escape too much
 bindkey -M vicmd -s "\e" ''
+bindkey -M vicmd "^[[8~" vi-end-of-line
+bindkey -M vicmd "^[[7~" vi-beginning-of-line
 
 # make W/B/E/dW/dB/dE move over entire shell arguments, customize w/b/e with wordchars
 autoload -U forward-word-match # TODO: acts weirdly when moving between words, like "a/b", 'w' command should move cursor to the "/", not the "b"
