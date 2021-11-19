@@ -40,6 +40,16 @@ in {
     };
   };
   config.deploy = {
+    archive.borg.retiredArchives = [
+      /*"taskserver"
+      #"gitolite"
+      #"bitlbee"
+      "bitwarden_rs" # "bitwarden_rs-postgresql"
+      "matrix-synapse" # "matrix-synapse-postgresql"
+      "prosody" # "prosody-postgresql"
+      "mautrix-googlechat" "mautrix-whatsapp" "mx-puppet-discord"*/
+      "mautrix-hangouts"
+    ];
     targets.common.tf = {
       acme = {
         account = {
