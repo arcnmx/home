@@ -112,7 +112,15 @@ in {
       ];
     };
     home.shell = {
-      aliases.vit = "task vit";
+      aliases = {
+        vit = "task vit";
+        task3s = "task rc.context=3s";
+        taskwork = "task rc.context=work";
+        taskfun = "task rc.context=fun";
+        taskrm = "task rc.confirmation=no delete";
+      } // optionalAttrs (!config.home.minimalSystem && config ? home.nixosConfig.nix.nix24) {
+        nix3 = "${config.home.nixosConfig.nix.nix24.wrapped}/bin/nix";
+      };
       functions = {
         mradio = mkIf config.home.profiles.trusted ''
           mplay http://shanghai:32101
@@ -178,13 +186,6 @@ in {
           ${config.systemd.package}/bin/journalctl --user -fu lorri.service
         '';
       };
-      aliases = {
-        task3s = "task rc.context=3s";
-        taskwork = "task rc.context=work";
-        taskfun = "task rc.context=fun";
-        taskrm = "task rc.confirmation=no delete";
-      };
-    };
 
     home.sessionVariables = {
       TASKRC = "${config.xdg.configHome}/taskrc";

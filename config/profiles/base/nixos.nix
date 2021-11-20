@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ tf, config, pkgs, lib, ... }:
 let
 in {
   imports = [
@@ -75,13 +75,19 @@ in {
     programs.command-not-found.enable = lib.mkDefault false;
     services.udisks2.enable = lib.mkDefault (!config.home.minimalSystem);
 
+    deploy.tf.variables.github-access = {
+      export = true;
+      bitw.name = "github-public-access";
+    };
+
     nix = {
       distributedBuilds = true;
-      extraOptions = ''
-        builders-use-substitutes = true
-      '' + lib.optionalString (lib.versionAtLeast config.nix.package.version "2.4") ''
-        experimental-features = nix-command flakes
-      '';
+      accessTokens = lib.mkIf tf.state.enable {
+        "github.com" = tf.variables.github-access.get;
+      };
+      buildersUseSubstitutes = true;
+      experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" ]
+        ++ lib.optional (lib.versionOlder config.nix.nix24.package.version "2.5") "ca-derivations";
       binaryCaches = [ "https://arc.cachix.org" ];
       binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
       package = let
@@ -90,6 +96,7 @@ in {
         (lib.mkDefault nix)
         (lib.mkIf (!config.home.minimalSystem) (pkgs.nix-readline.override { inherit nix; }))
       ];
+      nix24.package = lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline;
     };
 
     services.openssh = {
