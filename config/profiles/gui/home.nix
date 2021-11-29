@@ -80,8 +80,13 @@ in {
       };
     };
     programs.zsh.loginExtra = ''
-      if [[ -z "''${TMUX-}" && -z "''${DISPLAY-}" && "''${XDG_VTNR-}" = 1 && $(${pkgs.coreutils}/bin/id -u) != 0 ]]; then
+      if [[ -z "''${TMUX-}" && -z "''${DISPLAY-}" && "''${XDG_VTNR-}" = 1 && $(${pkgs.coreutils}/bin/id -u) != 0 && $- == *i* ]]; then
         ${pkgs.xorg.xinit}/bin/startx
+      fi
+    '';
+    programs.zsh.initExtra = ''
+      if [[ -n ''${ARC_PROMPT_RUN-} ]]; then
+        source ${files/zshrc-run}
       fi
     '';
     home.packages = with pkgs; [

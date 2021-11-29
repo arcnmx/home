@@ -1,4 +1,4 @@
-{ options, config, pkgs, lib, ... } @ args: with lib;
+{ base16, options, config, pkgs, lib, ... } @ args: with lib;
 let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
@@ -79,8 +79,9 @@ let
     ${lib.concatStringsSep "\n" (map (opt: "setopt ${opt}") zshOpts)}
 
     source ${files/zshrc-vimode}
-    source ${files/zshrc-title}
-    source ${files/zshrc-prompt}
+    if [[ $USER = $DEFAULT_USER && -z ''${SSH_CLIENT-} ]]; then
+      ZSH_TAB_TITLE_DEFAULT_DISABLE_PREFIX=true
+    fi
   '';
 in {
   imports = [
@@ -403,6 +404,7 @@ in {
           inherit src;
         })
         pkgs.zsh-plugins.evil-registers.zshPlugin
+        pkgs.zsh-plugins.tab-title.zshPlugin
       ];
       localVariables = {
         ZSH_HIGHLIGHT_HIGHLIGHTERS = [ "main" "brackets" ];
@@ -414,7 +416,9 @@ in {
         PROMPT_EOL_MARK = "";
         KEYTIMEOUT = 1;
         DEFAULT_USER = "${config.home.username}";
+        ZSH_TAB_TITLE_ENABLE_FULL_COMMAND= "true";
         ZSH_AUTOSUGGEST_USE_ASYNC = 1;
+        ZSH_AUTOSUGGEST_MANUAL_REBIND = 1; # otherwise prompts get incredibly slow as $LINENO increases
         ZSHZ_DATA = "${config.xdg.dataHome}/z/data";
         ZSHZ_TILDE = 1;
         ZSHZ_UNCOMMON = 1;
@@ -427,6 +431,126 @@ in {
         ${shellInit}
         ${zshInit}
       '';
+    };
+    programs.starship = with base16.map.ansiStr; let
+      bg = "bg:${background_status}";
+      substitutions = let
+        expand = replaceStrings [ "$HOME" ] [ "~" ];
+        mapDir = name: dir: nameValuePair (expand dir) "~${name}";
+      in mapAttrs' mapDir config.programs.zsh.dirHashes;
+      substitutionsList = mapAttrsToList (name: value: { inherit name value; }) substitutions;
+      orderedSubstitutions = sort (a: b: a.name > b.name) substitutionsList;
+    in {
+      enable = mkDefault (!config.home.minimalSystem);
+      extraConfig = mkMerge (
+        singleton "[directory.substitutions]"
+        ++ map ({ name, value }: ''"${name}" = "${value}"'') orderedSubstitutions
+      );
+      settings = {
+        command_timeout = 200;
+        add_newline = false;
+        format =
+          "[$username$hostname$directory$all$shlvl$jobs$status$cmd_duration$fill$line_break](${bg} fg:${foreground_status})"
+          + "$shell$character";
+        right_format = "$package$battery$time";
+        character = {
+          format = "$symbol; ";
+          success_symbol = ":";
+          error_symbol = "[!](bold fg:${deleted})";
+          vicmd_symbol = " ";
+        };
+        time = {
+          format = "[🕓$time]($style)";
+          style = "bold fg:${deprecated}";
+          disabled = false;
+        };
+        fill = {
+          symbol = " ";
+          style = bg;
+        };
+        cmd_duration = {
+          format = "[~$duration]($style)";
+          style = "${bg} fg:${comment}";
+          show_notifications = true;
+        };
+        directory = {
+          truncation_length = 0;
+          truncate_to_repo = false;
+          truncation_symbol = "…/";
+          style = "${bg} bold fg:${function}";
+        };
+        env_var = { }; # TODO
+        git_branch = {
+          format = "[$symbol$branch]($style) ";
+          style = "${bg} fg:${class}";
+          symbol = "";
+          #only_attached = true;
+        };
+        git_commit = {
+          tag_disabled = false;
+          inherit (config.programs.starship.settings.git_branch) style;
+        };
+        git_state = {
+          # in-progress rebase/etc indicator
+          format = "[:: $state( $progress_current/$progress_total)]($style) ";
+          style = "${bg} bold fg:${deleted}";
+        };
+        git_status = {
+          style = "${bg} fg:${deprecated}";
+          # omit information that causes the prompt to lag severely: https://github.com/starship/starship/pull/3287
+          ahead = "";
+          behind = "";
+          up_to_date = "";
+          diverged = "";
+          ignore_submodules = true;
+          untracked = ""; # I kind of would like to keep this though..?
+        };
+        username = {
+          format = "[$user]($style)@";
+          style_user = "${bg} fg:${constant}";
+          style_root = "${bg} bold fg:${keyword}";
+        };
+        hostname = {
+          format = "[$hostname]($style):";
+          style = "${bg} fg:${class}";
+        };
+        jobs = {
+          style = "${bg} fg:${comment}";
+        };
+        nix_shell = {
+          format = '' [$symbol($name)]($style) '';
+          style = "${bg} fg:${support}";
+          symbol = "#";
+        };
+        shlvl = {
+          disabled = false;
+          style = "${bg} bold fg:${deprecated}";
+          symbol = "›";
+          repeat = true;
+          threshold = 3;
+        };
+        status = {
+          disabled = false;
+          format = "[$symbol$status]($style) ";
+          symbol = "";
+          success_symbol = "";
+          sigint_symbol = "^";
+          map_symbol = true;
+          pipestatus = true;
+          style = "${bg} bold fg:${deleted}";
+        };
+        package = {
+          format = "[$symbol$version]($style) ";
+          style = "bold fg:${class}";
+        };
+      } // mapListToAttrs (k: nameValuePair k { disabled = mkOptionDefault true; }) [
+        # disable most builtin modules I'd never use...
+        "aws" "battery" "docker_context" "gcloud" "kubernetes" "openstack" "pulumi" "singularity" "terraform" "vagrant" "vcsh"
+        # useless modules that just show version numbers...
+        "golang" "helm" "java" "julia" "cmake" "cobol" "conda" "crystal" "dart" "deno" "dotnet" "elixir" "elm" "erlang" "kotlin" "lua" "nim" "nodejs" "ocaml" "perl" "php" "purescript" "python" "rlang" "red" "ruby" "rust" "scala" "swift" "vlang" "zig"
+        # sorry mercurial
+        "hg_branch"
+      ];
     };
     programs.fzf = {
       enable = !config.home.minimalSystem;

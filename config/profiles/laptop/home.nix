@@ -25,6 +25,26 @@
       '';
     };
 
+    programs.starship.settings.battery = with base16.map.ansiStr; {
+      disabled = false;
+      # https://starship.rs/config/#battery
+      # TODO: colour percentage based on charge status
+      # use fg:${inserted} when charging, fg:${constant} when discharging (to be consistent with polybar
+      display = [
+        {
+          threshold = 100;
+          style = "fg:${inserted}";
+        }
+        {
+          threshold = 90;
+          style = "fg:${constant}";
+        }
+        {
+          threshold = 20;
+          style = "bold fg:${deleted}";
+        }
+      ];
+    };
     services.polybar = {
       config = {
         "bar/base" = {
