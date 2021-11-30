@@ -1,0 +1,36 @@
+set encoding=utf-8
+scriptencoding utf-8
+
+runtime! plugin/sensible.vim
+
+set undodir=$XDG_DATA_HOME/vim/undo
+set directory=$XDG_DATA_HOME/vim/swap//
+set backupdir=$XDG_DATA_HOME/vim/backup
+set runtimepath+=$XDG_CONFIG_HOME/vim/after
+
+set timeoutlen=100
+set ttimeoutlen=1000
+
+nnoremap <esc><esc> :silent! nohls<cr>
+
+"set background=light " dark or light
+set background=dark " dark or light
+
+" https://shapeshed.com/vim-netrw/
+let g:netrw_home='$XDG_DATA_HOME/vim/netrw'
+let g:netrw_banner=0
+let g:netrw_liststyle=3
+let g:netrw_browse_split=4
+let g:netrw_winsize=25
+let g:netrw_altv=1
+
+" see https://github.com/vim/vim/issues/4365, no support for urxvt rgba: colours, nor T_CRC
+if $TERM ==# 'rxvt-unicode-256color'
+  set t_RC= t_RB=
+endif
+
+" Avoid E173
+if argc() > 1
+  silent blast " load last buffer
+  silent bfirst " switch back to the first
+endif

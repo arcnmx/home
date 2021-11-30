@@ -10,6 +10,64 @@
       ${mpc}/bin/mpc play $(($(${mpc}/bin/mpc playlist | wc -l) - COUNT + 1))
   '';
   cfg = config.home.profileSettings.personal;
+  vimNotmuchSettings = ''
+    source ${./files/vimrc-notmuch}
+    let g:notmuch_config_file='${config.home.sessionVariables.NOTMUCH_CONFIG}'
+    let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
+    let g:notmuch_attachment_dir='${config.xdg.userDirs.absolute.download}'
+    let g:notmuch_view_attachment='xdg-open'
+    let g:notmuch_sendmail_method='sendmail'
+    let g:notmuch_sendmail_location='${pkgs.msmtp}/bin/msmtp'
+    let g:notmuch_open_uri='firefox'
+  '';
+  vimCocSettings = ''
+    source ${./files/vimrc-coc}
+    let g:coc_node_path='${pkgs.nodejs}/bin/node'
+  '';
+  vimSettings = ''
+    let g:Hexokinase_ftDisabled = ['notmuch-search']
+    let g:Hexokinase_ftEnabled = ['html', 'css'] " TODO: not worth configuring properly right now
+    let g:echodoc#enable_at_startup=1
+    set statusline^=%{FugitiveStatusline()}
+  '' + optionalString (!config.home.minimalSystem) ''
+    function M2A()
+      :%!${pkgs.pandoc}/bin/pandoc --columns=120 --wrap=preserve -f gfm+hard_line_breaks -t asciidoctor
+      :set ft=asciidoc
+    endfunction
+    function A2M()
+      " workaround for https://github.com/jgm/pandoc/issues/8011
+      :%!${pkgs.asciidoctor}/bin/asciidoctor -b docbook5 - | sed -e 's/10063;/9744;/' -e 's/10003;/9746;/g' | ${pkgs.pandoc}/bin/pandoc --columns=120 --wrap=none -f docbook -t gfm+hard_line_breaks | sed -e 's/^-   /- /'
+      :set ft=markdown
+    endfunction
+    command M2A call M2A()
+    command A2M call A2M()
+  '';
+  vimPlugins = with pkgs.vimPlugins; [
+    notmuch-vim
+    editorconfig-vim
+    vim-easymotion
+    vim-fugitive
+    vim-hexokinase
+    jsonc-vim
+    echodoc-vim
+  ];
+  vimCocPlugins = with pkgs.vimPlugins; [
+    coc-json
+    coc-yaml
+    coc-rust-analyzer
+    coc-git
+    coc-yank
+    coc-tsserver
+    coc-lua
+    coc-pyright
+    coc-spell-checker
+    coc-smartf
+    coc-markdownlint
+    coc-cmake
+    coc-html coc-css
+    coc-explorer
+    coc-lists
+  ];
 in {
   imports = [
     ./ncmpcpp.nix
@@ -177,7 +235,7 @@ in {
               else
                   task "''${_TASK_OPTIONS[@]}" "$_TASK_REPORT" "$@"
               fi
-          } 2> /dev/null | less -R # ''${PAGER-less} (my current pager sucks at this)
+          } 2> /dev/null | ''${PAGER-less -R}
         '';
       } // optionalAttrs pkgs.hostPlatform.isLinux {
         lorri-status = ''
@@ -287,42 +345,84 @@ in {
       '';
     };
     programs.vim = {
-      plugins = with pkgs.vimPlugins; [
-        notmuch-vim
-        editorconfig-vim
-        vim-fugitive
-        vim-hexokinase
-        coc-nvim
-        coc-json
-        coc-yaml
-        #coc-rls
-        coc-rust-analyzer
-        coc-git
-        coc-yank
-        echodoc-vim
-        #LanguageClient-neovim
-        #deoplete-nvim
-        nvim-yarp
-        vim-hug-neovim-rpc
+      plugins = vimPlugins ++ optionals config.programs.neovim.coc.enable (
+        singleton pkgs.vimPlugins.coc-nvim ++ vimCocPlugins
+      );
+      extraConfig = mkMerge [
+        (mkIf config.programs.notmuch.enable vimNotmuchSettings)
+        (mkIf config.programs.neovim.coc.enable ''
+          ${vimCocSettings}
+          let g:coc_config_home=$XDG_CONFIG_HOME . '/vim/coc'
+        '')
+        vimSettings
       ];
-      extraConfig = ''
-        source ${./files/vimrc-coc}
-        let g:coc_node_path='${pkgs.nodejs}/bin/node'
-        let g:coc_config_home=$XDG_CONFIG_HOME . '/vim/coc'
+    };
+    programs.neovim = {
+      enable = true;
+      plugins = vimPlugins ++ optionals config.programs.neovim.coc.enable vimCocPlugins;
+      extraConfig = mkMerge [
+        (mkIf config.programs.notmuch.enable vimNotmuchSettings)
+        (mkIf config.programs.neovim.coc.enable vimCocSettings)
+        ''
+          ${vimSettings}
 
-        " Completion
-        " let g:deoplete#enable_at_startup=1
-        let g:echodoc#enable_at_startup=0
-
-        source ${./files/vimrc-notmuch}
-        let g:notmuch_config_file='${config.xdg.configHome}/notmuch/notmuchrc'
-        let g:notmuch_html_converter='${pkgs.elinks}/bin/elinks --dump'
-        let g:notmuch_attachment_dir='${config.xdg.userDirs.absolute.download}'
-        let g:notmuch_view_attachment='xdg-open'
-        let g:notmuch_sendmail_method='sendmail'
-        let g:notmuch_sendmail_location='${pkgs.msmtp}/bin/msmtp'
-        let g:notmuch_open_uri='firefox'
-      '';
+          let g:echodoc#type = 'floating'
+        ''
+      ];
+      coc = {
+        enable = mkDefault (!config.home.minimalSystem);
+        settings = {
+          languageserver = {
+            efm = {
+              command = "${pkgs.efm-langserver}/bin/efm-langserver";
+              args = [];
+              filetypes = [ "vim" ];
+            };
+            nix = {
+              command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
+              args = [];
+              filetypes = ["nix"];
+              cwd = "./";
+              initializationOptions = {
+              };
+              settings = {
+              };
+            };
+          };
+          "coc.preferences.extensionUpdateCheck" = "never";
+          "coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman";
+          "suggest.timeout" = 1000;
+          "suggest.maxPreviewWidth" = 120;
+          "suggest.enablePreview" = true;
+          "suggest.echodocSupport" = true;
+          "suggest.minTriggerInputLength" = 2;
+          "suggest.acceptSuggestionOnCommitCharacter" = true;
+          "suggest.snippetIndicator" = "►";
+          "diagnostic.checkCurrentLine" = true;
+          "diagnostic.enableMessage" = "jump";
+          "list.nextKeymap" = "<A-j>";
+          "list.previousKeymap" = "<A-k>";
+          # list.normalMappings, list.insertMappings
+          # coc.preferences.formatOnType, coc.preferences.formatOnSaveFiletypes
+          "npm.binPath" = "${pkgs.coreutils}/bin/false"; # whatever it wants npm for, please just don't
+          "codeLens.enable" = true;
+          "rust-analyzer.server.path" = "rust-analyzer";
+          "rust-analyzer.updates.prompt" = "neverDownload";
+          "rust-analyzer.notifications.cargoTomlNotFound" = false;
+          "rust-analyzer.cargo.runBuildScripts" = true;
+          "rust-analyzer.procMacro.enable" = true;
+          "rust-analyzer.experimental.procAttrMacros" = true;
+          "rust-analyzer.completion.addCallParenthesis" = true; # consider using this?
+          "rust-analyzer.hover.linksInHover" = true;
+          "rust-analyzer.rustfmt.enableRangeFormatting" = true;
+          "rust-analyzer.lens.methodReferences" = true;
+          "rust-analyzer.assist.allowMergingIntoGlobImports" = false;
+          "rust-analyzer.diagnostics.disabled" = [
+            "inactive-code" # it has strange cfg support..?
+          ];
+          # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
+        };
+      };
     };
     programs.kakoune = {
       config.hooks = [
@@ -802,72 +902,8 @@ in {
             lint-formats:
             - '%f:%l:%c: %m'
       '';
-      "vim/coc/coc-settings.json".text = builtins.toJSON {
-        languageserver = {
-          efm = {
-            command = "${pkgs.efm-langserver}/bin/efm-langserver";
-            args = [];
-            filetypes = ["vim" /*"yaml"*/ "markdown"]; # consider coc-yaml instead?
-          };
-          nix = {
-            command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
-            args = [];
-            filetypes = ["nix"];
-            cwd = "./";
-            initializationOptions = {
-            };
-            settings = {
-            };
-          };
-          /*rust = {
-            command = "ra_lsp_server";
-            args = [];
-            filetypes = ["rust"];
-            cwd = "./";
-            initializationOptions = {
-            };
-            settings = {
-            };
-          };*/
-        };
-        "coc.preferences.extensionUpdateCheck" = "never";
-        "coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman";
-        "suggest.timeout" = 1000;
-        "suggest.maxPreviewWidth" = 120;
-        "suggest.enablePreview" = true;
-        "suggest.echodocSupport" = true;
-        "suggest.minTriggerInputLength" = 2;
-        "suggest.acceptSuggestionOnCommitCharacter" = true;
-        "suggest.snippetIndicator" = "►";
-        "diagnostic.checkCurrentLine" = true;
-        "suggest.numberSelect" = true;
-        "list.nextKeymap" = "<A-j>";
-        "list.previousKeymap" = "<A-k>";
-        # list.normalMappings, list.insertMappings
-        # coc.preferences.formatOnType, coc.preferences.formatOnSaveFiletypes
-        "npm.binPath" = "${pkgs.coreutils}/bin/false"; # whatever it wants npm for, please just don't
-        "rust-client.rlsPath" = "rls";
-        "rust-client.disableRustup" = true;
-        "rust-client.updateOnStartup" = false;
-        "rust.wait_to_build" = 800; # ms
-        "rust.unstable_features" = true;
-        #"rust.crate_blacklist" = ["cocoa","gleam","glium","idna","libc","openssl","rustc_serialize","serde","serde_json","typenum","unicode_normalization","unicode_segmentation","winapi"];
-        # rust.sysroot, rust.target, rust.rustflags, rust.unstable_features, rust.build_on_save, rust.target_dir, rust.full_docs
-        # rust.clippy_preference = enum [ off opt-in on ]
-        "rust.rustfmt_path" = "${config.programs.rustfmt.package}/bin/rustfmt";
-        "rust-analyzer.serverPath" = "rust-analyzer";
-        "rust-analyzer.updates.prompt" = false;
-        "rust-analyzer.notifications.cargoTomlNotFound" = false;
-        "rust-analyzer.notifications.workspaceLoaded" = false;
-        "rust-analyzer.procMacro.enable" = true;
-        "rust-analyzer.cargo.loadOutDirsFromCheck" = true;
-        "rust-analyzer.cargo-watch.enable" = true; # TODO: want some way to toggle this on-demand?
-        "rust-analyzer.completion.addCallParenthesis" = false; # consider using this?
-        "rust-analyzer.hoverActions.linksInHover" = true;
-        "rust-analyzer.diagnostics.disabled" = [
-          "inactive-code" # it has strange cfg support..?
-        ];
-        # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
+      "vim/coc/coc-settings.json" = mkIf (config.programs.vim.enable && config.programs.neovim.coc.enable) {
+        text = builtins.toJSON config.programs.neovim.coc.settings;
       };
       "kak-lsp/kak-lsp.toml".source = pkgs.substituteAll {
         inherit (pkgs) efm-langserver rnix-lsp;

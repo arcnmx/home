@@ -1,0 +1,18 @@
+" alt-hjkl for moving around word-wrapped lines
+nnoremap <M-h> gh
+nnoremap <M-j> gj
+nnoremap <M-k> gk
+nnoremap <M-l> gl
+
+" trying alternatives to Esc for exiting insert mode
+inoremap kj <Esc>`^
+inoremap lkj <Esc>`^:w<CR>
+inoremap ;lkj <Esc>:wq<CR>
+
+cmap <M-h> <Left>
+cmap <M-j> <Down>
+cmap <M-k> <Up>
+cmap <M-l> <Right>
+cmap <M-0> <Home>
+
+imap <C-l> <C-O>:redr!<CR>

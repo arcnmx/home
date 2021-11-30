@@ -1,7 +1,20 @@
 { base16, options, config, pkgs, lib, ... } @ args: with lib;
 let
   inherit (config.lib.file) mkOutOfStoreSymlink;
-  # TODO: use lld? put a script called `ld.gold` in $PATH than just invokes ld.lld "$@" or patch gcc to accept -fuse-ld=lld
+  vimPlugins = with pkgs.vimPlugins; [
+    vim-cool
+    vim-ledger
+    vim-dispatch
+    vim-lastplace
+    vim-commentary
+    vim-surround
+    vim-toml
+    kotlin-vim
+    swift-vim
+    rust-vim
+    vim-nix
+    vim-osc52
+  ];
   shellAliases = (if pkgs.hostPlatform.isDarwin then {
     ls = "ls -G";
   } else {
@@ -138,8 +151,6 @@ in {
       nix-readline
     ]) (mkIf config.programs.git.enable [
       gitAndTools.git-fixup
-    ]) (mkIf config.programs.vim.enable [
-      vimpager-latest
     ]) (mkIf (!config.home.profiles.gui) [
       (clip.override { enableX11 = false; enableWayland = false; })
     ]) ];
@@ -163,26 +174,28 @@ in {
         set shiftwidth=2
         set expandtab
       '';
-      "vim/vimpagerrc".text = ''
-        set noloadplugins
+      "vim/vimpagerrc" = mkIf config.programs.vim.enable {
+        text = ''
+          set noloadplugins
 
-        if !exists('g:less')
-          let g:less = {}
-        endif
-        if !exists('g:vimpager')
-          let g:vimpager = {}
-        endif
+          if !exists('g:less')
+            let g:less = {}
+          endif
+          if !exists('g:vimpager')
+            let g:vimpager = {}
+          endif
 
-        " let g:less.enabled = 0
-        let g:less.number = 1
+          " let g:less.enabled = 0
+          let g:less.number = 1
 
-        " alternate screen clears on exit :(
-        " TODO: make t_te move up one line to accomodate the double-height prompt? also set cmdheight=2 so a line doesn't get clobbered when doing so
-        set t_ti= t_te=
+          " alternate screen clears on exit :(
+          " TODO: make t_te move up one line to accomodate the double-height prompt? also set cmdheight=2 so a line doesn't get clobbered when doing so
+          set t_ti= t_te=
 
-        " I want to select things in X thanks
-        set mouse=
-      '';
+          " I want to select things in X thanks
+          set mouse=
+        '';
+      };
       "inputrc".text = ''
         set editing-mode vi
         set keyseq-timeout 1
@@ -249,9 +262,6 @@ in {
     home.sessionVariables = mkMerge [ {
       INPUTRC = "${config.xdg.configHome}/inputrc";
 
-      PAGER = if config.programs.vim.enable
-        then "${pkgs.vimpager-latest}/bin/vimpager"
-        else"${pkgs.less}/bin/less";
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
@@ -262,7 +272,13 @@ in {
       CARGO_HOME = "${config.xdg.configHome}/cargo";
       CARGO_TARGET_DIR = "${config.xdg.cacheHome}/cargo/target";
       TIME_STYLE = "long-iso";
-    } (mkIf config.programs.vim.enable {
+    } (mkIf config.programs.neovim.enable {
+      EDITOR = "nvim";
+    }) (mkIf (!config.programs.page.enable && config.programs.vim.enable) {
+      PAGER = "${pkgs.vimpager-latest}/bin/vimpager";
+    }) (mkIf (!config.programs.page.enable && !config.programs.vim.enable) {
+      PAGER = "${pkgs.less}/bin/less";
+    }) (mkIf (config.programs.vim.enable && !config.programs.neovim.enable) {
       EDITOR = "${config.programs.vim.package}/bin/vim";
     }) ];
     base16 = {
@@ -634,45 +650,15 @@ in {
       # see https://github.com/Delapouite/base16-kakoune/blob/master/build.js
     };
     programs.vim = {
-      enable = true;
-      plugins = with pkgs.vimPlugins; [
-        vim-cool
-        vim-ledger
-        vim-dispatch
-        vim-lastplace
-        vim-toml
-        kotlin-vim
-        swift-vim
-        rust-vim
-        vim-nix
-        vim-osc52
-      ];
+      enable = mkDefault (!config.programs.neovim.enable);
+      plugins = vimPlugins;
       settings = {};
       extraConfig = mkMerge [ (mkBefore ''
         let base16background='none' " activate patch to disable solid backgrounds
       '') ''
+        source ${./files/vimrc-vim}
         source ${./files/vimrc}
-
-        " alt-hjkl for moving around word-wrapped lines
-        nnoremap <M-h> gh
-        nnoremap <M-j> gj
-        nnoremap <M-k> gk
-        nnoremap <M-l> gl
-
-        " trying alternatives to Esc for exiting insert mode
-        inoremap kj <Esc>`^
-        inoremap lkj <Esc>`^:w<CR>
-        inoremap ;lkj <Esc>:wq<CR>
-
-        cmap <M-h> <Left>
-        cmap <M-j> <Down>
-        cmap <M-k> <Up>
-        cmap <M-l> <Right>
-        cmap <M-0> <Home>
-
-        imap <C-l> <C-O>:redr!<CR>
-
-        set cmdheight=2 updatetime=300 shortmess+=c
+        source ${./files/vimrc-keys}
       '' ];
       packageConfigurable = if config.home.minimalSystem
         then pkgs.vim_configurable.override {
@@ -681,6 +667,29 @@ in {
           multibyteSupport = true;
           ftNixSupport = false;
         } else pkgs.vim_configurable-pynvim;
+    };
+    programs.neovim = {
+      vimAlias = !config.programs.vim.enable;
+      vimdiffAlias = true;
+      plugins = vimPlugins;
+      extraConfig = mkMerge [ (mkBefore ''
+        let base16background='none' " activate patch to disable solid backgrounds
+      '') ''
+        source ${./files/vimrc}
+        source ${./files/vimrc-keys}
+        source ${./files/vimrc-nvim.lua}
+        source ${./files/vimrc-page.lua}
+      '' ];
+    };
+    programs.page = {
+      enable = !config.home.minimalSystem && config.programs.neovim.enable;
+      package = pkgs.page-develop;
+      manPager = true;
+      queryLines = 80000; # because of how nvim terminal treats long lines (it breaks lines instead of wrapping them), this can go over
+      openLines = {
+        enable = true;
+        promptHeight = 2;
+      };
     };
 
     programs.rustfmt = {

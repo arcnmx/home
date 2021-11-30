@@ -72,6 +72,12 @@ in {
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';
+    # workaround for https://github.com/neovim/neovim/issues/12075
+    programs.neovim.extraConfig = mkAfter ''
+      set shada+=r/mnt/wdarchive
+      set shada+=r/mnt/wdworking
+      set shada+=r/mnt/wdmisc
+    '';
     hardware.display = mapAttrs (k: v: {
       nvidia.enable = mkDefault config.home.nixosConfig.hardware.display.nvidia.enable;
       monitors = v config.hardware.display.${k}.monitors;

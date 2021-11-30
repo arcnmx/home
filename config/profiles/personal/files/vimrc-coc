@@ -1,3 +1,7 @@
+if $PAGE_NVIM ==? '1'
+  finish
+endif
+
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -13,13 +17,14 @@ inoremap <silent><expr> <C-space> coc#refresh()
 inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " alt+jk for cycling between completions
-inoremap <expr> <Esc>j pumvisible() ? "\<C-n>" : "\<Down>"
-inoremap <expr> <Esc>k pumvisible() ? "\<C-p>" : "\<Up>"
-inoremap <expr> <Esc>h "\<Left>"
-inoremap <expr> <Esc>l "\<Right>"
+inoremap <expr> <M-j> pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <M-k> pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <M-h> "\<Left>"
+inoremap <expr> <M-l> "\<Right>"
 
 nmap <silent> [c <Plug>(coc-diagnostic-prev)
 nmap <silent> ]c <Plug>(coc-diagnostic-next)
+nmap <silent> mc <Plug>(coc-diagnostic-info)
 
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)

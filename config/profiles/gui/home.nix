@@ -572,7 +572,7 @@ in {
       src = ./files/tridactyl/tridactylrc;
       xsel = "${pkgs.xsel}/bin/xsel";
       urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
-      vim = "${config.programs.vim.package}/bin/vim";
+      vim = config.home.sessionVariables.EDITOR;
       firefox = "${config.programs.firefox.package}/bin/firefox";
     in {
       enable = true;
