@@ -50,11 +50,7 @@ in {
       ".task/hooks/on-exit.task-blocks".source = on-exit;
       ".task/hooks/on-add.task-blocks".source = on-add;
       ".task/hooks/on-modify.task-blocks".source = on-modify;
-      ".taskrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/taskrc";
       ".electrum".source = mkOutOfStoreSymlink "${config.xdg.configHome}/electrum/";
-    };
-    xdg.configFile = {
-      taskrc.text = config.home.file.".taskrc".text;
     };
     home.packages = with pkgs; [
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
@@ -186,9 +182,6 @@ in {
           ${config.systemd.package}/bin/journalctl --user -fu lorri.service
         '';
       };
-
-    home.sessionVariables = {
-      TASKRC = "${config.xdg.configHome}/taskrc";
     };
     #services.lorri.enable = true;
     services.gpg-agent = {
