@@ -1,5 +1,5 @@
 { lib }: with lib; let
-  _4k = {
+  _4k = mapAttrs (_: mkDefault) {
     width = 3840;
     height = 2160;
   };
@@ -10,21 +10,34 @@
     spectrum = { config, ... }: {
       imports = [ defaults.common ];
       output = mkDefault "DP-0";
+      #source = mkDefault "DisplayPort-2"; # broken USB Type-C port
+      edid = mapAttrs (_: mkDefault) {
+        manufacturer = "EVE";
+        model = "ES07D03";
+      };
       xserver.sectionName = mkDefault "Monitor[1]";
       refreshRate = mkDefault 144;
-    } // mapAttrs (_: mkDefault) _4k;
+    } // _4k;
     dell = { config, ... }: {
       imports = [ defaults.common ];
       output = mkDefault "HDMI-0";
+      edid = mapAttrs (_: mkDefault) {
+        manufacturer = "DEL";
+        model = "DELL S2721QS";
+      };
       xserver.sectionName = mkDefault "Monitor[0]";
       primary = mkDefault true;
-    } // mapAttrs (_: mkDefault) _4k;
+    } // _4k;
     lg = { config, ... }: {
       imports = [ defaults.common ];
       output = mkDefault "DP-2";
+      edid = mapAttrs (_: mkDefault) {
+        manufacturer = "GSM";
+        model = "LG Ultra HD";
+      };
       xserver.sectionName = mkDefault "Monitor[2]";
       rotation = mkDefault "right";
-    } // mapAttrs (_: mkDefault) _4k;
+    } // _4k;
   };
   layouts = {
     stacked = monitors: with monitors; {

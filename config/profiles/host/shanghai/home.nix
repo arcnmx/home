@@ -32,8 +32,9 @@ in {
     };
   };
 
-  config = mkMerge [ {
-  } (mkIf config.home.profiles.host.shanghai {
+  imports = [ ./screenstub.nix ];
+
+  config = mkIf config.home.profiles.host.shanghai {
     home.profiles.trusted = true;
     home.profiles.personal = true;
     home.profiles.gui = true;
@@ -130,5 +131,5 @@ in {
         demuxer-max-back-bytes = "250MiB";
       };
     };
-  }) ];
+  };
 }
