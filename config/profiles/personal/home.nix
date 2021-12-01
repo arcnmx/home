@@ -109,6 +109,7 @@ in {
     };
     home.shell = {
       aliases = {
+        mail = mkIf config.programs.notmuch.enable "vim +NotMuch";
         vit = "task vit";
         task3s = "task rc.context=3s";
         taskwork = "task rc.context=work";
