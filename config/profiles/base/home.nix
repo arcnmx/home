@@ -341,7 +341,7 @@ in {
     };
     programs.less = {
       enable = true;
-      lesskey.extraConfig = ''
+      keys = ''
         #command
         h left-scroll
         l right-scroll
