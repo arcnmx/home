@@ -18,8 +18,13 @@
       programs = {
         ssh = {
           matchBlocks."git-codecommit.*.amazonaws.com" = mkIf config.home.profiles.trusted {
+            identitiesOnly = true;
             identityFile = userConfig.secrets.files.iam_ssh_key.path;
             user = resources.personal_iam_ssh.getAttr "ssh_public_key_id";
+            extraOptions = {
+              HostkeyAlgorithms = "+ssh-rsa";
+              PubkeyAcceptedAlgorithms = "+ssh-rsa";
+            };
           };
           extraConfig = ''
             IdentityFile ${userConfig.secrets.files.ssh_key.path}
