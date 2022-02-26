@@ -28,7 +28,7 @@ in {
       prosody = {
         package = let
           package = pkgs.prosody.override (old: {
-            withExtraLibs = old.withExtraLibs ++ singleton pkgs.luaPackages.luadbi-postgresql;
+            withExtraLuaPackages = p: old.withExtraLuaPackages p ++ singleton p.luadbi-postgresql;
           });
         in mkIf config.services.postgresql.enable package;
         bindings = {
