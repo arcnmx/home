@@ -265,7 +265,7 @@ in {
       postgresql.enable = true;
       matrix-synapse.enable = true;
       matrix-appservices = {
-        mautrix-hangouts.enable = true;
+        mautrix-googlechat.enable = true;
         mx-puppet-discord.enable = true;
         mautrix-whatsapp.enable = true;
         #matrix-appservice-irc.enable = true;

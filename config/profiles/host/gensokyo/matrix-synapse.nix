@@ -103,6 +103,22 @@ in {
             };
           };
         };
+        mautrix-googlechat = {
+          binding = bindings.mautrix-googlechat;
+          registration.pushEphemeral = true;
+          appservice.maxBodySize = 4;
+          logging.root.handlers = [ "console" ];
+          bridge = {
+            displayname_template = "{full_name}";
+            permissions = {
+              "@arc:${config.services.matrix-synapse.server_name}" = "admin";
+            };
+            web.auth = {
+              public = domains.matrix-client.url + "/mautrix-googlechat/";
+              prefix = "/mautrix-googlechat";
+            };
+          };
+        };
         mx-puppet-discord = {
           binding = bindings.mx-puppet-discord;
           registrationPrefix = "_discord_";
@@ -122,6 +138,12 @@ in {
               proxyPassConnection = {
                 extraUrlArgs.path = config.services.matrix-appservices.mautrix-hangouts.bridge.web.auth.prefix + "/";
                 binding = config.services.matrix-appservices.mautrix-hangouts.binding;
+              };
+            };
+            "/mautrix-googlechat/" = mkIf config.services.matrix-appservices.mautrix-googlechat.enable {
+              proxyPassConnection = {
+                extraUrlArgs.path = config.services.matrix-appservices.mautrix-googlechat.bridge.web.auth.prefix + "/";
+                binding = config.services.matrix-appservices.mautrix-googlechat.binding;
               };
             };
             # TODO: "/" = { ? };
@@ -204,6 +226,9 @@ in {
         synapse-private-federation = { };
         mautrix-hangouts = {
           port = 32063;
+        };
+        mautrix-googlechat = {
+          port = 32064;
         };
         mx-puppet-discord = {
           port = 32065;
