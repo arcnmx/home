@@ -120,6 +120,7 @@ in {
           };
         };
         mx-puppet-discord = {
+          package = pkgs.mx-puppet-discord-develop;
           binding = bindings.mx-puppet-discord;
           registrationPrefix = "_discord_";
           database.filename = "mx-puppet-discord.db";
