@@ -809,6 +809,7 @@ in {
         osd-font-size = config.lib.gui.fontSize 26; # pixels at 720 window height, then scaled to real size
         osd-bar-h = 2.5; # 3.125 default
         osd-border-size = 2; # font border pixels, default 3
+        osd-fractions = true;
         term-osd-bar = true;
         script-opts = concatStringsSep "," (mapAttrsToList (k: v: "${k}=${toString v}") {
           ytdl_hook-ytdl_path = "${pkgs.yt-dlp}/bin/yt-dlp";
@@ -840,21 +841,38 @@ in {
           "Ctrl+J" = "playlist-prev";
           "Alt+h" = "frame-back-step";
           "Alt+l" = "frame-step";
-          "`" = "cycle mute";
-          "SPACE" = "cycle pause";
           "w" = "screenshot";
           "W" = "screenshot video";
           "Ctrl+w" = "screenshot window";
           "Ctrl+W" = "screenshot each-frame";
-          "o" = "show-progress";
-          "O" = "script-message show_osc_dur 5";
-          "F1" = "cycle sub";
-          "F2" = "cycle audio";
-          "Ctrl+p" = "cycle video";
           "L" = "add volume 2";
           "H" = "add volume -2";
           "Alt+H" = "add audio-delay -0.100";
           "Alt+L" = "add audio-delay 0.100";
+          "d" = "drop-buffers";
+          "Ctrl+d" = "quit";
+        };
+        common = {
+          "`" = "cycle mute";
+          "SPACE" = "cycle pause";
+
+          "Ctrl+0" = "set speed 1.0";
+          "Ctrl+)" = "set speed 1.004"; # ctrl+shift+0
+          "Ctrl+=" = "multiply speed 1.1";
+          "Ctrl+-" = "multiply speed 1/1.1";
+
+          "o" = "show-progress";
+          "O" = "script-message show_osc_dur 5";
+          "?" = "script-binding stats/display-stats-toggle";
+          "Ctrl+/" = "script-binding console/enable";
+
+          "Ctrl+r" = "loadfile \${path}";
+          "Ctrl+R" = "video-reload";
+
+          "F1" = "cycle sub";
+          "F2" = "cycle audio";
+          "Ctrl+p" = "cycle video";
+
           "1" = "set volume 10";
           "2" = "set volume 20";
           "3" = "set volume 30";
@@ -866,16 +884,6 @@ in {
           "9" = "set volume 90";
           ")" = "set volume 150";
           "0" = "set volume 100";
-          "m" = "cycle mute";
-          "Ctrl+r" = "loadfile \${path}";
-          "Ctrl+R" = "video-reload";
-          "d" = "drop-buffers";
-          "Ctrl+d" = "quit";
-        };
-        common = {
-          "Ctrl+0" = "set speed 1.0";
-          "Ctrl+=" = "multiply speed 1.1";
-          "Ctrl+-" = "multiply speed 1/1.1";
         };
         directional = {
           "RIGHT" = vim."l";
@@ -892,8 +900,8 @@ in {
           "Ctrl+Shift+DOWN" = vim."Ctrl+J";
           "Alt+LEFT" = vim."Alt+h";
           "Alt+RIGHT" = vim."Alt+l";
-          "MBTN_RIGHT" = vim."SPACE";
-          "m" = vim."`";
+          "MBTN_RIGHT" = common."SPACE";
+          "m" = common."`";
           "WHEEL_UP" = vim."L";
           "WHEEL_DOWN" = vim."H";
         };
@@ -927,14 +935,39 @@ in {
       enable = true;
       config = {
         scaling_mode = "shrink";
+        suppress_default_binds = true;
       };
-      configContent.binds = {
+      binds = {
         "<Ctrl+0>" = "zoom actual";
         "<Ctrl+minus>" = "zoom -10";
         "<Ctrl+equal>" = "zoom 10";
         "<Ctrl+h>" = "prev";
         "<Ctrl+l>" = "next";
-        "O" = "overlay";
+        O = "overlay";
+        "<space>" = "center";
+        "<Return>" = "toggle_playing";
+        "<greater>" = "rotate by 90";
+        "<less>" = "rotate by -90";
+
+        # default bindings...
+        q = "quit";
+        "<Left>" = "prev 1";
+        "<Right>" = "next 1";
+        gg = "goto 1";
+        G = "goto -1";
+        j = "pan 0 10";
+        k = "pan 0 -10";
+        h = "pan -10 0";
+        l = "pan 10 0";
+        x = "close";
+        f = "fullscreen";
+        #p = "print to stdout"; # can't find this one
+        s = "scaling next";
+        S = "upscaling next";
+        r = "reset";
+        "<period>" = "next_frame";
+        t = "slideshow +1";
+        T = "slideshow -1";
       };
     };
     services.playerctld.enable = true;
