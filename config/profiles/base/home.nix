@@ -495,6 +495,7 @@ in {
     programs.starship = with base16.map.ansiStr; let
       bg = "bg:${background_status}";
       substitutions = let
+        # TODO: workaround for https://github.com/nix-community/home-manager/issues/2519
         expand = replaceStrings [ "$HOME" ] [ "~" ];
         mapDir = name: dir: nameValuePair (expand dir) "~${name}";
       in mapAttrs' mapDir config.programs.zsh.dirHashes;
@@ -502,6 +503,7 @@ in {
       orderedSubstitutions = sort (a: b: a.name > b.name) substitutionsList;
     in {
       enable = mkDefault (!config.home.minimalSystem);
+      #package = pkgs.starship-develop;
       extraConfig = mkMerge (
         singleton "[directory.substitutions]"
         ++ map ({ name, value }: ''"${name}" = "${value}"'') orderedSubstitutions
@@ -538,6 +540,7 @@ in {
           truncate_to_repo = false;
           truncation_symbol = "…/";
           style = "${bg} bold fg:${function}";
+          #inherit substitutions;
         };
         env_var = { }; # TODO
         git_branch = {
@@ -886,7 +889,7 @@ in {
       customPaneNavigationAndResize = true;
       shortcut = "a";
       terminal = "screen-256color";
-      tmuxp.enable = true;
+      #tmuxp.enable = true; # TODO: broken
       extraConfig = ''
         set -g mouse off
 

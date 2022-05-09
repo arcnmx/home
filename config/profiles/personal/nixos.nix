@@ -259,7 +259,7 @@ in {
     };
     services.wireplumber = {
       logLevel = mkDefault 3;
-      policy.roles.enable = mkDefault true;
+      policy.roles.enable = mkDefault true; # XXX: experimental functionality!!!
       service.moduleDir = let
         modules = pkgs.symlinkJoin {
           name = "wireplumber-modules";

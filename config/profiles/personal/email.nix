@@ -170,6 +170,7 @@ in {
       accountsWithTags = filterAttrs (_: acc: acc.notmuch.enable && acc.notmuch.tag != null) config.accounts.email.accounts;
     in {
       enable = mkDefault true;
+      #package = mkDefault pkgs.notmuch-arc;
       new.tags = [ "new" ];
       search.excludeTags = [ "deleted" "trash" "spam" "junk" "draft" "twitter" ];
       hooks.new = {
@@ -208,6 +209,7 @@ in {
       mapAttrs' (_: acc: nameValuePair "lieer-${acc.name}" {
         Timer.OnStartupSec = "30s";
       }) (filterAttrs (_: acc: acc.lieer.enable && acc.lieer.sync.enable) config.accounts.email.accounts)
+
     );
     systemd.user.services = mkMerge [ (mkIf config.services.lieer.enable (
       mapAttrs' (_: acc: nameValuePair "lieer-${acc.name}" {

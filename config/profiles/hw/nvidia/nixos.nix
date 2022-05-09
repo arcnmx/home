@@ -8,6 +8,7 @@
   };
 
   config = mkIf config.home.profiles.hw.nvidia {
+    #home.profileSettings.nvidia.patch = builtins.trace "TODO:nvidia-patch update" false;
     hardware.nvidia = {
       modesetting.enable = true;
       package = let

@@ -236,7 +236,7 @@ in {
               "session.suspend-timeout-seconds" = 60;
             };
           };
-          onboard-mic-broken = {
+          onboard-mic-broken = { # TODO: this doesn't appear anymore?
             matches = singleton [
               { subject = "alsa.id"; comparison = "ALC1220 Alt Analog"; }
               { subject = "api.alsa.pcm.stream"; comparison = "capture"; }

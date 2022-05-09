@@ -50,23 +50,29 @@
     vim-hexokinase
     jsonc-vim
     echodoc-vim
+    #LanguageClient-neovim
+    #nvim-yarp vim-hug-neovim-rpc
   ];
   vimCocPlugins = with pkgs.vimPlugins; [
     coc-json
     coc-yaml
+    #coc-rls
     coc-rust-analyzer
     coc-git
     coc-yank
     coc-tsserver
+    #coc-fzf <or> coc-clap
     coc-lua
     coc-pyright
     coc-spell-checker
-    coc-smartf
+    coc-smartf # compare with easymotion?
     coc-markdownlint
     coc-cmake
     coc-html coc-css
+    #coc-highlight # don't like the colours, and not convinced the hover is helpful
     coc-explorer
     coc-lists
+    # coc-denite but denite is deprecated?
   ];
 in {
   imports = [
@@ -318,6 +324,41 @@ in {
       enable = !config.home.minimalSystem;
       settings.git_protocol = "ssh";
     };
+    programs.github-label-sync = {
+      enable = !config.home.minimalSystem;
+      sensible.enable = true;
+      labels = {
+        tasks = {
+          labels = {
+            boring = {
+              description = "existence and organizational things";
+              colour = "e0d5c7";
+            };
+            pandemic = {
+              description = "irrelevant before outside exists again";
+              colour = "689823";
+            };
+          };
+          json = config.programs.github-label-sync.labels.sensible.out.json;
+          combineJson = true;
+        };
+        sensible = {
+          combineJson = true;
+          labels = {
+            "priority: low" = {
+              aliases = [ "ignore" ];
+              description = "wishlist of nice-to-haves and things to eventually fix";
+              colour = "c5bdc8";
+            };
+            "priority: soon" = {
+              aliases = [ "priority" ];
+              description = "prioritize these";
+              #colour = "bef3fe";
+            };
+          };
+        };
+      };
+    };
     programs.buku = {
       enable = !config.home.minimalSystem;
       bookmarks = {
@@ -381,7 +422,9 @@ in {
         ''
           ${vimSettings}
 
+          " let g:echodoc#type = 'virtual' # this is really annoying when it's wrong :<
           let g:echodoc#type = 'floating'
+          " highlight link EchoDocFloat Pmenu
         ''
       ];
       coc = {
@@ -391,7 +434,7 @@ in {
             efm = {
               command = "${pkgs.efm-langserver}/bin/efm-langserver";
               args = [];
-              filetypes = [ "vim" ];
+              filetypes = ["vim" /*"yaml"*/ /*"markdown"*/]; # consider coc-yaml instead?
             };
             nix = {
               command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
@@ -433,7 +476,8 @@ in {
           "rust-analyzer.lens.methodReferences" = true;
           "rust-analyzer.assist.allowMergingIntoGlobImports" = false;
           "rust-analyzer.diagnostics.disabled" = [
-            "inactive-code" # it has strange cfg support..?
+            #"inactive-code" # it has strange cfg support..?
+            # TODO: consider setting warningsAsHint or warningsAsHint for inactive code?
           ];
           # NOTE: per-project overrides go in $PWD/.vim/coc-settings.json
         };
@@ -466,7 +510,7 @@ in {
         weechat-matrix
         vimode-develop
         weechat-go weechat-autosort buffer_autoset unread_buffer
-        highmon weechat-notify-send
+        highmon #weechat-notify-send
         auto_away colorize_nicks urlgrab
         emoji
       ];

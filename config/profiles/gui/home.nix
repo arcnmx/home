@@ -111,7 +111,8 @@ in {
       arc.packages.personal.emxc
       rxvt-unicode-arc
       mumble-develop
-      libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
+      #libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
+      libreoffice
       (clip.override { enableWayland = config.wayland.windowManager.sway.enable; })
       gioTerminal
     ] ++ optionals config.gtk.enable [
