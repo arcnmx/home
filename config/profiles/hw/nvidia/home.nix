@@ -26,6 +26,7 @@
         # could support multiple GPUs, also use `--loop` for tail-style output
         query = pkgs.writeShellScriptBin "query" ''
           set -eu
+          set -o pipefail
 
           export PATH=$PATH:${path}
 
