@@ -25,6 +25,7 @@ in {
     home.profiles.hw.intel = true;
     home.profiles.laptop = true;
     home.profiles.personal = true;
+    home.profileSettings.intel.graphics.enable = true;
 
     boot = {
       kernel = {
@@ -53,7 +54,6 @@ in {
       };
     };
 
-    hardware.opengl.extraPackages = with pkgs; [vaapiIntel libvdpau-va-gl vaapiVdpau intel-ocl];
     services.xserver = {
       xrandrHeads = [{
         output = "eDP1";

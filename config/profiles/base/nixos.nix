@@ -52,7 +52,7 @@ in {
           # actions provides way too little disk space for compiling a kernel
           (lib.mkIf (builtins.getEnv "CI_PLATFORM" == "gh-actions") (lib.mkForce false))
         ];
-        arch = lib.mkIf (lib.versionAtLeast config.boot.kernelPackages.kernel.stdenv.cc.version "11.1") "x86-64-v3";
+        arch = lib.mkIf (lib.versionAtLeast config.boot.kernelPackages.kernel.stdenv.cc.version "11.1") (lib.mkOverride 1400 "x86-64-v3");
       };
       tmpOnTmpfs = true;
       initrd = {
