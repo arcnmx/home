@@ -4,12 +4,12 @@
   tlib = tconfig.lib.tf;
   cfg = config.deploy.repos;
   inherit (tconfig.lib.tf) tfTypes;
-  annexString = value:
+  gitString = value:
     if value == true then "true"
     else if value == false then "false"
     else toString value;
   gitConfigCommands = config:
-    mapAttrsToList (k: v: [ "git" "config" k v ]) config;
+    mapAttrsToList (k: v: [ "git" "config" k (gitString v) ]) config;
   gcryptType = types.submodule ({ config, name, ... }: {
     options = {
       enable = mkEnableOption "git-remote-gcrypt";
@@ -183,11 +183,19 @@
       };
     };
   });
-  annexRemoteType = { defaults }: types.submoduleWith {
-    modules = singleton ({ config, name, defaults, ... }: {
+  annexRemoteType = { defaults, remote }: types.submoduleWith {
+    modules = singleton ({ config, defaults, ... }: {
       options = {
         enable = mkOption {
           type = types.bool;
+        };
+        enableRemote = mkOption {
+          type = types.bool;
+          default = true;
+        };
+        name = mkOption {
+          type = types.str;
+          default = if config.uuid != null then config.uuid else remote.name;
         };
         uuid = mkOption {
           type = types.nullOr types.str;
@@ -197,6 +205,18 @@
           type = types.nullOr types.str;
           default = null;
           # example "5MiB"
+        };
+        trust = mkOption {
+          type = types.nullOr (types.enum [ "trusted" "semitrusted" "untrusted" "dead" ]);
+          default = null;
+        };
+        group = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+        };
+        wanted = mkOption {
+          type = types.nullOr types.str;
+          default = null;
         };
         extraConfig = mkOption {
           type = types.attrsOf types.unspecified;
@@ -242,11 +262,15 @@
           };
           initremote = mkOption {
             type = types.listOf (types.listOf types.str);
-            default = { };
+            default = [ ];
           };
           enableremote = mkOption {
             type = types.listOf types.str;
-            default = { };
+            default = [ ];
+          };
+          enableCommands = mkOption {
+            type = types.listOf (types.listOf types.str);
+            default = [ ];
           };
         };
       };
@@ -274,9 +298,19 @@
               enableConfig = { };
             };
           initremote = singleton (
-            mapAttrsToList (k: v: "${k}=${annexString v}") config.extraConfig
+            mapAttrsToList (k: v: "${k}=${gitString v}") config.extraConfig
           ) ++ map (key: config.out.enableremote ++ singleton "keyid+=${key}") config.encryption.out.additionalKeys;
-          enableremote = mapAttrsToList (k: v: "${k}=${annexString v}") config.enableConfig;
+          enableremote = mapAttrsToList (k: v: "${k}=${gitString v}") config.enableConfig;
+          enableCommands = let
+            trustCommand = {
+              "trusted" = "trust";
+              "semitrusted" = "semitrust";
+              "untrusted" = "untrust";
+              "dead" = "dead";
+            }.${config.trust};
+          in optionals (config.group != [ ]) (map (g: [ "git" "annex" "group" config.name g ]) config.group)
+            ++ optional (config.wanted != null) [ "git" "annex" "wanted" config.name config.wanted ]
+            ++ optional (config.trust != null) [ "git" "annex" trustCommand config.name ];
         };
       };
     });
@@ -693,6 +727,10 @@
           type = types.str;
           default = name;
         };
+        mirror = mkOption {
+          type = types.bool;
+          default = false;
+        };
         gcrypt = mkOption {
           type = gcryptType;
           default = { };
@@ -730,6 +768,7 @@
         annex = mkOption {
           type = annexRemoteType {
             inherit defaults;
+            remote = config;
           };
           default = { };
         };
@@ -761,19 +800,19 @@
           };
           cloneUrl = mkOption {
             type = types.unspecified;
-            default = { };
+            default = [ ];
           };
           add = mkOption {
             type = types.unspecified;
-            default = { };
+            default = [ ];
           };
           set = mkOption {
             type = types.unspecified;
-            default = { };
+            default = [ ];
           };
           init = mkOption {
             type = types.listOf (types.listOf types.str);
-            default = { };
+            default = [ ];
           };
         };
       };
@@ -804,6 +843,9 @@
           (mkIf (repo.annex.enable && !config.annex.enable) {
             annex-ignore = mkDefault "true";
           })
+          (mkIf (repo.annex.enable && config.mirror) {
+            annex-sync = mkDefault "false";
+          })
           (mkIf (config.s3 != null) (mapAttrs (_: mkDefault) config.s3.extraConfig))
         ];
         gitConfig = mkMerge [
@@ -825,25 +867,26 @@
             inherit (config.cloneUrl) fetch push;
           };
           add =
-            (if config.annex.enable then [
-              ([ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote)
-            ] else [
+            (if config.annex.enable then optional config.annex.enableRemote (
+              [ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote
+            ) ++ config.annex.out.enableCommands else [
               [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
               [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
             ]) ++ remoteConfig;
           set =
-            (if config.annex.enable then [
-              ([ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote)
-            ] else [
+            []/*(if config.annex.enable then optional config.annex.enableRemote (
+              [ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote
+            ) ++ config.annex.out.enableCommands else [
               [ "git" "remote" "set-url" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
               [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
-            ]) ++ remoteConfig;
+            ]) ++ remoteConfig*/;
           init =
-            (if config.annex.enable then ([
+            (if config.annex.enable then [
               ([ "git" "annex" "initremote" name ] ++ builtins.head config.annex.out.initremote)
-            ] ++ map (ir: [ "git" "annex" "enableremote" name ] ++ ir) (builtins.tail config.annex.out.initremote))
+            ] ++ map (ir: [ "git" "annex" "enableremote" name ] ++ ir) (builtins.tail config.annex.out.initremote)
+            ++ config.annex.out.enableCommands
             else [
               [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
@@ -872,6 +915,18 @@
         };
         participants = mkOption {
           type = types.listOf types.str;
+        };
+        numCopies = mkOption {
+          type = types.nullOr types.int;
+          default = null;
+        };
+        groupWanted = mkOption {
+          type = types.attrsOf types.str;
+          default = { };
+        };
+        extraConfig = mkOption {
+          type = with types; attrsOf (oneOf [ bool int float str ]);
+          default = { };
         };
       };
       gcrypt = mkOption {
@@ -935,12 +990,17 @@
       extraConfig = mkMerge (mapAttrsToList (_: remote:
         (mapAttrs (_: mkDefault) remote.gitConfig)
       ) config.remotes);
-      out = {
+      out = let
+        annexInit = singleton [ "git" "annex" "init" ]
+        ++ mapAttrsToList (group: wanted: [ "git" "annex" "groupwanted" group wanted ]) config.annex.groupWanted
+        ++ mapAttrsToList (k: v: [ "git" "annex" "config" "--set" "annex.${k}" (gitString v) ]) config.annex.extraConfig
+        ++ optional (config.annex.numCopies != null) [ "git" "annex" "numcopies" (toString config.annex.numCopies) ];
+      in {
         name = config.name
           + optionalString config.annex.enable ".anx"
           + optionalString config.gcrypt.enable ".cry";
         setRepoResources = mkMerge (mapAttrsToList (_: r: r.out.setRepoResources) config.remotes);
-        origin = findFirst (remote: remote.enable && !remote.annex.enable) null (
+        origin = findFirst (remote: remote.enable && !remote.annex.enable && !remote.mirror) null (
           optional (config.remotes ? origin) config.remotes.origin
           ++ attrValues config.remotes
         );
@@ -949,18 +1009,15 @@
             ++ optionals (config.out.origin.name != "origin") [ "-o" config.out.origin.name ]
           )
         ] ++ gitConfigCommands config.extraConfig
-        ++ optionals (config.annex.enable) [
-          [ "git" "annex" "init" ]
-        ] ++ config.out.origin.out.set
+        ++ optionals config.annex.enable annexInit
+        ++ config.out.origin.out.set
         ++ concatLists (mapAttrsToList (_: remote: remote.out.add) (filterAttrs (_: remote:
           remote.enable && remote.name != config.out.origin.name
         ) config.remotes));
-        init = [
-          [ "git" "init" ]
-        ] ++ gitConfigCommands config.extraConfig
-        ++ optionals (config.annex.enable) [
-          [ "git" "annex" "init" ]
-        ] ++ concatLists (mapAttrsToList (_: remote: remote.out.init) (filterAttrs (_: remote:
+        init = singleton [ "git" "init" ]
+        ++ gitConfigCommands config.extraConfig
+        ++ optionals config.annex.enable annexInit
+        ++ concatLists (mapAttrsToList (_: remote: remote.out.init) (filterAttrs (_: remote:
           remote.enable
         ) config.remotes));
         run = let

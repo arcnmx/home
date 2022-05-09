@@ -25,10 +25,14 @@
         type = types.bool;
         default = true;
       };
+      path = mkOption {
+        type = types.nullOr types.str;
+        default = if config.bitw.name == null then null else "tokens/${config.bitw.name}";
+      };
     };
-    config = mkIf (config.bitw.name != null) {
+    config = mkIf (config.bitw.path != null) {
       sensitive = mkDefault config.bitw.isSecret;
-      value.shellCommand = mkDefault "bitw get tokens/${escapeShellArg config.bitw.name} -f ${escapeShellArg config.bitw.field}";
+      value.shellCommand = mkDefault "bitw get ${escapeShellArg config.bitw.path} -f ${escapeShellArg config.bitw.field}";
     };
   };
   tfType = types.submoduleWith {
@@ -111,6 +115,9 @@ in {
             };
             continue.envVar = "TF_NIX_CONTINUE_${replaceStrings [ "-" ] [ "_" ] config.name}";
           } ++ map (nodeName: unmerged.mergeAttrs meta.network.nodes.${nodeName}.deploy.tf.out.set) config.nodeNames);
+          config._module.args = {
+            inherit meta;
+          };
         });
       in mkOption {
         type = types.attrsOf type;
