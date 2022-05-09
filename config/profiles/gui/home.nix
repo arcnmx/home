@@ -546,7 +546,7 @@ in {
             "network.prefetch-next" = true;
             "security.dialog_enable_delay" = 300;
 
-            "dom.event.contextmenu.enabled" = false; # hm this is useful but sometimes I want it?
+            "dom.event.contextmenu.enabled" = true; # learn to shift+right-click instead
 
             "privacy.trackingprotection.enabled" = true;
             "privacy.trackingprotection.fingerprinting.enabled" = true;
