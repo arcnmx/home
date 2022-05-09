@@ -108,7 +108,6 @@ in {
     ] ++ optionals config.gtk.enable [
       evince
       gnome3.adwaita-icon-theme
-      gnome3.defaultIconTheme
     ];
 
     home.sessionVariables = {
@@ -569,7 +568,6 @@ in {
       };
     };
     programs.firefox.tridactyl = let
-      src = ./files/tridactyl/tridactylrc;
       xsel = "${pkgs.xsel}/bin/xsel";
       urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
       vim = config.home.sessionVariables.EDITOR;
@@ -1045,7 +1043,7 @@ in {
       };
       theme = {
         name = "Adwaita";
-        package = pkgs.gnome3.gnome-themes-standard;
+        package = pkgs.gnome3.gnome-themes-extra;
       };
       gtk3 = {
         extraConfig = {

@@ -18,10 +18,12 @@ in {
   ];
 
   nix = {
-    allowedUsers = ["@builders"];
-    trustedUsers = ["root" "@wheel"];
-    buildCores = 0;
-    maxJobs = lib.mkDefault 6; # "auto"
+    settings = {
+      allowed-users = ["@builders"];
+      trusted-users = ["root" "@wheel"];
+      cores = 0;
+      max-jobs = lib.mkDefault 6; # "auto"
+    };
   };
 
   home-manager = {

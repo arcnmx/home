@@ -16,8 +16,11 @@
   config = mkIf config.home.profiles.hw.cross {
     boot.binfmt = {
       emulatedSystems = mkIf config.home.profileSettings.cross.aarch64 [ "aarch64-linux" ];
-      registrations.aarch64-linux = mkIf config.home.profileSettings.cross.aarch64 {
-        interpreter = mkForce "${pkgs.qemu-vfio or pkgs.qemu}/bin/qemu-aarch64";
+      registrations.aarch64-linux = let
+        qemu = pkgs.qemu-vfio or pkgs.qemu;
+      in mkIf config.home.profileSettings.cross.aarch64 {
+        interpreter = mkForce "${qemu}/bin/qemu-aarch64";
+        wrapInterpreterInShell = false;
       };
     };
 

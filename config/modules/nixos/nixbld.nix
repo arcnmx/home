@@ -15,7 +15,7 @@ in {
           ./nixbld.pub
         ];
       };
-      nix.trustedUsers = ["nixbld"]; # TODO: this shouldn't strictly be necessary? (https://github.com/NixOS/nix/issues/2789)
+      nix.settings.trusted-users = ["nixbld"]; # TODO: this shouldn't strictly be necessary? (https://github.com/NixOS/nix/issues/2789)
     })
   ];
 }

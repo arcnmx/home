@@ -85,11 +85,13 @@ in {
       accessTokens = lib.mkIf tf.state.enable {
         "github.com" = tf.variables.github-access.get;
       };
-      buildersUseSubstitutes = true;
-      experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" ]
-        ++ lib.optional (lib.versionOlder config.nix.nix24.package.version "2.5") "ca-derivations";
-      binaryCaches = [ "https://arc.cachix.org" ];
-      binaryCachePublicKeys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
+      experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" "ca-derivations" ];
+        #++ lib.optional (lib.versionOlder config.nix.nix24.package.version "2.5") "ca-derivations";
+      settings = {
+        builders-use-substitutes = true;
+        substituters = [ "https://arc.cachix.org" ];
+        trusted-public-keys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
+      };
       package = let
         nix = pkgs.nix_2_3;
       in lib.mkMerge [
@@ -97,6 +99,14 @@ in {
         (lib.mkIf (!config.home.minimalSystem) (pkgs.nix-readline.override { inherit nix; }))
       ];
       nix24.package = lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline;
+      registry.ci = {
+        to = {
+          type = "github";
+          owner = "arcnmx";
+          repo = "ci";
+        };
+        exact = false;
+      };
     };
 
     services.openssh = {
@@ -105,7 +115,7 @@ in {
       startWhenNeeded = lib.mkDefault false;
       allowSFTP = true;
       gatewayPorts = "yes";
-      challengeResponseAuthentication = false;
+      kbdInteractiveAuthentication = false;
       passwordAuthentication = lib.mkDefault false;
       useDns = false;
       extraConfig = ''
@@ -128,7 +138,9 @@ in {
       media-session = {
         enable = lib.mkDefault (config.services.pipewire.enable && !config.services.wireplumber.enable);
       };
+      wireplumber.enable = lib.mkDefault false; # disable the built-in module
     };
+    services.wireplumber.enable = lib.mkDefault false;
 
     security.sudo.enable = true;
     security.sudo.extraConfig = ''

@@ -22,7 +22,14 @@ in {
       "URxvt.iso14755" = false;
       "URxvt.fading" = 0;
 
-      "URxvt.perl-ext-common" = "default,matcher,color-themes,osc-52,xresources-256";
+      "URxvt.perl-ext-common" = concatStringsSep "," [
+        "default"
+        "-confirm-paste" # yells at me if I try to paste anything with newlines; but vim/zsh/weechat already handle this anyway so stop please .-.
+        "matcher"
+        "color-themes"
+        "osc-52"
+        "xresources-256"
+      ];
       "URxvt.url-launcher" = "${config.programs.firefox.package}/bin/firefox";
       "URxvt.matcher.button" = 3;
       "URxvt.keysym.M-f" = "perl:matcher:list";

@@ -42,40 +42,45 @@ in {
     services = {
       matrix-synapse = {
         extraConfigFiles = singleton config.secrets.files.matrix-synapse-secrets.path;
-        database_type = mkIf config.services.postgresql.enable "psycopg2";
         domains = {
           discovery = domains.matrix-discovery;
           public = domains.matrix-client;
+          listeners = {
+            private-client = {
+              binding = bindings.synapse-private-client;
+              tls = false;
+              x_forwarded = true;
+              resources = [
+                { names = [ "client" ]; compress = true; }
+              ];
+            };
+            private-federation = {
+              binding = bindings.synapse-private-federation;
+              tls = false;
+              x_forwarded = true;
+              resources = [
+                { names = [ "federation" ]; compress = true; }
+              ];
+            };
+          };
         };
-        listeners = [ {
-          binding = bindings.synapse-private-client;
-          tls = false;
-          x_forwarded = true;
-          resources = [
-            { names = [ "client" ]; compress = true; }
-          ];
-        } {
-          binding = bindings.synapse-private-federation;
-          tls = false;
-          x_forwarded = true;
-          resources = [
-            { names = [ "federation" ]; compress = true; }
-          ];
-        } ];
+        settings = {
+          database = mkIf config.services.postgresql.enable {
+            name = "psycopg2";
+          };
 
-        rc_messages_per_second = mkDefault "0.5";
-        rc_message_burst_count = mkDefault "25.0";
-        max_upload_size = mkDefault "128M";
-        url_preview_enabled = mkDefault true;
-        enable_registration = mkDefault false;
-        enable_metrics = mkDefault false;
-        report_stats = mkDefault false;
-        dynamic_thumbnails = mkDefault true;
-        allow_guest_access = mkDefault true;
-        extraConfig = ''
-          suppress_key_server_warning: true
-          enable_group_creation: true
-        '';
+          #rc_messages_per_second = mkDefault "0.5";
+          #rc_message_burst_count = mkDefault 25;
+          max_upload_size = mkDefault "128M";
+          url_preview_enabled = mkDefault true;
+          enable_registration = mkDefault false;
+          enable_metrics = mkDefault false;
+          report_stats = mkDefault false;
+          dynamic_thumbnails = mkDefault true;
+          allow_guest_access = mkDefault true;
+          suppress_key_server_warning = mkDefault true;
+          enable_group_creation = mkDefault true;
+        };
       };
       matrix-appservices = {
         matrix-appservice-irc.binding = bindings.matrix-appservice-irc;
@@ -83,7 +88,7 @@ in {
           binding = bindings.mautrix-whatsapp;
           bridge = {
             permissions = {
-              "@arc:${config.services.matrix-synapse.server_name}" = "admin";
+              "@arc:${config.services.matrix-synapse.settings.server_name}" = "admin";
             };
           };
         };
@@ -95,7 +100,7 @@ in {
           bridge = {
             displayname_template = "{full_name}";
             permissions = {
-              "@arc:${config.services.matrix-synapse.server_name}" = "admin";
+              "@arc:${config.services.matrix-synapse.settings.server_name}" = "admin";
             };
             web.auth = {
               public = domains.matrix-client.url + "/mautrix-hangouts/";
@@ -111,7 +116,7 @@ in {
           bridge = {
             displayname_template = "{full_name}";
             permissions = {
-              "@arc:${config.services.matrix-synapse.server_name}" = "admin";
+              "@arc:${config.services.matrix-synapse.settings.server_name}" = "admin";
             };
             web.auth = {
               public = domains.matrix-client.url + "/mautrix-googlechat/";

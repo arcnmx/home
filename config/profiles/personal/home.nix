@@ -216,7 +216,7 @@ in {
           fi
           local TASK_DIR=$XDG_RUNTIME_DIR/taskwarrior
           mkdir -p "$TASK_DIR" &&
-            (cd "$TASK_DIR" && ${pkgs.taskwarrior}/bin/task "$@")
+            (cd "$TASK_DIR" && "$TASK_EXEC" "$@")
         ''; # NOTE: link theme to $TASK_DIR/theme and `include ./theme` - can be conditional on $(theme isDark)
         tasks = ''
           #local _TASK_REPORT=next
@@ -259,6 +259,7 @@ in {
         "allow-loopback-pinentry"
         "no-allow-external-cache"
       ];
+      #defaultCacheTtl = 31536000; maxCacheTtl = 31536000; defaultCacheTtlSsh = 31536000; maxCacheTtlSsh = 31536000; # doing a bad remove me later thanks
     };
     services.mpd = {
       enable = true;
@@ -390,7 +391,7 @@ in {
             };
           };
           "coc.preferences.extensionUpdateCheck" = "never";
-          "coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman";
+          #"coc.preferences.watchmanPath" = "${pkgs.watchman}/bin/watchman"; # TODO: segfaults constantly, see https://github.com/NixOS/nixpkgs/issues/156177
           "suggest.timeout" = 1000;
           "suggest.maxPreviewWidth" = 120;
           "suggest.enablePreview" = true;

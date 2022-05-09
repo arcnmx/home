@@ -136,7 +136,7 @@ in {
       curl
       rsync
 
-      buildPackages.rxvt-unicode-cvs-unwrapped.terminfo
+      buildPackages.rxvt-unicode-unwrapped.terminfo
     ] (mkIf (!config.home.minimalSystem) [
       file
 

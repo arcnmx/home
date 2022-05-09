@@ -71,12 +71,12 @@
       ffmpeg
       v4l_utils
       usbutils
-      gstreamer.dev
+      gstreamer
       gst-rtsp-launch
     ];
     environment.sessionVariables = {
       GST_PLUGIN_SYSTEM_PATH_1_0 = with pkgs; with gst_all_1; lib.makeSearchPath "lib/gstreamer-1.0" [
-        gstreamer
+        gstreamer.out
         gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
         gst-jpegtrunc
       ];
