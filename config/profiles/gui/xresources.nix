@@ -32,7 +32,7 @@ in {
       "URxvt.matcher.launcher.2" = "${emxc} $0";
       "URxvt.matcher.launcher.3" = "${emxc} $2 $1";
       #"URxvt.matcher.pattern.4" = ''\\B(/\\S+?):(\\d+)(?=:|$)'';
-      "URxvt.cutchars" = ''\\'"'&()*,;<=>?@[]^{|│└┼┴┬├─┤}·↪»'';
+      "URxvt.cutchars" = ''\\'"'&()*,;<=>?@[]^{|│└┼┴┬├─┤}·↪»ㆍ'';
 
       "URxvt.color-themes.themedir" = config.xdg.configHome + "/urxvt/themes";
       "URxvt.color-themes.state-file" = config.xdg.dataHome + "/urxvt/theme";
