@@ -58,9 +58,9 @@ in {
         };
         acme_key_file = {
           provider = "local";
-          type = "file";
+          type = "sensitive_file";
           inputs = {
-            sensitive_content = tf.resources.acme_key.refAttr "private_key_pem";
+            content = tf.resources.acme_key.refAttr "private_key_pem";
             filename = toString (tf.terraform.dataDir + "/acme.priv.pem");
             file_permission = "0600";
           };
@@ -75,9 +75,9 @@ in {
         };
         taskserver_ca_key_file = {
           provider = "local";
-          type = "file";
+          type = "sensitive_file";
           inputs = {
-            sensitive_content = tf.resources.taskserver_ca_key.refAttr "private_key_pem";
+            content = tf.resources.taskserver_ca_key.refAttr "private_key_pem";
             filename = toString (tf.terraform.dataDir + "/taskserver_ca.priv.pem");
             file_permission = "0600";
           };

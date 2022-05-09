@@ -79,9 +79,9 @@ in {
         };
         ssh_home_file = {
           provider = "local";
-          type = "file";
+          type = "sensitive_file";
           inputs = {
-            sensitive_content = tf.resources.ssh_home.refAttr "private_key_pem";
+            content = tf.resources.ssh_home.refAttr "private_key_pem";
             filename = toString (tf.terraform.dataDir + "/ssh_home_cirno");
             file_permission = "0600";
           };
