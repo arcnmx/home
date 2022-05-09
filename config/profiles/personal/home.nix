@@ -300,6 +300,13 @@ in {
         nix = "${config.xdg.userDirs.documents}/nix";
       };
     };
+    programs.git = {
+      extraConfig = {
+        gcrypt = {
+          require-explicit-force-push = false;
+        };
+      };
+    };
     programs.gh = {
       enable = true;
       settings.git_protocol = "ssh";
