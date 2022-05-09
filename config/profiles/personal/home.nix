@@ -79,7 +79,7 @@ in {
         (mkBefore [
           # core/plugins at top...
           "\${if:\${buffer.full_name}!=core.weechat}" # core_first
-          "\${info:autosort_order,\${info:autosort_escape,${script_or_plugin}},core,highmon,*}"
+          "\${info:autosort_order,\${info:autosort_escape,${script_or_plugin}},core,*}"
           "\${if:\${buffer.full_name}!=irc.irc_raw}" # irc_raw_first
           "\${info:autosort_order,\${type},server,*}"
         ])
@@ -87,7 +87,7 @@ in {
           "\${"
           + concatStringsSep "," ([
             "info:autosort_order"
-            "\${info:autosort_escape,\${buffer.short_name}}"
+            "\${info:autosort_escape,\${buffer.full_name}}"
           ] ++ cfg.weechat.autosortShortNames.first ++ singleton "*")
           + "}"
         ) ])
@@ -95,7 +95,7 @@ in {
           "\${"
           + concatStringsSep "," ([
             "info:autosort_order"
-            "\${info:autosort_escape,\${buffer.short_name}}"
+            "\${info:autosort_escape,\${buffer.full_name}}"
           ] ++ singleton "*" ++ cfg.weechat.autosortShortNames.last)
           + "}"
         ) ])
@@ -106,6 +106,9 @@ in {
           "\${info:autosort_replace,#,,\${info:autosort_escape,\${buffer.name}}}"
           "\${buffer.full_name}"
         ])
+      ];
+      weechat.autosortShortNames.last = mkAfter [
+        "perl.highmon"
       ];
     };
     home.shell = {
@@ -345,16 +348,21 @@ in {
         packages = [ "weechat-matrix" ];
       };
       scripts = with pkgs.weechatScripts; [
-        go auto_away autosort colorize_nicks unread_buffer urlgrab vimode-develop weechat-matrix highmon weechat-notify-send
-        # TODO: add emoji script for :emoj<tab> completion
+        weechat-matrix
+        vimode-develop
+        weechat-go weechat-autosort buffer_autoset unread_buffer
+        highmon weechat-notify-send
+        auto_away colorize_nicks urlgrab
+        emoji
       ];
       init = mkMerge [
         # make a new split window for highmon
         ''
           /window splith +10
           /window 2
-          /buffer highmon
+          /buffer perl.highmon
           /window 1
+          /buffer hide perl.highmon
         ''
       ];
       config = with base16.map.ansiStr; let
