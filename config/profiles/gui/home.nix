@@ -973,7 +973,7 @@ in {
         global = {
           transparency = 10;
           follow = "mouse";
-          font = "monospace ${config.lib.gui.fontSizeStr 11}";
+          font = "monospace ${config.lib.gui.fontSizeStr 9}";
           width = "(0, 720)"; # min, max
           idle_threshold = 60 * 3;
           show_age_threshold = 60;
@@ -982,6 +982,7 @@ in {
           mouse_middle_click = "context";
           mouse_left_click = "close_current";
           show_indicators = false;
+          fullscreen = "pushback"; # default is to "show"
           #dmenu = "${config.programs.dmenu.package}/bin/dmenu";
           dmenu = "${config.programs.rofi.package}/bin/rofi";
           browser = "${xdg-open}/bin/xdg-open";
