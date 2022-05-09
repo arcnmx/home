@@ -29,11 +29,12 @@ in {
         utillinux
         coreutils
         iproute
+      ] ++ lib.optionals (!config.home.minimalSystem) [
         bind.dnsutils
         (if config.home.profiles.gui
           then duc
           else duc-cli)
-      ] ++ (lib.optional config.services.yggdrasil.enable pkgs.yggdrasil);
+      ];
     };
 
     i18n = {

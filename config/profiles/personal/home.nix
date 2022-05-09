@@ -308,11 +308,11 @@ in {
       };
     };
     programs.gh = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       settings.git_protocol = "ssh";
     };
     programs.buku = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       bookmarks = {
         howoldis = {
           title = "NixOS Channel Freshness";
@@ -344,7 +344,7 @@ in {
       };
     };
     programs.filebin = {
-      enable = true;
+      enable = !config.home.minimalSystem;
       extraConfig = ''
         AWS_ACCESS_KEY_ID=$(bitw get tokens/aws-filebin -f aws_access_key_id)
         AWS_SECRET_ACCESS_KEY=$(bitw get tokens/aws-filebin -f aws_secret_access_key)
