@@ -15,8 +15,9 @@
         manufacturer = "EVE";
         model = "ES07D03";
       };
-      xserver.sectionName = mkDefault "Monitor[1]";
+      xserver.sectionName = mkDefault "Monitor[0]";
       refreshRate = mkDefault 144;
+      primary = mkDefault true;
     } // _4k;
     dell = { config, ... }: {
       imports = [ defaults.common ];
@@ -25,8 +26,7 @@
         manufacturer = "DEL";
         model = "DELL S2721QS";
       };
-      xserver.sectionName = mkDefault "Monitor[0]";
-      primary = mkDefault true;
+      xserver.sectionName = mkDefault "Monitor[1]";
     } // _4k;
     lg = { config, ... }: {
       imports = [ defaults.common ];
@@ -41,19 +41,19 @@
   };
   layouts = {
     stacked = monitors: with monitors; {
-      spectrum = { config, ... }: {
-        imports = [ defaults.spectrum ];
-        x = lg.x - config.viewport.width;
-        y = dell.y - config.viewport.height;
-      };
       dell = { config, ... }: {
         imports = [ defaults.dell ];
+        x = lg.x - config.viewport.width;
+        y = spectrum.y - config.viewport.height;
+      };
+      spectrum = { config, ... }: {
+        imports = [ defaults.spectrum ];
         x = 0;
         y = lg.y + lg.viewport.height - config.viewport.height;
       };
       lg = { config, ... }: {
         imports = [ defaults.lg ];
-        x = dell.x + dell.viewport.width;
+        x = spectrum.x + spectrum.viewport.width;
         y = max 0 ((spectrum.viewport.height + dell.viewport.height) - config.viewport.height);
       };
     };
