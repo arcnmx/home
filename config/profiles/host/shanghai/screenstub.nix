@@ -105,6 +105,15 @@ in {
           events = swapDisplay "eve-portrait";
         }
         {
+          triggers = singleton "Equal";
+          modifiers = singleton cfg.modifierKey;
+          events = singleton {
+            guest_exec = [
+              "C:/Apps/heater.bat"
+            ];
+          };
+        }
+        {
           triggers = singleton "RightCtrl";
           modifiers = singleton "LeftMeta";
           events = [
