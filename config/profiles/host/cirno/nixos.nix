@@ -236,6 +236,7 @@ in {
     };
 
     boot.kernel.customBuild = mkForce false;
+    boot.growPartition = false; # brings in too many deps, enable for a fresh install or disk change only!
     nix.gc = {
       automatic = true;
       options = "-d"; # actually delete old things
