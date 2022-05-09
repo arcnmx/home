@@ -737,7 +737,7 @@ in {
 
         browser = firefox;
 
-        editorcmd = ''${urxvt} -e ${vim} %f -c "normal %lG%cl"'';
+        editorcmd = "${urxvt} -e zsh -ic '${vim} %f \"+normal!%lG%c|\"'";
 
         nag = false;
         leavegithubalone = false;
@@ -786,6 +786,10 @@ in {
         allowautofocus = {
           "play\\.rust-lang\\.org" = { value = true; };
           "typescriptlang\\.org/play" = { value = true; };
+          "danielyxie\\.github\\.io/bitburner/" = { value = true; };
+        };
+        editorcmd = {
+          "github\\.com" = { value = "${urxvt} -e zsh -ic '${vim} %f \"+normal!%lG%c|:M2A\"'"; };
         };
       };
     };
