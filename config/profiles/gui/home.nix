@@ -17,6 +17,21 @@
   in {
     ".mozilla".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/mozilla";
   } // paths;
+  # `gio open` (which firefox uses via libgio) picks from a list of hard-coded terminals:
+  # https://github.com/GNOME/glib/blob/cbb2a51a5b45925b04f3bf7d06ade59c00154bdf/gio/gdesktopappinfo.c#L2612
+  xdg-open = (pkgs.writeShellScriptBin "xdg-open" ''
+    export PATH="$PATH:${gioTerminal}/bin"
+    exec ${pkgs.glib.bin}/bin/gio open "$@"
+  '').overrideAttrs (_: {
+    meta.priority = 3;
+  });
+  gioTerminal = pkgs.writeShellScriptBin "rxvt" ''
+    if [[ ''${1-} != -e ]]; then
+      exec ${pkgs.rxvt-unicode-arc}/bin/urxvtc "$@"
+    fi
+    shift
+    exec ${pkgs.rxvt-unicode-arc}/bin/urxvtc -e ''${SHELL-bash} -ic "$*"
+  '';
 in {
   imports = [
     ./xresources.nix
@@ -77,12 +92,14 @@ in {
       scrot
       xsel
       xorg.xinit
-      xdg_utils-mimi
+      xdg_utils
+      xdg-open
       arc.packages.personal.emxc
       rxvt-unicode-arc
       mumble-develop
       libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
       (clip.override { enableWayland = config.wayland.windowManager.sway.enable; })
+      gioTerminal
     ] ++ optionals config.gtk.enable [
       evince
       gnome3.adwaita-icon-theme
@@ -961,7 +978,7 @@ in {
           show_indicators = false;
           #dmenu = "${config.programs.dmenu.package}/bin/dmenu";
           dmenu = "${config.programs.rofi.package}/bin/rofi";
-          browser = "${pkgs.xdg-utils}/bin/xdg-open";
+          browser = "${xdg-open}/bin/xdg-open";
         };
         urgency_low = {
           frame_color = background_light;
