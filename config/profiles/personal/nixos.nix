@@ -84,6 +84,7 @@ in {
 
     base16.console.enable = true;
 
+    hardware.xpadneo.enable = true;
     hardware.enableAllFirmware = true;
 
     systemd.network.links = {
@@ -157,17 +158,27 @@ in {
         # Gamepads
         SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", ${assignLocalGroup}
         SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="045e", ATTR{idProduct}=="0b12", ${assignLocalGroup}
         # Moonlander: https://github.com/zsa/wally/wiki/Live-training-on-Linux
         SUBSYSTEM=="usb", ATTR{idVendor}=="3297", ATTR{idProduct}=="1969", GROUP="plugdev"
       '';
       uinput = ''
         ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0660", ${assignLocalGroup}
       '';
+      uvc = ''
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", GROUP="video"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="1d6c", GROUP="video"
+        KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6366", ATTRS{product}=="USB Live camera", SYMLINK+="video-hd682h", TAG+="systemd"
+        KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6366", ATTRS{product}=="USB  Live camera", SYMLINK+="video-hd826", TAG+="systemd"
+        KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="1d6c", ATTRS{idProduct}=="1278", ATTRS{manufacturer}=="YGTek", ATTRS{product}=="Webcam", ATTRS{serial}=="YG_U600D.4653_4K.2103121705", SYMLINK+="video-yg4k", TAG+="systemd"
+        KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", ATTR{name}=="OBS Virtual Camera", SYMLINK+="video-obs", TAG+="systemd"
+      '';
     in ''
       ${devBoards}
       ${i2c}
       ${inputs}
       ${uinput}
+      ${uvc}
     '';
     services.udev.packages = [
       pkgs.android-udev-rules

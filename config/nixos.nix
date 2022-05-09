@@ -51,7 +51,7 @@ in {
     arc = {
       isNormalUser = true;
       initialPassword = "hello";
-      extraGroups = [ "wheel" "builders" "kvm" ];
+      extraGroups = [ "wheel" "builders" "kvm" "video" ] ++ lib.optional config.virtualisation.docker.enable "docker";
       shell = pkgs.zsh;
     };
   };

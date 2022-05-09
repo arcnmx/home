@@ -18,8 +18,9 @@
         kvmfr.options = {
           static_size_mb = "64";
         };
+        xpad.blacklist = true;
       };
-      extraModulePackages = with config.boot.kernelPackages; [ forcefully-remove-bootfb looking-glass-kvmfr ];
+      extraModulePackages = with config.boot.kernelPackages; [ forcefully-remove-bootfb kvmfr ];
       kernel.extraPatches = with pkgs.kernelPatches; [
         (mkIf config.hardware.vfio.i915arbiter i915-vga-arbiter)
         (mkIf config.hardware.vfio.acsOverride acs-override)

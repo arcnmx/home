@@ -137,8 +137,6 @@ in {
 
     services.udev.extraRules = ''
       SUBSYSTEM=="i2c-dev", OWNER="root", GROUP="kvm", MODE="0660"
-      SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", OWNER="root", GROUP="kvm"
-      SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", OWNER="root", GROUP="kvm"
       SUBSYSTEM=="vfio", OWNER="root", GROUP="kvm"
       SUBSYSTEM=="misc", KERNEL=="uinput", OPTIONS+="static_node=uinput", MODE="0660", GROUP="uinput"
       ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0666", GROUP="users"
