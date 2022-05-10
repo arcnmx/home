@@ -102,6 +102,10 @@ in {
         };
       };
     };
+    home.profileSettings.bitw = mkOption {
+      type = types.package;
+      default = pkgs.rbw-bitw;
+    };
   };
 
   config = mkIf config.home.profiles.personal {
@@ -112,6 +116,7 @@ in {
       ".electrum".source = mkOutOfStoreSymlink "${config.xdg.configHome}/electrum/";
     };
     home.packages = with pkgs; [
+      config.home.profileSettings.bitw
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
       gnupg
       pass-arc
