@@ -276,12 +276,12 @@ in {
           (pkgs.fetchurl {
             # base16background=none
             url = "https://github.com/arcnmx/base16-vim/commit/fe16eaaa1de83b649e6867c61494276c1f35c3c3.patch";
-            sha256 = "0xh0s6ajd4d8bjgiykrh6imxknqkj4mk3ly5mpzbahl8mkmxza6w";
+            sha256 = "1c0n7mf6161mvxn5xlabhyxzha0m1c41csa6i43ng8zybbspipld";
           })
           (pkgs.fetchurl {
             # fix unreadable error highlights under cursor
             url = "https://github.com/arcnmx/base16-vim/commit/807e442d95c57740dd3610c9f9c07c9aae8e0995.patch";
-            sha256 = "0ypz047l0wxj91rldqiiifq9vajq646pydf70lghr08i41ll53rx";
+            sha256 = "1l3qmk15v8d389363adkmfg8cpxppyhlk215yq3rdcasvw7r8bla";
           })
         ];
       });
