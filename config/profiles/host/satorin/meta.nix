@@ -6,11 +6,8 @@
     network.nodes.satorin = { ... }: {
       imports = [
         ../../../nixos.nix
+        ./nixos.nix
       ];
-
-      networking = {
-        hostName = "satorin";
-      };
     };
   };
 }

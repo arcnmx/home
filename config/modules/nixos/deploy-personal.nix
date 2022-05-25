@@ -9,12 +9,12 @@
   in {
     options.programs.git.gitHub.users = mkOption {
       type = types.attrsOf (types.submodule ({ name, config, ... }: {
-        config.sshKeyPrivate = mkIf cfg.enable userConfig.secrets.files."github_${name}_ssh_key".path;
+        config.sshKeyPrivate = mkIf (cfg.enable && tf.state.enable) userConfig.secrets.files."github_${name}_ssh_key".path;
       }));
     };
     config = mkMerge [ {
       services.sshd.authorizedKeys = meta.deploy.personal.ssh.authorizedKeys;
-    } (mkIf cfg.enable {
+    } (mkIf (cfg.enable && tf.state.enable) {
       programs = {
         ssh = {
           matchBlocks."git-codecommit.*.amazonaws.com" = mkIf config.home.profiles.trusted {
@@ -117,6 +117,15 @@ in {
           inputs = {
             algorithm = "RSA";
             rsa_bits = 4096;
+          };
+        };
+        personal_iam_ssh = mkIf config.home.profiles.trusted {
+          provider = "aws";
+          type = "iam_user_ssh_key";
+          inputs = {
+            username = meta.deploy.targets.archive.tf.resources.personal_iam_user.importAttr "name";
+            encoding = "SSH";
+            public_key = resources.personal_aws_ssh_key.refAttr "public_key_openssh";
           };
         };
 

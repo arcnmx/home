@@ -1,7 +1,7 @@
 { tf, config, pkgs, lib, ... }: with lib; let
   inherit (config.networking) domains bindings;
 in {
-  config = mkIf config.home.profiles.host.gensokyo {
+  config = {
     deploy.tf = {
       resources = {
         vaultwarden_token = mkIf config.services.vaultwarden.enable {

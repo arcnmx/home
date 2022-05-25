@@ -1,5 +1,15 @@
-{ lib, config, ... }: with lib; {
-  imports = (import ./profiles/modules.nix { }).metaImports;
+{ lib, config, ... }: with lib; let
+  trustedPath = ./profiles/trusted/meta.nix;
+  hasTrusted = builtins.pathExists trustedPath;
+in {
+  imports = [
+    ./profiles/host/gensokyo/meta.nix
+    ./profiles/host/aya/meta.nix
+    ./profiles/host/cirno/meta.nix
+    ./profiles/host/mystia/meta.nix
+    ./profiles/host/satorin/meta.nix
+    ./profiles/host/shanghai/meta.nix
+  ] ++ optional hasTrusted trustedPath;
   config = {
     deploy = {
       dataDir = ../deploy;
@@ -25,54 +35,5 @@
         args = [ "--show-trace" ];
       };
     };
-    home.profiles = {
-      base = {
-        imports = [
-          ./home.nix
-        ];
-        home.profiles.base = mkDefault true;
-      };
-
-      personal = {
-        imports = [
-          ./home.nix
-        ];
-        home.profiles = {
-          base = mkDefault true;
-          personal = true;
-        };
-      };
-
-      desktop = {
-        imports = [
-          ./home.nix
-        ];
-        home.profiles = {
-          base = mkDefault true;
-          personal = true;
-          gui = true;
-        };
-      };
-
-      laptop = {
-        imports = [
-          ./home.nix
-        ];
-        home.profiles = {
-          base = mkDefault true;
-          personal = true;
-          gui = true;
-          laptop = true;
-        };
-      };
-    } // mapAttrs (host: _: {
-      imports = [
-        ./home.nix
-      ];
-      home = {
-        profiles.base = mkDefault true;
-        hostName = host;
-      };
-    }) (builtins.readDir ./profiles/host);
   };
 }

@@ -8,13 +8,10 @@
         tf = import (meta.channels.paths.tf + "/modules");
       in [
         ../../../nixos.nix
+        ./nixos.nix
         tf.nixos.oracle
         tf.nixos.ubuntu-linux # lustrate host image
       ];
-
-      networking = {
-        hostName = "cirno";
-      };
     };
   };
 }

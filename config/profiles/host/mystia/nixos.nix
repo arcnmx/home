@@ -1,12 +1,9 @@
 { meta, tf, name, pkgs, config, lib, ... }: with lib; {
-  options.home = {
-    profiles.host.mystia = mkEnableOption "hostname: mystia";
-  };
+  imports = [
+    ../../../../cfg/trusted.nix
+  ];
 
-  config = mkIf config.home.profiles.host.mystia {
-    home.profiles.trusted = true;
-    home.profiles.host.gensokyo = true;
-
+  config = {
     networking = {
       enableIPv6 = false;
       useNetworkd = true;

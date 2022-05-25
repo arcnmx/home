@@ -1,16 +1,12 @@
 { name, pkgs, config, lib, ... }: with lib; {
   imports = [
     ./ayacam.nix
+    ../../../../hw/pinecube
+    ../../../../cfg/gensokyo.nix
+    ../../../../cfg/trusted.nix
   ];
 
-  options.home = {
-    profiles.host.aya = mkEnableOption "hostname: aya";
-  };
-
-  config = mkIf config.home.profiles.host.aya {
-    home.profiles.hw.pinecube = true;
-    home.profiles.host.gensokyo = true;
-    home.profiles.trusted = true;
+  config = {
     home.minimalSystem = true;
     deploy.tf.deploy = {
       gcroot.enable = true;

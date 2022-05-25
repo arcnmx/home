@@ -6,11 +6,8 @@
     network.nodes.shanghai = { ... }: {
       imports = [
         ../../../nixos.nix
+        ./nixos.nix
       ];
-
-      networking = {
-        hostName = "shanghai";
-      };
     };
   };
 }

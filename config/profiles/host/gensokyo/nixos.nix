@@ -9,20 +9,13 @@ in {
   ];
 
   options.home = {
-    profiles = {
-      host.gensokyo = mkEnableOption "network: gensokyo";
-    };
-    profileSettings.gensokyo.zone = mkOption {
-      type = types.nullOr types.str;
-      default = findFirst (k: hasSuffix k config.networking.domain) null (mapAttrsToList (_: zone: zone.zone) tf.dns.zones);
-    };
     profileSettings.gensokyo.frontpage = mkOption {
       type = types.bool;
       default = false;
     };
   };
 
-  config = mkIf config.home.profiles.host.gensokyo {
+  config = {
     deploy.tf = let
       inherit (config.home.profileSettings.gensokyo) zone;
       domain = removeSuffix zone "${config.networking.hostName}.${config.networking.domain}";

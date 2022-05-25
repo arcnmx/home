@@ -12,13 +12,12 @@
   in assert hasSuffix "::" prefix; prefix + "9";
   addr_ipv4_private = terraformExpr ''cidrhost("${common.resources.oci_homedeploy_subnet.importAttr "cidr_block"}", 9)'';
 in {
-  options.home = {
-    profiles.host.cirno = mkEnableOption "hostname: cirno";
-  };
+  imports = [
+    ../gensokyo/nixos.nix
+    ../../../../cfg/trusted.nix
+  ];
 
-  config = mkIf config.home.profiles.host.cirno {
-    home.profiles.trusted = true;
-    home.profiles.host.gensokyo = true;
+  config = {
     home.minimalSystem = true;
 
     nixpkgs.localSystem = systems.examples.aarch64-multiplatform // {
