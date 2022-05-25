@@ -6,7 +6,7 @@
   ci.gh-actions.export = true;
   gh-actions.jobs.ci.step = let
     hostnames = [ "satorin" "shanghai" ];
-    profiles = [ "base" "personal" "desktop" "laptop" ];
+    profiles = [ /*"base" "personal" "desktop" "laptop"*/ ];
   in mapAttrs' (k: nameValuePair "nixos-${k}") (genAttrs hostnames (host: {
     name = "build nixos/${host}";
     run = ''
