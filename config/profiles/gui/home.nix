@@ -827,6 +827,7 @@ in {
         opengl-waitvsync = true;
 
         keep-open = true;
+        cache-pause-wait = 0.5;
 
         volume-max = 200;
         osd-scale-by-window = false;
