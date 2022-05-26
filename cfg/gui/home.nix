@@ -75,10 +75,10 @@ in {
           )
         '';
         discord = ''
-          PULSE_PROP="media.role=phone" nix run nixpkgs.discord -c Discord "$@"
+          PULSE_PROP="media.role=phone" nix shell nixpkgs#discord -c Discord "$@"
         '';
         ffr = ''
-          nix run nixpkgs.flashplayer-standalone -c flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
+          nix shell nixpkgs#flashplayer-standalone -c flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
         '';
         monstercatfm = ''
           mplay ytdl://http://twitch.tv/monstercat
@@ -1066,7 +1066,7 @@ in {
     };
     home.shell.aliases = {
       konawall = "systemctl --user restart konawall.service";
-      chrome = "nix run nixpkgs.google-chrome -c google-chrome-stable";
+      chrome = "nix shell nixpkgs#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
     };
 

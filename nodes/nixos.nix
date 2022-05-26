@@ -13,6 +13,7 @@
       cores = 0;
       max-jobs = lib.mkDefault 6; # "auto"
     };
+    nrBuildUsers = 32; # XXX: workaround for infinite recursion due to `nix.settings` being freeform
   };
 
   home-manager = {

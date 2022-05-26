@@ -100,13 +100,10 @@ in {
         substituters = [ "https://arc.cachix.org" ];
         trusted-public-keys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
       };
-      package = let
-        nix = pkgs.nix_2_3;
-      in lib.mkMerge [
-        (lib.mkDefault nix)
-        (lib.mkIf (!config.home.minimalSystem) (pkgs.nix-readline.override { inherit nix; }))
+      package = lib.mkMerge [
+        (lib.mkDefault pkgs.nix)
+        (lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline)
       ];
-      nix24.package = lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline;
       registry.ci = {
         to = {
           type = "github";

@@ -122,8 +122,6 @@ in {
         taskwork = "task rc.context=work";
         taskfun = "task rc.context=fun";
         taskrm = "task rc.confirmation=no delete";
-      } // optionalAttrs (!config.home.minimalSystem && config ? home.nixosConfig.nix.nix24) {
-        nix3 = "${config.home.nixosConfig.nix.nix24.wrapped}/bin/nix";
       };
       deprecationAliases = {
         ncpamixer = "pulsemixer";
