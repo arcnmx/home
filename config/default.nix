@@ -40,7 +40,7 @@
     ];
 
     specialArgs = {
-      inherit channels;
+      inherit channels inputs;
       trusted = import ./trusted.nix { inherit lib; };
       # TODO?
     };

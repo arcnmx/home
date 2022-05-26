@@ -1,4 +1,4 @@
-{ tf, config, pkgs, lib, ... }:
+{ tf, inputs, config, pkgs, lib, ... }:
 let
 in {
   imports = [
@@ -104,13 +104,21 @@ in {
         (lib.mkDefault pkgs.nix)
         (lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline)
       ];
-      registry.ci = {
-        to = {
+      registry = {
+        nixpkgs.to = {
           type = "github";
-          owner = "arcnmx";
-          repo = "ci";
+          owner = "NixOS";
+          repo = "nixpkgs";
+          inherit (inputs.nixpkgs.sourceInfo) lastModified rev narHash;
         };
-        exact = false;
+        ci = {
+          to = {
+            type = "github";
+            owner = "arcnmx";
+            repo = "ci";
+          };
+          exact = false;
+        };
       };
     };
 
