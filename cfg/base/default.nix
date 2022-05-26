@@ -94,8 +94,7 @@ in {
       accessTokens = lib.mkIf tf.state.enable {
         "github.com" = tf.variables.github-access.get;
       };
-      experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" "ca-derivations" ];
-        #++ lib.optional (lib.versionOlder config.nix.nix24.package.version "2.5") "ca-derivations";
+      experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" "ca-derivations" "impure-derivations" ];
       settings = {
         builders-use-substitutes = true;
         substituters = [ "https://arc.cachix.org" ];
