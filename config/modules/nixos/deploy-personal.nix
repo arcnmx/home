@@ -17,7 +17,7 @@
     } (mkIf (cfg.enable && tf.state.enable) {
       programs = {
         ssh = {
-          matchBlocks."git-codecommit.*.amazonaws.com" = mkIf config.home.profiles.trusted {
+          matchBlocks."git-codecommit.*.amazonaws.com" = mkIf (userConfig.secrets.files ? iam_ssh_key) {
             identitiesOnly = true;
             identityFile = userConfig.secrets.files.iam_ssh_key.path;
             user = resources.personal_iam_ssh.getAttr "ssh_public_key_id";
@@ -39,13 +39,13 @@
             clientCertificate = pkgs.writeText "taskd-client.pem" (resources.taskserver_client_cert.getAttr "cert_pem");
             clientKey = userConfig.secrets.files.taskserver-client.path;
           };
-          extraConfig = mkIf config.home.profiles.trusted ''
+          extraConfig = ''
             include ${userConfig.secrets.files.taskserver-creds.path}
           '';
         };
       };
       services = {
-        mpd = mkIf config.home.profiles.trusted {
+        mpd = {
           extraConfig = ''
             password "${resources.mpd_password.refAttr "result"}@read,add,control"
             password "${resources.mpd_password_admin.refAttr "result"}@read,add,control,admin"
@@ -53,27 +53,29 @@
           configPath = userConfig.secrets.files.mpd-config.path;
         };
       };
-      xdg.configFile."cargo/config" = mkIf config.home.profiles.trusted {
+      xdg.configFile."cargo/config" = {
         source = mkOutOfStoreSymlink userConfig.secrets.files.cargo-config.path;
       };
       secrets.files = mkMerge (singleton {
         taskserver-client = mkIf userConfig.programs.taskwarrior.enable {
           text = resources.taskserver_client_key.refAttr "private_key_pem";
         };
-        taskserver-creds = mkIf (config.home.profiles.trusted && userConfig.programs.taskwarrior.enable) {
+        taskserver-creds = mkIf userConfig.programs.taskwarrior.enable {
           text = ''
             taskd.credentials=arc/arc/${variables.TASKD_CREDS_ARC.ref}
           '';
         };
-        iam_ssh_key.text = resources.personal_aws_ssh_key.refAttr "private_key_pem";
+        iam_ssh_key = mkIf (meta.deploy.targets ? archive.tf.resources.personal_iam_user) {
+          text = resources.personal_aws_ssh_key.refAttr "private_key_pem";
+        };
         ssh_key.text = resources.personal_ssh_key.refAttr "private_key_pem";
-        cargo-config = mkIf config.home.profiles.trusted {
+        cargo-config = {
           text = ''
             [registry]
             token = "${variables.CRATES_TOKEN_ARC.ref}"
           '';
         };
-        mpd-config = mkIf (config.home.profiles.trusted && userConfig.services.mpd.enable) {
+        mpd-config = mkIf userConfig.services.mpd.enable {
           text = userConfig.services.mpd.configText;
         };
       } ++ map (ghUser: {
@@ -112,6 +114,7 @@ in {
 
         # TODO: deploy this key to gpg via ssh as part of switch??
         personal_aws_ssh_key = {
+          enable = resources.personal_iam_ssh.enable;
           provider = "tls";
           type = "private_key";
           inputs = {
@@ -119,7 +122,8 @@ in {
             rsa_bits = 4096;
           };
         };
-        personal_iam_ssh = mkIf config.home.profiles.trusted {
+        personal_iam_ssh = {
+          enable = meta.deploy.targets ? archive.tf.resources.personal_iam_user;
           provider = "aws";
           type = "iam_user_ssh_key";
           inputs = {
@@ -210,7 +214,7 @@ in {
           };
         };
       }) (unique (concatMap (home: attrNames home.programs.git.gitHub.users) (attrValues config.home-manager.users))));
-      variables = mkIf config.home.profiles.trusted {
+      variables = {
         TASKD_CREDS_ARC.bitw.name = "taskd-arc";
         CRATES_TOKEN_ARC.bitw.name = "crates-arcnmx";
       };

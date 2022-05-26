@@ -129,7 +129,7 @@ in {
         ncpamixer = "pulsemixer";
       };
       functions = {
-        mradio = mkIf config.home.profiles.trusted ''
+        mradio = ''
           mplay http://shanghai:32101
         '';
         lorri-init = ''

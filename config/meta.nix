@@ -1,7 +1,4 @@
-{ lib, config, ... }: with lib; let
-  trustedPath = ./profiles/trusted/meta.nix;
-  hasTrusted = builtins.pathExists trustedPath;
-in {
+{ lib, config, trusted, ... }: with lib; {
   imports = [
     ./profiles/host/gensokyo/meta.nix
     ./profiles/host/aya/meta.nix
@@ -9,7 +6,7 @@ in {
     ./profiles/host/mystia/meta.nix
     ./profiles/host/satorin/meta.nix
     ./profiles/host/shanghai/meta.nix
-  ] ++ optional hasTrusted trustedPath;
+  ] ++ trusted.import.meta "default";
   config = {
     deploy = {
       dataDir = ../deploy;

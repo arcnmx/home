@@ -11,7 +11,6 @@ in {
   ];
 
   options.home = {
-    profiles.trusted = mkEnableOption "trusted";
     profileSettings.gensokyo.zone = mkOption {
       type = types.nullOr types.str;
       default = findFirst (k: hasSuffix k (toString config.networking.domain)) null (mapAttrsToList (_: zone: zone.zone) tf.dns.zones);

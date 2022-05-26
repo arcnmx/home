@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }: with lib; {
+{ pkgs, lib, config, trusted, ... }: with lib; {
   options.network = {
     nixos = {
       extraModules = mkOption {
@@ -65,7 +65,7 @@
           ++ config.network.nixos.extraModules;
 
         specialArgs = {
-          inherit baseModules;
+          inherit baseModules trusted;
           inherit (config.network.nixos) modulesPath;
           inherit (config.network.nixos.specialArgs) nodes meta;
         }; #// config.network.nixos.specialArgs;

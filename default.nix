@@ -20,6 +20,7 @@
 
     specialArgs = {
       inherit channels;
+      trusted = import ./config/trusted.nix { inherit lib; };
       # TODO?
     };
   };
