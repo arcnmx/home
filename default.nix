@@ -1,1 +1,1 @@
-{ }: import ./config { }
+(import ./ci/bootstrap.nix).flake

@@ -17,6 +17,70 @@
         "type": "github"
       }
     },
+    "base16": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "std": [
+          "std"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653522543,
+        "narHash": "sha256-xd3/lVQ3/usqmpzceVeVTIOWUZYzoz+L1Jhu0Rz06HU=",
+        "owner": "flakelib",
+        "repo": "pkgs",
+        "rev": "76928225e9bc4e42c79fdf0fbf3f9411e899e035",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "ref": "base16",
+        "repo": "pkgs",
+        "type": "github"
+      }
+    },
+    "fl-config": {
+      "locked": {
+        "lastModified": 1653159448,
+        "narHash": "sha256-PvB9ha0r4w6p412MBPP71kS/ZTBnOjxL0brlmyucPBA=",
+        "owner": "flakelib",
+        "repo": "fl",
+        "rev": "fcefb9738d5995308a24cda018a083ccb6b0f460",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "ref": "config",
+        "repo": "fl",
+        "type": "github"
+      }
+    },
+    "flakelib": {
+      "inputs": {
+        "fl-config": "fl-config",
+        "std": [
+          "std"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653175637,
+        "narHash": "sha256-dQpOC0nJnTfmNqbPlk1/C6aW/NRfoS20pSJIUM1X3VY=",
+        "owner": "flakelib",
+        "repo": "fl",
+        "rev": "798bb3a6987efa22c6f4944e9136d54e372f0625",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "repo": "fl",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -34,6 +98,57 @@
       "original": {
         "owner": "nix-community",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "linuxPackages": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653171481,
+        "narHash": "sha256-0k5z1zTrm1cV//6VJ1t2yyJ3TaB+NR7dyb7BoOT1tpw=",
+        "owner": "flakelib",
+        "repo": "pkgs",
+        "rev": "3a027875a7d82313981a86ad2085edfbd8e122ab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "ref": "linux",
+        "repo": "pkgs",
+        "type": "github"
+      }
+    },
+    "meta": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "std": [
+          "std"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653688298,
+        "narHash": "sha256-CEf/nD1oxgsC5RJGAw4SvaqQBWuIHk8mpxLTZlX1fXw=",
+        "owner": "flakelib",
+        "repo": "pkgs",
+        "rev": "2439bdfa32eb0bf143a36fa99bfdc6d7d0c04cf7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "ref": "meta",
+        "repo": "pkgs",
         "type": "github"
       }
     },
@@ -72,11 +187,16 @@
     "root": {
       "inputs": {
         "arc": "arc",
+        "base16": "base16",
+        "flakelib": "flakelib",
         "home-manager": "home-manager",
+        "linuxPackages": "linuxPackages",
+        "meta": "meta",
         "nixpkgs": "nixpkgs",
         "rust": "rust",
         "std": "std",
-        "tf": "tf"
+        "tf": "tf",
+        "wireplumber-scripts-arc": "wireplumber-scripts-arc"
       }
     },
     "rust": {
@@ -126,6 +246,29 @@
       "original": {
         "owner": "arcnmx",
         "repo": "tf-nix",
+        "type": "github"
+      }
+    },
+    "wireplumber-scripts-arc": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653174502,
+        "narHash": "sha256-Bm/1urNnNSlcBujlj3owudnBdYDs5ZpO63Ys1Y5vX80=",
+        "owner": "arcnmx",
+        "repo": "wireplumber-scripts",
+        "rev": "631731d5025359b2c4efe1ee66651544145cb90d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "repo": "wireplumber-scripts",
         "type": "github"
       }
     }

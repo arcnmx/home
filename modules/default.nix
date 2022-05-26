@@ -1,0 +1,3 @@
+{ }: {
+  default = ../config/modules/nixos;
+}
