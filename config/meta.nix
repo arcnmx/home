@@ -28,7 +28,7 @@
     };
     runners = {
       lazy = {
-        file = ../default.nix;
+        file = ./default.nix;
         args = [ "--show-trace" ];
       };
     };

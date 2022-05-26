@@ -1,6 +1,6 @@
 env:
   CI_ALLOW_ROOT: '1'
-  CI_CONFIG: ./ci.nix
+  CI_CONFIG: ./ci/config.nix
   CI_PLATFORM: gh-actions
 jobs:
   ci:
@@ -12,12 +12,6 @@ jobs:
       uses: actions/checkout@v1
       with:
         submodules: false
-    - id: submodules
-      name: git submodule init
-      run: "gh_submodule() {\n  SUBMODULE_COMMIT=$(git submodule status $1 | cut -d\
-        \ ' ' -f 1)\n  curl -fSL https://github.com/$2/archive/${SUBMODULE_COMMIT#-}.tar.gz\
-        \ | tar -xz --strip-components=1 -C $1\n}\n\ngit submodule update --init channels/{arc,tf,home-manager,rust,nur}\n\
-        gh_submodule channels/nixpkgs nixos/nixpkgs\n"
     - id: nix-install
       name: nix install
       uses: arcnmx/ci/actions/nix/install@master

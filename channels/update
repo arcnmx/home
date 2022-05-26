@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-exec git submodule update --remote $(git rev-parse --show-toplevel)/channels/*/

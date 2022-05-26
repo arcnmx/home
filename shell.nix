@@ -1,5 +1,5 @@
 { }: let
-  config = import ./default.nix { };
+  config = import ./config { };
   inherit (config) pkgs;
   hostname = pkgs.writeShellScriptBin "hostname" ''
     exec ${pkgs.inetutils}/bin/hostname "$@"
@@ -13,6 +13,6 @@ in pkgs.mkShell {
     export HOME_HOSTNAME=$(hostname -s)
     export HOME_UID=$(id -u)
     export HOME_USER=$(id -un)
-    export NIX_PATH="$NIX_PATH:home=${toString ./.}"
+    export NIX_PATH="$NIX_PATH:home=${toString ./config}"
   '';
 }
