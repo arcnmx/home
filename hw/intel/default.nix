@@ -21,6 +21,7 @@ in {
   };
 
   config = {
+    nixpkgs.system = "x86_64-linux";
     environment.systemPackages = [ pkgs.i7z ];
     hardware = {
       cpu.intel.updateMicrocode = mkDefault true;
