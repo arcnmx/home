@@ -7,6 +7,7 @@
     ../../cfg/cross.nix
     ../../cfg/vfio
     ../../cfg/trusted.nix
+    ../../cfg/ddclient
     ./audio.nix
     ./network.nix
     ./fs.nix
@@ -18,7 +19,6 @@
       imports = [ ./home.nix ];
     };
 
-    services.ddclient.enable = true;
     services.ofono.enable = true;
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     hardware.openrazer.enable = true;

@@ -29,8 +29,6 @@
     ${pkgs.python3.withPackages (p: with p; [ dbus-python /*pygobject3*/ ])}/bin/python ${./files/bluephone.py} "$@"
   '';
 in {
-  imports = [ ./ddclient.nix ];
-
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     home.profileSettings.base.defaultNameservers = true;

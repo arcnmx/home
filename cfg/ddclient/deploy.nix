@@ -4,10 +4,9 @@
   zoneId = tf.dns.zones.${cfg.zone}.cloudflare.id;
   isCloudflare = cfg.protocol == "cloudflare";
   domainName = domain: "dyndns_" + replaceStrings [ "-" "." ] [ "" "" ] domain;
-  hasSecret = cfg.enable && isCloudflare && tf.state.enable;
 in {
   config = {
-    deploy.tf = mkIf cfg.enable {
+    deploy.tf = {
       dns.records = listToAttrs (concatMap (domain: [
         # ddclient requires that records already exist in order to change them
         (nameValuePair "dyndns-${domain}-a" {
@@ -64,26 +63,11 @@ in {
         (nameValuePair "dyndns-${domain}-aaaa" (mkIf recordAAAA.enable (recordAAAA.out.resource.refAttr "id")))
       ]) cfg.domains);
     };
-    secrets.files.ddclient-secret = mkIf hasSecret {
-      text = tf.resources.ddclient-cloudflare-key.refAttr "value";
-    };
-    services.ddclient = {
-      package = pkgs.ddclient-develop;
-      quiet = true;
-      username = mkIf isCloudflare "token";
-      use = "no";
-      domains = mkDefault [ ]; # why the hell is `[""]` the default???
-      extraConfig = mkMerge [ (mkIf enableIPv6 ''
-        usev6=webv6, webv6=https://ipv6.nsupdate.info/myip
-      '') ''
-        usev4=webv4, webv4=https://ipv4.nsupdate.info/myip
-        max-interval=1d
-      '' ];
-      passwordFile = mkIf hasSecret config.secrets.files.ddclient-secret.path;
-    };
-    systemd.services.ddclient = mkIf cfg.enable {
-      serviceConfig = {
-        TimeoutStartSec = 90;
+    extern.entries.ddclient-secret = {
+      asFile = true;
+      tf = {
+        sensitive = true;
+        text = tf.resources.ddclient-cloudflare-key.refAttr "value";
       };
     };
   };

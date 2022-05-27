@@ -8,6 +8,8 @@
 in {
   imports = [
     ../nodes/nixos.nix
+    ../cfg/base/deploy.nix
+    ./extern.nix
   ];
 
   options.home = {

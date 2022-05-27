@@ -1,4 +1,4 @@
-{ tf, inputs, config, pkgs, lib, ... }:
+{ extern, inputs, config, pkgs, lib, ... }:
 let
 in {
   imports = [
@@ -84,15 +84,10 @@ in {
     programs.command-not-found.enable = lib.mkDefault false;
     services.udisks2.enable = lib.mkDefault (!config.home.minimalSystem);
 
-    deploy.tf.variables.github-access = {
-      export = true;
-      bitw.name = "github-public-access";
-    };
-
     nix = {
       distributedBuilds = true;
-      accessTokens = lib.mkIf tf.state.enable {
-        "github.com" = tf.variables.github-access.get;
+      accessTokens = lib.mkIf extern.enable {
+        "github.com" = extern.get.github-access;
       };
       experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" "ca-derivations" "impure-derivations" ];
       settings = {
