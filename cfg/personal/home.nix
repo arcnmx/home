@@ -228,6 +228,10 @@ in {
           type "pulse"
           name "speaker"
         }
+        input {
+          plugin "youtube-dl"
+          executable "${pkgs.yt-dlp}/bin/yt-dlp"
+        }
       '';
     };
     services.mpdris2.enable = mkDefault config.services.mpd.enable;
