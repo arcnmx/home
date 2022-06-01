@@ -8,7 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arc = {
-      url = "github:arcnmx/nixexprs/2205";
+      url = "github:arcnmx/nixexprs";
       flake = false;
     };
     rust = {
