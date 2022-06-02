@@ -4,6 +4,7 @@ let
 in {
   imports = [
     ../../modules/keep-dirs.nix
+    ../../modules/open.nix
     ./base16.nix
     ./bitw.nix
     ./email.nix

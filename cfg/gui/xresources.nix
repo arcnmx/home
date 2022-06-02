@@ -126,5 +126,5 @@ in {
       #"URxvt*background" = "rgba:0000/22bb/3366/ee00"; # dark
     });
   };
-  xdg.dataFile."urxvt/.keep".text = "";
+  xdg.dataDirs = [ "urxvt" ];
 }
