@@ -19,6 +19,7 @@ in {
 
   config = {
     home.minimalSystem = true;
+    system.stateVersion = "21.11";
 
     nixpkgs.localSystem = systems.examples.aarch64-multiplatform // {
       system = "aarch64-linux";

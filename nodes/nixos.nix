@@ -4,7 +4,6 @@
   ];
 
   networking.hostName = lib.mkDefault name;
-  system.stateVersion = lib.mkDefault "21.11";
 
   nix = {
     settings = {

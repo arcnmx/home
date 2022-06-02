@@ -164,7 +164,7 @@ in {
   };
 
   config = {
-    home.stateVersion = "21.05";
+    home.stateVersion = mkDefault "22.05";
     home.file = {
       ".gnupg".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/gnupg";
       ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {
@@ -208,7 +208,6 @@ in {
       type = "url";
       path = "https://github.com/arcnmx/ci/archive/master.tar.gz";
     };
-    home.keyboard = mkDefault null;
     xdg.enable = true;
     xdg.configFile = {
       "vim/after/indent/rust.vim".text = ''

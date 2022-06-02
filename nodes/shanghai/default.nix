@@ -18,6 +18,8 @@
       imports = [ ./home.nix ];
     };
 
+    system.stateVersion = "21.11";
+
     services.ddclient.enable = true;
     services.ofono.enable = true;
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
