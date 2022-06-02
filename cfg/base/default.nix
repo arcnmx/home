@@ -115,6 +115,12 @@ in {
           repo = "nixpkgs";
           inherit (inputs.nixpkgs.sourceInfo) lastModified rev narHash;
         };
+        nixpkgs-big.to = {
+          type = "github";
+          owner = "NixOS";
+          repo = "nixpkgs";
+          inherit (inputs.nixpkgs-big.sourceInfo) lastModified rev narHash;
+        };
         ci = {
           to = {
             type = "github";

@@ -81,7 +81,6 @@ in {
       arc.packages.personal.emxc
       rxvt-unicode-arc
       mumble-develop
-      libreoffice-fresh # use `libreoffice` instead when this is broken, happens often ;-;
       gioTerminal
     ] ++ optionals config.gtk.enable [
       evince
@@ -121,8 +120,9 @@ in {
     };
     home.shell.aliases = {
       konawall = "systemctl --user restart konawall.service";
-      chrome = "nix shell --impure nixpkgs#google-chrome -c google-chrome-stable";
+      chrome = "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
+      libreoffice = "nix shell nixpkgs-big#libreoffice-fresh -c libreoffice";
     };
 
     xsession = {
