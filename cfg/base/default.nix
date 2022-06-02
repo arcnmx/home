@@ -3,6 +3,7 @@ let
 in {
   imports = [
     ./base16.nix
+    ../ssh/sshd.nix
   ];
 
   options = {
@@ -123,26 +124,6 @@ in {
           exact = false;
         };
       };
-    };
-
-    services.openssh = {
-      enable = true;
-      ports = lib.mkDefault [22]; # TODO: start using a different port for personal and server machines? way too much spam otherwise...
-      startWhenNeeded = lib.mkDefault false;
-      allowSFTP = true;
-      gatewayPorts = "yes";
-      kbdInteractiveAuthentication = false;
-      passwordAuthentication = lib.mkDefault false;
-      useDns = false;
-      extraConfig = ''
-        MaxSessions 100
-        AllowAgentForwarding yes
-        AllowTcpForwarding yes
-        PrintMotd no
-        PermitUserEnvironment yes
-        Compression yes
-        PermitTunnel yes
-      '';
     };
 
     services.yggdrasil = {

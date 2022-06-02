@@ -1,0 +1,18 @@
+set noloadplugins
+
+if !exists('g:less')
+	let g:less = {}
+endif
+if !exists('g:vimpager')
+	let g:vimpager = {}
+endif
+
+" let g:less.enabled = 0
+let g:less.number = 1
+
+" alternate screen clears on exit :(
+" TODO: make t_te move up one line to accomodate the double-height prompt? also set cmdheight=2 so a line doesn't get clobbered when doing so
+set t_ti= t_te=
+
+" I want to select things in X thanks
+set mouse=
