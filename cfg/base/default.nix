@@ -54,7 +54,10 @@ in {
     };
 
     boot = {
-      kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
+      kernelPackages = lib.mkMerge [
+        (lib.mkDefault pkgs.linuxPackages_latest)
+        (lib.mkIf (lib.elem "zfs" config.boot.supportedFilesystems) (lib.mkForce pkgs.linuxPackages_5_17))
+      ];
       kernel = {
         customBuild = lib.mkMerge [
           (lib.mkDefault config.boot.kernel.bleedingEdge)
