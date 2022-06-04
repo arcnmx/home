@@ -221,7 +221,8 @@
         "danielyxie\\.github\\.io/bitburner/" = { value = true; };
       };
       editorcmd = {
-        "github\\.com" = { value = "${urxvt} -e zsh -ic '${vim} %f \"+normal!%lG%c|:M2A\"'"; };
+        "github\\.com" = { value = "${urxvt} -e zsh -ic '${vim} %f \"+normal!%lG%c|\" \"+GHC\"'"; };
+        "reddit\\.com" = { value = "${urxvt} -e zsh -ic '${vim} %f \"+normal!%lG%c|\" \"+M2A\"'"; };
       };
     };
   };
