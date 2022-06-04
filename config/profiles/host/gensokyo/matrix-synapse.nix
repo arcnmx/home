@@ -80,6 +80,7 @@ in {
           allow_guest_access = mkDefault true;
           suppress_key_server_warning = mkDefault true;
           enable_group_creation = mkDefault true;
+          media_store_path = mkDefault "${config.services.matrix-synapse.dataDir}/media"; # stateVersion affects this default, so stabilize it
         };
       };
       matrix-appservices = {

@@ -7,7 +7,7 @@
   ];
 
   config = {
-    system.stateVersion = "21.11";
+    system.stateVersion = "22.05";
     home.minimalSystem = true;
     deploy.tf.deploy = {
       gcroot.enable = true;

@@ -14,7 +14,7 @@
       imports = [ ./home.nix ];
     };
 
-    system.stateVersion = "21.11";
+    system.stateVersion = "22.05";
 
     systemd.watchdog.enable = false;
     home.hw.xps13.wifi = "ax210";

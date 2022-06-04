@@ -19,7 +19,7 @@ in {
 
   config = {
     home.minimalSystem = true;
-    system.stateVersion = "21.11";
+    system.stateVersion = "22.05";
 
     nixpkgs.localSystem = systems.examples.aarch64-multiplatform // {
       system = "aarch64-linux";
@@ -264,6 +264,7 @@ in {
       vaultwarden.enable = true;
       nginx.enable = true;
       postgresql.enable = true;
+      postgresql.package = pkgs.postgresql_13; # from stateVersion 21.11
       matrix-synapse.enable = true;
       matrix-appservices = {
         mautrix-googlechat.enable = true;
