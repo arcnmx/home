@@ -273,6 +273,7 @@ in {
         #matrix-appservice-irc.enable = true;
       };
     };
+    systemd.services.mx-puppet-discord.serviceConfig.Restart = "on-failure";
     home.profileSettings.gensokyo.frontpage = true;
   };
 }
