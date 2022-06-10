@@ -3,6 +3,7 @@
   asciidoctor = ''nix shell nixpkgs-big\\#asciidoctor -c asciidoctor''; # "${pkgs.asciidoctor}/bin/asciidoctor";
   filterTasklist = optionalString (versionOlder pkgs.pandoc.version "2.18.1") # workaround for https://github.com/jgm/pandoc/issues/8011
     "sed -e 's/10063;/9744;/' -e 's/10003;/9746;/g' |";
+  compactLists = ''nix shell nixpkgs-big\\#xmlstarlet -c xmlstarlet ed -i //_:itemizedlist -t attr -n spacing -v compact -i //_:orderedlist -t attr -n spacing -v compact |'';
   vimSettings = mkIf (!config.home.minimalSystem) ''
     function M2A()
       if &ft == "markdown"
@@ -13,16 +14,16 @@
     endfunction
     function A2M()
       if &ft == "asciidoc"
-        execute "%!${asciidoctor} -b docbook5 - | ${filterTasklist} ${pandoc} --columns=120 --wrap=none -f docbook -t" g:mkdn_format "| sed -e 's/^-   /- /'"
+        execute "%!${asciidoctor} -b docbook5 - | ${filterTasklist} ${compactLists} ${pandoc} --columns=120 --wrap=none -f docbook -t" g:mkdn_format "| sed -e 's/^-   /- /'"
         set ft=markdown
       endif
     endfunction
     augroup M2A
       au!
-      au BufWritePre *.md if g:mkdn | A2M | endif
-      au BufWritePost *.md if g:mkdn | M2A | endif
-      au BufWritePre *.txt if g:mkdn | A2M | endif
-      au BufWritePost *.txt if g:mkdn | M2A | endif
+      au BufWritePre *.md if g:mkdn | call A2M() | endif
+      au BufWritePost *.md if g:mkdn | call M2A() | endif
+      au BufWritePre *.txt if g:mkdn | call A2M() | endif
+      au BufWritePost *.txt if g:mkdn | call M2A() | endif
     augroup END
     command M2A set ft=markdown | call M2A()
     command A2M call A2M()
