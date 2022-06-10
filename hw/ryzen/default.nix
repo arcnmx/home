@@ -8,11 +8,18 @@
         arch = mkDefault "znver2";
         bleedingEdge = mkDefault true;
       };
-      kernelParams = [ "amd_iommu=on" ];
+      modprobe.modules = {
+        acpi_cpufreq.blacklist = true;
+        amd_pstate.options.shared_mem = true;
+      };
+      kernelParams = [
+        "amd_iommu=on"
+      ];
       kernelModules = [
         "msr" # for zenstates
         "ryzen_smu" # for ryzen-monitor
         "kvm-amd"
+        "amd_pstate"
       ];
       extraModulePackages = with config.boot.kernelPackages; [ ryzen-smu zenpower ];
     };
