@@ -64,12 +64,14 @@ in {
         "suggest.snippetIndicator" = "►";
         "diagnostic.checkCurrentLine" = true;
         "diagnostic.enableMessage" = "jump";
+        "diagnostic.virtualText" = true;
         "list.nextKeymap" = "<A-j>";
         "list.previousKeymap" = "<A-k>";
         # list.normalMappings, list.insertMappings
         # coc.preferences.formatOnType, coc.preferences.formatOnSaveFiletypes
         "npm.binPath" = "${pkgs.coreutils}/bin/false"; # whatever it wants npm for, please just don't
         "codeLens.enable" = true;
+        "codeLens.position" = "eol";
         "rust-analyzer.server.path" = "rust-analyzer";
         "rust-analyzer.updates.prompt" = "neverDownload";
         "rust-analyzer.notifications.cargoTomlNotFound" = false;
