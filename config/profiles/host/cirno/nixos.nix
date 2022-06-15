@@ -273,6 +273,7 @@ in {
       };
     };
     systemd.services.mx-puppet-discord.serviceConfig.Restart = "on-failure";
+    system.mutableState.services.mautrix-googlechat.restore.enable = false; # XXX: re-enable on a redeploy
     home.profileSettings.gensokyo.frontpage = true;
   };
 }
