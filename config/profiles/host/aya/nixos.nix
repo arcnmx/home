@@ -3,7 +3,6 @@
     ./ayacam.nix
     ../../../../hw/pinecube
     ../../../../cfg/gensokyo.nix
-    ../../../../cfg/trusted.nix
   ];
 
   config = {

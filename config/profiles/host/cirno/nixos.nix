@@ -14,7 +14,6 @@
 in {
   imports = [
     ../gensokyo/nixos.nix
-    ../../../../cfg/trusted.nix
   ];
 
   config = {

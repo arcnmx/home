@@ -1,8 +1,4 @@
 { meta, tf, name, pkgs, config, lib, ... }: with lib; {
-  imports = [
-    ../../../../cfg/trusted.nix
-  ];
-
   config = {
     networking = {
       enableIPv6 = false;
