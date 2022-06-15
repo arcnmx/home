@@ -1,4 +1,4 @@
-{ lib, config, trusted, ... }: with lib; {
+{ lib, pkgs, config, trusted, ... }: with lib; {
   imports = [
     ./profiles/host/gensokyo/meta.nix
     ./profiles/host/aya/meta.nix
@@ -27,6 +27,7 @@
       };
     };
     runners = {
+      inherit pkgs;
       lazy = {
         file = ./default.nix;
         args = [ "--show-trace" ];
