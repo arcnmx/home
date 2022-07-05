@@ -1,20 +1,21 @@
 { config, pkgs, lib, ... } @ args: with lib; let
-  pandoc = ''nix shell nixpkgs-big\\#pandoc -c pandoc''; # "${pkgs.pandoc}/bin/pandoc";
-  asciidoctor = ''nix shell nixpkgs-big\\#asciidoctor -c asciidoctor''; # "${pkgs.asciidoctor}/bin/asciidoctor";
+  shell = package: command: ''nix shell nixpkgs-big\\#${package} -c ${package} ${command} 2>/dev/null''; # ${pkgs.${package}}
+  pandoc = shell "pandoc";
+  asciidoctor = shell "asciidoctor";
   filterTasklist = optionalString (versionOlder pkgs.pandoc.version "2.18.1") # workaround for https://github.com/jgm/pandoc/issues/8011
     "sed -e 's/10063;/9744;/' -e 's/10003;/9746;/g' |";
-  compactLists = ''nix shell nixpkgs-big\\#xmlstarlet -c xmlstarlet ed -i //_:itemizedlist -t attr -n spacing -v compact -i //_:orderedlist -t attr -n spacing -v compact |'';
+  compactLists = shell "xmlstarlet" ''ed -i //_:itemizedlist -t attr -n spacing -v compact -i //_:orderedlist -t attr -n spacing -v compact'' + " |";
   vimSettings = mkIf (!config.home.minimalSystem) ''
     function M2A()
       if &ft == "markdown"
-        execute "%!${pandoc} --columns=120 --wrap=preserve -f" g:mkdn_format "-t asciidoctor"
+        execute "%!${pandoc ''--columns=120 --wrap=preserve -f" g:mkdn_format "-t asciidoctor''}"
         set ft=asciidoc
         let g:mkdn=1
       endif
     endfunction
     function A2M()
       if &ft == "asciidoc"
-        execute "%!${asciidoctor} -b docbook5 - | ${filterTasklist} ${compactLists} ${pandoc} --columns=120 --wrap=none -f docbook -t" g:mkdn_format "| sed -e 's/^-   /- /'"
+        execute "%!${asciidoctor "-b docbook5 -"} | ${filterTasklist} ${compactLists} ${pandoc ''--columns=120 --wrap=none -f docbook -t" g:mkdn_format "''} | sed -e 's/^-   /- /'"
         set ft=markdown
       endif
     endfunction
