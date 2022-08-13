@@ -122,7 +122,9 @@ in {
       konawall = "systemctl --user restart konawall.service";
       chrome = "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
-      libreoffice = "nix shell nixpkgs-big#libreoffice-fresh -c libreoffice";
+    };
+    home.shell.functions = {
+      soffice = ''nix shell nixpkgs-big#libreoffice-fresh -c soffice "$@"'';
     };
 
     xsession = {
