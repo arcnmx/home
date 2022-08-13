@@ -62,6 +62,9 @@ in {
         mradio = ''
           mplay http://shanghai:32101
         '';
+        unrar = ''
+          nix shell --impure nixpkgs#unrar -c unrar "$@"
+        '';
         lorri-init = ''
           echo 'use ${if config.services.lorri.useNix || !config.services.lorri.enable then "nix" else "lorri"}' > .envrc
         '' + optionalString config.services.lorri.enable ''
