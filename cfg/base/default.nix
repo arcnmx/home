@@ -135,6 +135,7 @@ in {
     services.yggdrasil = {
       ifName = "y";
       nodeInfoPrivacy = true;
+      group = "wheel";
     };
 
     services.pipewire = {

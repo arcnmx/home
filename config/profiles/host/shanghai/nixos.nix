@@ -14,6 +14,8 @@
     };
     secrets.files.ygg-key = mkIf (tf.state.enable && config.services.yggdrasil.enable) {
       text = tf.variables.ygg-key.ref;
+      group = config.services.yggdrasil.group;
+      mode = "0440";
     };
     deploy.tf = {
       variables.ygg-key.bitw.name = "yggdrasil-shanghai";
