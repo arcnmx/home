@@ -4,9 +4,7 @@
   config = {
     services.picom = {
       backend = "xrender";
-      extraOptions = ''
-        unredir-if-possible = true;
-      '';
+      settings.unredir-if-possible = true;
     };
     services.polybar = {
       config = {
