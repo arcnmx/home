@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... } @ args: with lib; {
   programs.page = {
     enable = !config.home.minimalSystem && config.programs.neovim.enable;
-    package = pkgs.page-develop;
     manPager = true;
     queryLines = 80000; # because of how nvim terminal treats long lines (it breaks lines instead of wrapping them), this can go over
     openLines = {
