@@ -146,7 +146,6 @@ in {
           provider = "tls";
           type = "cert_request";
           inputs = {
-            key_algorithm = resources.taskserver_client_key.refAttr "algorithm";
             private_key_pem = resources.taskserver_client_key.refAttr "private_key_pem";
 
             subject = {
@@ -155,6 +154,7 @@ in {
               organizational_unit = "taskserver";
             };
           };
+          lifecycle.ignoreChanges = singleton "subject";
         };
         taskserver_ca_key_ref.enable = true;
         taskserver_client_cert = {
@@ -162,7 +162,6 @@ in {
           type = "locally_signed_cert";
           inputs = {
             cert_request_pem = resources.taskserver_client_csr.refAttr "cert_request_pem";
-            ca_key_algorithm = common.resources.taskserver_ca_key.importAttr "algorithm";
             ca_private_key_pem = resources.taskserver_ca_key_ref.refAttr "content";
             ca_cert_pem = common.resources.taskserver_ca.importAttr "cert_pem";
 

@@ -96,7 +96,6 @@ in {
           provider = "tls";
           type = "self_signed_cert";
           inputs = {
-            key_algorithm = tf.resources.taskserver_ca_key.refAttr "algorithm";
             private_key_pem = tf.resources.taskserver_ca_key.refAttr "private_key_pem";
             is_ca_certificate = true;
             subject = {
@@ -111,6 +110,7 @@ in {
             validity_period_hours = 365 * 4 * 24;
             early_renewal_hours = 365 * 24;
           };
+          lifecycle.ignoreChanges = singleton "subject";
         };
       };
     };
