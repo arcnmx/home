@@ -56,5 +56,9 @@
         };
       };
     };
+    hardware.cpu.info = {
+      modelName = "AMD Ryzen 9 5950X 16-Core Processor";
+      cores = 16;
+    };
   };
 }

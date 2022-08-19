@@ -23,7 +23,13 @@
       ];
       extraModulePackages = with config.boot.kernelPackages; [ ryzen-smu zenpower ];
     };
-    hardware.cpu.amd.updateMicrocode = true;
+    hardware.cpu = {
+      info = {
+        vendorId = "AuthenticAMD";
+        threadsPerCore = mkOptionDefault 2;
+      };
+      amd.updateMicrocode = true;
+    };
     environment.etc = {
       "sensors3.conf".text = ''
         chip "k10temp-pci-00c3"

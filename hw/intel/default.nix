@@ -24,7 +24,14 @@ in {
     nixpkgs.system = "x86_64-linux";
     environment.systemPackages = [ pkgs.i7z ];
     hardware = {
-      cpu.intel.updateMicrocode = mkDefault true;
+      cpu = {
+        info = {
+          vendorId = "GenuineIntel";
+          modelName = "Intel(R) Core(TM) i5-5200U CPU @ 2.20GHz";
+          threadsPerCore = mkOptionDefault 2;
+        };
+        intel.updateMicrocode = mkDefault true;
+      };
       opengl.extraPackages = mkIf cfg.graphics.enable openglPackages;
     };
     home.profileSettings.intel.graphics.generation = mkMerge [
