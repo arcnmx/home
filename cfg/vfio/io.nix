@@ -2,7 +2,17 @@
   cfg = config.hardware.vfio;
   nixosConfig = config;
   systemdUnits =
-    mapAttrsToList (_: dev: dev.systemd) cfg.devices;
+    mapAttrsToList (_: dev: dev.systemd) cfg.devices
+    ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
+    ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow;
+  applyPermission = { permission, path }: let
+    owner = optionalString (permission.owner != null) permission.owner;
+    group = optionalString (permission.group != null) permission.group;
+    chown = ''chown ${owner}:${group} ${path}'';
+    chmod = ''chmod ${permission.mode} ${path}'';
+    cmds = optional (permission.owner != null || permission.group != null) chown
+    ++ optional (permission.mode != null) chmod;
+  in concatStringsSep "\n" cmds;
   polkitPermissions = systemd: mkIf systemd.enable {
     ${systemd.polkit.user} = {
       systemd.units = [ systemd.id ];
@@ -11,6 +21,22 @@
   systemdService = systemd: {
     ${systemd.name} = unmerged.merge systemd.unit;
   };
+  permissionType = types.submodule ({ config, ... }: {
+    options = {
+      owner = mkOption {
+        type = with types; nullOr str;
+        default = null;
+      };
+      group = mkOption {
+        type = with types; nullOr str;
+        default = null;
+      };
+      mode = mkOption {
+        type = with types; nullOr str;
+        default = null;
+      };
+    };
+  });
   systemdModule = { config, ... }: {
     options = {
       enable = mkEnableOption "systemd service" // {
@@ -68,6 +94,107 @@
       };
     };
   };
+  mapDiskModule = { name, config, ... }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        default = name;
+      };
+      path = mkOption {
+        type = types.path;
+      };
+      source = mkOption {
+        type = types.path;
+      };
+      permission = mkOption {
+        type = permissionType;
+        default = { };
+      };
+      mbr = {
+        id = mkOption {
+          type = types.strMatching "[0-9a-f]{8}";
+          default = substring 8 8 (builtins.hashString "sha256" config.name);
+        };
+        partType = mkOption {
+          type = types.int;
+          default = 7; # NTFS
+        };
+      };
+      systemd = mkOption {
+        type = types.submodule systemdModule;
+        default = { };
+      };
+    };
+    config = {
+      path = "/dev/mapper/${config.name}";
+      systemd = {
+        name = "vfio-mapdisk-${config.name}";
+        polkit.user = config.permission.owner;
+        script = ''
+          ${nixosConfig.lib.arc-vfio.map-disk}/bin/map-disk ${config.source} ${config.name} ${config.mbr.id} ${toString config.mbr.partType}
+          ${applyPermission {
+            inherit (config) permission path;
+          }}
+        '';
+        unit.serviceConfig = {
+          RuntimeDirectory = config.systemd.name;
+          ExecStop = "${nixosConfig.lib.arc-vfio.map-disk}/bin/map-disk STOP";
+        };
+      };
+    };
+  };
+  snapshotDiskModule = { name, config, ... }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        default = name;
+      };
+      path = mkOption {
+        type = types.path;
+      };
+      source = mkOption {
+        type = types.path;
+      };
+      permission = mkOption {
+        type = permissionType;
+        default = { };
+      };
+      mode = mkOption {
+        type = types.enum [ "P" "N" ];
+        default = "N";
+        description = "(P)ersistent snapshot?";
+      };
+      storage = mkOption {
+        type = types.path;
+      };
+      sizeMB = mkOption {
+        type = types.int;
+        default = 1024 * 8;
+      };
+      systemd = mkOption {
+        type = types.submodule systemdModule;
+        default = { };
+      };
+    };
+    config = {
+      path = "/dev/mapper/${config.name}";
+      storage = mkIf (config.mode == "N") (mkOptionDefault "/tmp/qemu-cow-${config.name}");
+      systemd = {
+        name = "vfio-cowdisk-${config.name}";
+        polkit.user = config.permission.owner;
+        script = ''
+          ${nixosConfig.lib.arc-vfio.cow-disk}/bin/cow-disk ${config.source} ${config.name} ${config.mode} ${config.storage} ${toString config.sizeMB}
+          ${applyPermission {
+            inherit (config) permission path;
+          }}
+        '';
+        unit.serviceConfig = {
+          RuntimeDirectory = config.systemd.name;
+          ExecStop = "${nixosConfig.lib.arc-vfio.cow-disk}/bin/cow-disk STOP";
+        };
+      };
+    };
+  };
   vfioDeviceModule = { config, name, ... }: {
     options = {
       enable = mkEnableOption "VFIO device";
@@ -107,6 +234,16 @@ in {
     devices = mkOption {
       type = with types; attrsOf (submodule vfioDeviceModule);
       default = { };
+    };
+    disks = {
+      mapped = mkOption {
+        type = with types; attrsOf (submodule mapDiskModule);
+        default = { };
+      };
+      cow = mkOption {
+        type = with types; attrsOf (submodule snapshotDiskModule);
+        default = { };
+      };
     };
   };
   config = {
