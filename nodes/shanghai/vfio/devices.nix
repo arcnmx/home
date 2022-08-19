@@ -1,4 +1,4 @@
-{ lib, config, ... }: with lib; let
+{ lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
 in {
   config = {
@@ -38,6 +38,36 @@ in {
           };
         };
       };
+      disks = {
+        mapped = {
+          windows-games = {
+            source = "/dev/disk/by-partlabel/windows-games";
+            mbr.id = "f4901f82";
+            permission.owner = "arc";
+          };
+          windows-games-sabrent = {
+            source = "/dev/disk/by-partlabel/windows-games-sabrent";
+            mbr.id = "954e3dd3";
+            permission.owner = "arc";
+          };
+          windows-games-adata = {
+            source = "/dev/disk/by-partlabel/windows-games-adata";
+            mbr.id = "58ec08ca";
+          };
+        };
+        cow = {
+          windows-games-adata-arc = {
+            source = cfg.disks.mapped.windows-games-adata.path;
+            storage = "/mnt/data/hourai/adata-snapshot-overlay";
+            mode = "P";
+            sizeMB = 1024 * 16;
+            systemd.depends = [
+              cfg.disks.mapped.windows-games-adata.systemd.id
+            ];
+            permission.owner = "arc";
+          };
+        };
+      };
     };
     systemd.services = {
       bind1650 = rec {
@@ -50,6 +80,28 @@ in {
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
+        };
+      };
+      windows-games-adata-arc = rec {
+        requires = [ cfg.disks.mapped.windows-games-adata.systemd.id ];
+        after = requires;
+        conflicts = [
+          cfg.disks.cow.windows-games-adata-arc.systemd.id
+        ];
+        unitConfig = {
+          ConditionPathExists = "!${cfg.disks.cow.windows-games-adata-arc.storage}";
+        };
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = [
+            "${pkgs.coreutils}/bin/ln -s ${cfg.disks.mapped.windows-games-adata.path} /dev/disk/windows-games-adata-arc"
+            "${pkgs.coreutils}/bin/chown arc ${cfg.disks.mapped.windows-games-adata.path}"
+          ];
+          ExecStop = [
+            "${pkgs.coreutils}/bin/rm -f /dev/disk/windows-games-adata-arc"
+            "${pkgs.coreutils}/bin/chown root ${cfg.disks.mapped.windows-games-adata.path}"
+          ];
         };
       };
     };
