@@ -1,4 +1,9 @@
 { config, lib, pkgs, ... }: with lib; {
+  imports = [
+    ./io.nix
+    ./scripts
+  ];
+
   options = {
     hardware.vfio = {
       acsOverride = mkEnableOption "ACS IOMMU Override";
