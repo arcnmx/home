@@ -10,7 +10,7 @@
     ./audio.nix
     ./network.nix
     ./fs.nix
-    ./vfio.nix
+    ./vfio
   ];
 
   config = {
