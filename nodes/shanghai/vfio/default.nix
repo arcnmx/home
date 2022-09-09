@@ -1,5 +1,5 @@
 { lib, config, ... }: with lib; {
-  imports = [ ./devices.nix ];
+  imports = [ ./devices.nix ./machines ];
   config = {
     systemd.network.networks.br = {
       matchConfig.Name = "br";
