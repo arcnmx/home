@@ -63,6 +63,7 @@ in {
     globals.kvm-pit.lost_tick_policy = "delay";
     pci.devices = let
       netdevs = mapAttrs (name: netdev: {
+        device.cli.dependsOn = [ netdev.id ];
         settings = {
           id = "${name}-dev";
           driver = if config.virtio.enable then "virtio-net-pci" else "e1000-82545em";
