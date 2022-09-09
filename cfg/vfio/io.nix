@@ -315,7 +315,13 @@
         script = getExe config.exec.package;
         type = "exec";
         unit = let
-          ExecStop = optionalString config.qmp.enable ''
+          qga = getExe config.exec.qga;
+          qgaShutdown = config.qga.enable && config.qemucomm.enable;
+          ExecStop = optionalString qgaShutdown ''
+            if ${pkgs.coreutils}/bin/timeout 1 ${qga} info > /dev/null; then
+              ${qga} shutdown
+            fi
+          '' + optionalString config.qmp.enable ''
             if ${hmp config "system_powerdown"}; then
               ${pkgs.coreutils}/bin/sleep 3
               ${hmp config "system_powerdown"}
@@ -328,7 +334,7 @@
             StateDirectory = mkIf (hasPrefix "/var/lib/" config.state.path) (removePrefix "/var/lib/" config.state.path);
             RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
             OOMScoreAdjust = -150;
-          } (mkIf config.qmp.enable {
+          } (mkIf (config.qmp.enable || qgaShutdown) {
             ExecStop = pkgs.writeShellScript "vm-${config.name}-stop" ExecStop;
             KillSignal = "SIGCONT"; # only signal if timeout occurs
             FinalKillSignal = "SIGTERM";

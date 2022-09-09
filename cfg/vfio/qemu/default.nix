@@ -23,7 +23,7 @@
           ./spice.nix
           ./scream.nix
           ./lookingglass.nix
-          ./qmp.nix
+          ./qmp.nix ./qga.nix
           ./qemucomm.nix
         ];
         specialArgs = {
