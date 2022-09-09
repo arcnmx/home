@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: with lib; let
+{ nixosConfig, config, pkgs, lib, ... }: with lib; let
   # `gio open` (which firefox uses via libgio) picks from a list of hard-coded terminals:
   # https://github.com/GNOME/glib/blob/cbb2a51a5b45925b04f3bf7d06ade59c00154bdf/gio/gdesktopappinfo.c#L2612
   xdg-open = (pkgs.writeShellScriptBin "xdg-open" ''
@@ -58,9 +58,9 @@ in {
       };
     };
     xdg.open = "${xdg-open}/bin/xdg-open";
-    programs.zsh.loginExtra = ''
+    programs.zsh.loginExtra = mkIf nixosConfig.services.xserver.displayManager.startx.enable ''
       if [[ -z "''${TMUX-}" && -z "''${DISPLAY-}" && "''${XDG_VTNR-}" = 1 && $(${pkgs.coreutils}/bin/id -u) != 0 && $- == *i* ]]; then
-        ${pkgs.xorg.xinit}/bin/startx
+        startx
       fi
     '';
     programs.zsh.initExtra = ''
@@ -117,6 +117,18 @@ in {
     services.konawall = {
       enable = true;
       interval = "20m";
+    };
+    services.watchdogs.services = {
+      i3 = {
+        target = "i3-session.target";
+        inherit (config.xsession.windowManager.i3) enable;
+        command = [ "${config.xsession.windowManager.i3.package}/bin/i3-msg" "-t" "get_version" ];
+      };
+      display = {
+        target = "graphical-session.target";
+        inherit (config.xsession) enable;
+        command = [ "${pkgs.xorg.xset}/bin/xset" "q" ];
+      };
     };
     home.shell.aliases = {
       konawall = mkIf config.services.konawall.enable "systemctl --user restart konawall.service";

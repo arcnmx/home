@@ -35,7 +35,11 @@
         startx.enable = mkForce false;
         lightdm = {
           # TODO: switch to lxdm?
-          enable = true;
+          enable = !config.services.xserver.displayManager.startx.enable;
+          # https://wiki.archlinux.org/title/LightDM#Long_pause_before_LightDM_shows_up_when_home_is_encrypted
+          greeters.gtk.extraConfig = mkIf (config.fileSystems ? "/mnt/enc") ''
+            hide-user-image=true
+          '';
         };
         session = singleton {
           manage = "desktop";

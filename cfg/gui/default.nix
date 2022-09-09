@@ -86,7 +86,10 @@ in
       ];
       libinput.touchpad.naturalScrolling = true;
     };
-    systemd.services.display-manager.serviceConfig.OOMScoreAdjust = -500;
+    systemd.services.display-manager = {
+      bindsTo = [ "graphical.target" ];
+      serviceConfig.OOMScoreAdjust = -500;
+    };
     services.udev.extraRules = ''
       ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0067", RUN+="${openrazer-dpi} 5900"
       ACTION=="change", DRIVER=="razermouse", ATTR{dpi}=="*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0040", RUN+="${openrazer-dpi} 3100"

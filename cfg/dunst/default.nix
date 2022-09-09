@@ -46,4 +46,7 @@
       };
     };
   };
+  systemd.user.services.dunst = mkIf config.services.dunst.enable {
+    Unit.Requisite = [ "graphical-session.target" ];
+  };
 }

@@ -13,7 +13,7 @@ NOTIFY_TIMEOUT=30
 
 notify-send() {
 	# args: "title" "summary"
-	timeout $NOTIFY_TIMEOUT notify-send "$@"
+	timeout $NOTIFY_TIMEOUT notify-send "$@" || true
 }
 
 NEW_QUERY=()
