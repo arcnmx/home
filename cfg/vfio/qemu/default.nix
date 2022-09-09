@@ -26,6 +26,7 @@
           ./lookingglass.nix
           ./qmp.nix ./qga.nix
           ./qemucomm.nix
+          ./hotplug.nix
         ];
         specialArgs = {
           nixosConfig = config;

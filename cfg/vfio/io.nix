@@ -8,6 +8,10 @@
     mapAttrsToList (_: dev: dev.systemd) cfg.devices
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow
+    ++ concatLists (mapAttrsToList
+      (_: machine: mapAttrsToList (_: dev: dev.systemd) machine.hotplug.devices)
+      (filterAttrs (_: m: m.enable && m.hotplug.enable) cfg.qemu.machines)
+    )
     ++ mapAttrsToList (_: machine: machine.scream.systemd) (filterAttrs (_: m: m.scream.systemd.enable) cfg.qemu.machines)
     ++ mapAttrsToList (_: machine: machine.systemd) (filterAttrs (_: m: m.enable && m.systemd.enable) cfg.qemu.machines);
   applyPermission = { permission, path }: let
@@ -280,11 +284,49 @@
         ''${concatStringsSep ", " config.udev.conditions}, ${assignments}'';
     };
   };
+  hotplugDeviceModule = machineName: machineConfig: { config, ... }: {
+    options = {
+      systemd = mkOption {
+        type = types.submodule systemdModule;
+        default = { };
+      };
+    };
+    config = {
+      systemd = {
+        name = "vm-${machineName}-${config.id}";
+        user = mkDefault machineConfig.systemd.user;
+        unit = rec {
+          requisite = mkIf machineConfig.systemd.enable [ machineConfig.systemd.id ];
+          bindsTo = requisite;
+          wantedBy = mkIf (machineConfig.systemd.enable && config.default) [ machineConfig.systemd.id ];
+          after = requisite;
+          conflicts = let
+            otherMachines = filterAttrs (name: _: name != machineName) cfg.qemu.machines;
+            machineIds = mapAttrsToList (_: machine: let
+              devices = attrValues machine.hotplug.devices;
+              matching = filter (dev: dev.name == config.name) devices;
+            in map (dev: dev.systemd.id) matching) otherMachines;
+          in concatLists machineIds;
+          serviceConfig = {
+            ExecStart = if machineConfig.qemucomm.enable
+              then "${getExe machineConfig.exec.qmp} --wait add-device ${escapeShellArgs config.out.addDeviceArgs}"
+              else hmp machineConfig config.out.monitorLine;
+            ExecStop = if machineConfig.qemucomm.enable
+              then "${getExe machineConfig.exec.qmp} del-device --wait ${config.id}"
+              else hmp machineConfig "device_del ${config.id}";
+          };
+        };
+      };
+    };
+  };
   machineModule = { config, name, ... }: {
     options = {
       systemd = mkOption {
         type = types.submodule systemdModule;
         default = { };
+      };
+      hotplug.devices = mkOption {
+        type = with types; attrsOf (submodule (hotplugDeviceModule name config));
       };
       scream = {
         playback = {
