@@ -155,17 +155,22 @@ in {
       ''; # for DDC/monitor control
       inputs = ''
         # Gamepads
-        SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", ${assignLocalGroup}
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", ${assignLocalGroup}
-        SUBSYSTEM=="usb", ATTR{idVendor}=="045e", ATTR{idProduct}=="0b12", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="1d79", ATTR{idProduct}=="0100", GROUP="plugdev"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0f0d", ATTR{idProduct}=="0083", GROUP="plugdev"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="045e", ATTR{idProduct}=="0b12", GROUP="plugdev"
         # Moonlander: https://github.com/zsa/wally/wiki/Live-training-on-Linux
         SUBSYSTEM=="usb", ATTR{idVendor}=="3297", ATTR{idProduct}=="1969", GROUP="plugdev"
+        # GMMK
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", ATTR{idProduct}=="652f", GROUP="plugdev"
+        # Naga
+        SUBSYSTEM=="usb", ATTR{idVendor}=="1532", ATTR{idProduct}=="0067", GROUP="plugdev"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="1532", ATTR{idProduct}=="0040", GROUP="plugdev"
       '';
       uinput = ''
         ACTION=="add", SUBSYSTEM=="input", DEVPATH=="/devices/virtual/input/*", MODE="0660", ${assignLocalGroup}
       '';
       uvc = ''
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", GROUP="video"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0c45", ATTRS{idProduct}=="6366", GROUP="video"
         SUBSYSTEM=="usb", ATTR{idVendor}=="1d6c", GROUP="video"
         KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6366", ATTRS{product}=="USB Live camera", SYMLINK+="video-hd682h", TAG+="systemd"
         KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="6366", ATTRS{product}=="USB  Live camera", SYMLINK+="video-hd826", TAG+="systemd"

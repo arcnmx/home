@@ -3,6 +3,7 @@
     ../../hw/x570am
     ../../hw/nvidia
     ../../cfg/personal
+    ../../cfg/users/kat
     ../../cfg/gui
     ../../cfg/cross.nix
     ../../cfg/vfio
@@ -45,6 +46,12 @@
           '';
         };
       };
+    };
+
+    users = {
+      chroot.users = [ "kat" ];
+      users.kat.group = "kat";
+      groups.kat = { };
     };
 
     boot = {
