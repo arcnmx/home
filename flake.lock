@@ -85,12 +85,29 @@
         "type": "github"
       }
     },
+    "qemucomm": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1662662287,
+        "narHash": "sha256-8vM12brt6VP8MTQdu4jnLDpakpRTiLHbztazI+7SPYk=",
+        "owner": "arcnmx",
+        "repo": "qemucomm",
+        "rev": "c922896daffc9079d05199aa943b12290d61c141",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "repo": "qemucomm",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "arc": "arc",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-big": "nixpkgs-big",
+        "qemucomm": "qemucomm",
         "rust": "rust",
         "std": "std",
         "tf": "tf"

@@ -20,6 +20,10 @@
       url = "github:arcnmx/tf-nix";
       flake = false;
     };
+    qemucomm = {
+      url = "github:arcnmx/qemucomm";
+      flake = false;
+    };
   };
   outputs = { self, ... }@inputs: {
     nixosConfigurations = self.config.network.nodes;

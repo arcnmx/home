@@ -24,6 +24,7 @@
           ./scream.nix
           ./lookingglass.nix
           ./qmp.nix
+          ./qemucomm.nix
         ];
         specialArgs = {
           nixosConfig = config;

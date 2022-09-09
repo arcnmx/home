@@ -1,8 +1,9 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
   nixosConfig = config;
-  hmp = machineConfig: cmd:
-    "echo ${escapeShellArg cmd} | ${getExe machineConfig.exec.monitor}";
+  hmp = machineConfig: cmd: if machineConfig.qemucomm.enable
+    then "${getExe machineConfig.exec.qmp} hmp ${escapeShellArg cmd}"
+    else "echo ${escapeShellArg cmd} | ${getExe machineConfig.exec.monitor}";
   systemdUnits =
     mapAttrsToList (_: dev: dev.systemd) cfg.devices
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
