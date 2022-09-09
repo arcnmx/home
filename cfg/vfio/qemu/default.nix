@@ -23,6 +23,7 @@
           ./spice.nix
           ./scream.nix
           ./lookingglass.nix
+          ./qmp.nix
         ];
         specialArgs = {
           nixosConfig = config;

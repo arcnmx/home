@@ -1,6 +1,8 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
   nixosConfig = config;
+  hmp = machineConfig: cmd:
+    "echo ${escapeShellArg cmd} | ${getExe machineConfig.exec.monitor}";
   systemdUnits =
     mapAttrsToList (_: dev: dev.systemd) cfg.devices
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
@@ -311,14 +313,26 @@
         user = mkDefault config.state.owner;
         script = getExe config.exec.package;
         type = "exec";
-        unit = {
+        unit = let
+          ExecStop = optionalString config.qmp.enable ''
+            if ${hmp config "system_powerdown"}; then
+              ${pkgs.coreutils}/bin/sleep 3
+              ${hmp config "system_powerdown"}
+            fi
+          '';
+        in {
           conflicts = mapAttrsToList (_: machine: machine.systemd.id) sameMachines;
-          serviceConfig = {
+          serviceConfig = mkMerge [ {
             PIDFile = mkIf (config.exec.pidfile != null) config.exec.pidfile;
             StateDirectory = mkIf (hasPrefix "/var/lib/" config.state.path) (removePrefix "/var/lib/" config.state.path);
             RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
             OOMScoreAdjust = -150;
-          };
+          } (mkIf config.qmp.enable {
+            ExecStop = pkgs.writeShellScript "vm-${config.name}-stop" ExecStop;
+            KillSignal = "SIGCONT"; # only signal if timeout occurs
+            FinalKillSignal = "SIGTERM";
+            TimeoutStopSec = "2m";
+          }) ];
         };
       };
       scream = {
