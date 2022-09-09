@@ -91,7 +91,7 @@ in {
       enable = mkDefault true;
       experimentalBackends = mkDefault true;
       package = mkDefault pkgs.picom-next;
-      opacityRule = [
+      opacityRules = [
         # https://wiki.archlinux.org/index.php/Picom#Tabbed_windows_(shadows_and_transparency)
         "100:class_g = 'URxvt' && !_NET_WM_STATE@:32a"
           "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
