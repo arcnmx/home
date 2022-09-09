@@ -7,6 +7,9 @@
       unbind-vts = pkgs.callPackage ./unbind-vts.nix {
         forcefully-remove-bootfb = config.boot.kernelPackages.forcefully-remove-bootfb;
       };
+      alloc-hugepages = pkgs.callPackage ./alloc-hugepages.nix {
+        systemd = config.systemd.package;
+      };
     };
   };
 }

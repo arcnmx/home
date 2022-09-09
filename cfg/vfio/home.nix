@@ -2,13 +2,13 @@
   cfg = config.programs.screenstub;
   windows = pkgs.writeShellScriptBin "windows" ''
     tmux new-session -d -s windows \
-      "cd ~/projects/arc.github/vfio; echo vm windows run; $SHELL -i" \; \
+      "$SHELL -i" \; \
       split-window -h "$SHELL -ic ryzen-watch" \; \
       select-pane -L \; \
       split-window -dv "top -H" \; \
       attach
   '';
-  rundir = "/run/user/${toString nixosConfig.users.users.${config.home.username}.uid}/vfio/running";
+  rundir = "/run/vfio/hourai";
   qmp_socket = rundir + "/qmp";
   ga_socket = rundir + "/qga";
   inherit (cfg) modifierKey;

@@ -1,5 +1,6 @@
 { config, lib, pkgs, ... }: with lib; {
   imports = [
+    ./qemu
     ./io.nix
     ./scripts
   ];

@@ -4,7 +4,8 @@
   systemdUnits =
     mapAttrsToList (_: dev: dev.systemd) cfg.devices
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
-    ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow;
+    ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow
+    ++ mapAttrsToList (_: machine: machine.systemd) (filterAttrs (_: m: m.enable && m.systemd.enable) cfg.qemu.machines);
   applyPermission = { permission, path }: let
     owner = optionalString (permission.owner != null) permission.owner;
     group = optionalString (permission.group != null) permission.group;
@@ -275,6 +276,44 @@
         ''${concatStringsSep ", " config.udev.conditions}, ${assignments}'';
     };
   };
+  machineModule = { config, name, ... }: {
+    options = {
+      systemd = mkOption {
+        type = types.submodule systemdModule;
+        default = { };
+      };
+    };
+    config = let
+      otherMachines = filterAttrs (n: _: n != name) cfg.qemu.machines;
+      sameMachines = filterAttrs (_: machine: machine.systemd.enable && machine.name == config.name) otherMachines;
+    in {
+      systemd = {
+        name = "vm-${name}";
+        user = mkDefault config.state.owner;
+        script = getExe config.exec.package;
+        type = "exec";
+        unit = {
+          conflicts = mapAttrsToList (_: machine: machine.systemd.id) sameMachines;
+          serviceConfig = {
+            PIDFile = mkIf (config.exec.pidfile != null) config.exec.pidfile;
+            StateDirectory = mkIf (hasPrefix "/var/lib/" config.state.path) (removePrefix "/var/lib/" config.state.path);
+            RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
+            OOMScoreAdjust = -150;
+          };
+        };
+      };
+      exec = {
+        preExec = mkMerge [
+          (mkIf (config.systemd.depends != [ ]) ''
+            systemctl start ${toString config.systemd.depends}
+          '')
+          (mkIf (config.systemd.wants != [ ]) ''
+            systemctl start ${toString config.systemd.wants} || true
+          '')
+        ];
+      };
+    };
+  };
 in {
   options.hardware.vfio = {
     devices = mkOption {
@@ -297,10 +336,19 @@ in {
         default = { };
       };
     };
+    qemu.machines = mkOption {
+      type = with types; attrsOf (submoduleWith {
+        modules = [ machineModule ];
+      });
+    };
   };
   config = {
     systemd.services = mkMerge (map systemdService systemdUnits);
     security.polkit.users = mkMerge (map polkitPermissions systemdUnits);
+    systemd.tmpfiles.rules = mkMerge (mapAttrsToList (_: machine: [
+      "d ${machine.state.path} 0750 ${machine.state.owner} kvm -"
+      "d ${machine.state.runtimePath} 0750 ${machine.state.owner} kvm -"
+    ]) (filterAttrs (_: m: m.enable) cfg.qemu.machines));
     services.udev.extraRules = mkMerge (mapAttrsToList (_: usb: usb.out.udevRule) (filterAttrs (_: usb: usb.enable) cfg.usb.devices));
     boot.modprobe.modules = {
       vfio-pci = let
