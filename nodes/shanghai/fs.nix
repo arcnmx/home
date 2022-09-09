@@ -19,11 +19,6 @@
     '';
 
     fileSystems = {
-      "/mnt/old" = {
-        device = "/dev/disk/by-uuid/4a260bff-eac5-40c9-8c40-00f0557b5923";
-        fsType = "btrfs";
-        options = [ "x-systemd.automount" "noauto" "rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" "nofail" ];
-      };
       "/nix" = {
         device = "/dev/disk/by-uuid/a82e1a40-e0e5-4461-a29d-42caf5a502b6";
         fsType = "xfs";
@@ -71,11 +66,6 @@
         fsType = "btrfs";
         options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" "nofail"];
       };
-      "/mnt/efi-old" = {
-        device = "/dev/disk/by-uuid/D460-0EF6";
-        fsType = "vfat";
-        options = [ "x-systemd.automount" "noauto" "rw" "strictatime" "lazytime" "errors=remount-ro" "nofail" ];
-      };
       "/mnt/efi" = {
         device = "/dev/disk/by-uuid/1016-9B5D";
         fsType = "vfat";
@@ -96,21 +86,26 @@
         fsType = "ext4";
         options = [ "x-systemd.automount" "noauto" ];
       };
+      "/mnt/wdtemp" = {
+        device = "/dev/disk/by-uuid/56ea5e87-7344-4eeb-bf1a-166f174c9904";
+        fsType = "ext4";
+        options = [ "x-systemd.automount" "noauto" ];
+      };
     };
     swapDevices = [
       {
-        # 72G Plextor
+        # 16G adata
+        device = "/dev/disk/by-partuuid/0ecca923-20db-c34b-807b-2be849bf2017";
+        randomEncryption.enable = true;
+      }
+      {
+        # 32G Plextor
         device = "/dev/disk/by-partuuid/38b62f92-2fa2-4ee3-9e20-77a77a8e2b31";
         randomEncryption.enable = true;
       }
       {
-        # 16G BPX
+        # 32G BPX
         device = "/dev/disk/by-partuuid/8a7fdfac-14bc-431e-9907-1069ec937e88";
-        randomEncryption.enable = true;
-      }
-      {
-        # 16G sabrent
-        device = "/dev/disk/by-partuuid/0ecca923-20db-c34b-807b-2be849bf2017";
         randomEncryption.enable = true;
       }
     ];

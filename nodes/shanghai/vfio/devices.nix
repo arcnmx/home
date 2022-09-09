@@ -102,6 +102,11 @@ in {
             mbr.id = "954e3dd3";
             permission.owner = "arc";
           };
+          windows-games-bpx = {
+            source = "/dev/disk/by-partlabel/windows-games-bpx";
+            mbr.id = "3fa0fceb";
+            permission.owner = "arc";
+          };
           windows-games-adata = {
             source = "/dev/disk/by-partlabel/windows-games-adata";
             mbr.id = "58ec08ca";
