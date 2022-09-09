@@ -19,6 +19,7 @@
           ./usb.nix
           ./disks.nix
           ./vfio.nix
+          ./audio.nix
           ./spice.nix
           ./scream.nix
           ./lookingglass.nix
