@@ -31,12 +31,17 @@ in {
       (mkIf (cfg.backend == "pa") cfg.pulseaudio)
     ];
     pci.devices.sound0 = {
+      device.cli.dependsOn = mkIf (cfg.driver == ac97) [ config.audiodevs.audio0.id ];
       settings = {
         driver = cfg.driver;
         audiodev = mkIf (cfg.driver == ac97) config.audiodevs.audio0.id;
       };
     };
     devices.mic0 = mkIf (cfg.driver == hda) {
+      cli.dependsOn = [
+        config.devices.sound0.id
+        config.audiodevs.audio0.id
+      ];
       settings = {
         driver = "hda-micro";
         audiodev = config.audiodevs.audio0.id;

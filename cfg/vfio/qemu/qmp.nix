@@ -30,6 +30,7 @@ in {
         wait = false;
       };
       monitors.qmp = {
+        cli.dependsOn = [ config.chardevs.qmp.id ];
         settings = {
           mode = "control";
           chardev = config.chardevs.qmp.id;
@@ -45,6 +46,7 @@ in {
         wait = false;
       };
       monitors.monitor = {
+        cli.dependsOn = [ config.chardevs.monitor.id ];
         settings = {
           mode = "readline";
           chardev = config.chardevs.monitor.id;

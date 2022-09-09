@@ -15,6 +15,7 @@
         inherit (cfg) bus;
       };
       device = {
+        cli.dependsOn = [ config.settings.bus ];
         settings = mapAttrs (_: mkDefault) config.settings;
       };
     };

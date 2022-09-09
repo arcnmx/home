@@ -24,6 +24,7 @@ in {
       wait = false;
     };
     devices.qga0 = {
+      cli.dependsOn = [ config.chardevs.qga0.id cfg.bus ];
       settings = {
         driver = "virtserialport";
         name = "org.qemu.guest_agent.0";

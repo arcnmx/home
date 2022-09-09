@@ -37,6 +37,7 @@ in {
         name = "vdagent";
       };
       devices.spice0 = {
+        cli.dependsOn = [ config.chardevs.spice0.id cfg.bus ];
         settings = {
           driver = "virtserialport";
           name = "com.redhat.spice.0";
@@ -65,18 +66,30 @@ in {
       };
       devices = {
         spiceusb1-dev = {
+          cli.dependsOn = [
+            config.usb.bus
+            config.chardevs.spiceusb1.id
+          ];
           settings = {
             driver = "usb-redir";
             chardev = config.chardevs.spiceusb1.id;
           };
         };
         spiceusb2-dev = {
+          cli.dependsOn = [
+            config.usb.bus
+            config.chardevs.spiceusb2.id
+          ];
           settings = {
             driver = "usb-redir";
             chardev = config.chardevs.spiceusb2.id;
           };
         };
         spiceusb3-dev = {
+          cli.dependsOn = [
+            config.usb.bus
+            config.chardevs.spiceusb3.id
+          ];
           settings = {
             driver = "usb-redir";
             chardev = config.chardevs.spiceusb3.id;

@@ -61,9 +61,11 @@
           settings.driver = "ivshmem-${config.mode}";
         }
         (mkIf (config.mode == "plain") {
+          device.cli.dependsOn = [ machineConfig.objects.${name}.id ];
           settings.memdev = machineConfig.objects.${name}.id;
         })
         (mkIf (config.mode == "doorbell") {
+          device.cli.dependsOn = [ machineConfig.chardevs.${name}.id ];
           settings = {
             chardev = machineConfig.chardevs.${name}.id;
             inherit (config) vectors;

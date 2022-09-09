@@ -30,6 +30,7 @@
     config = {
       device = {
         inherit (config) enable;
+        cli.dependsOn = mkIf (config.bus != null) [ config.bus ];
         settings = mapAttrs (_: mkDefault) {
           driver = "usb-host";
           vendorid = "0x${config.vendor}";

@@ -15,6 +15,7 @@
           ./ivshmem.nix
           ./smp.nix
           ./exec.nix
+          ./depends.nix
           ./ovmf.nix
           ./pci.nix
           ./usb.nix

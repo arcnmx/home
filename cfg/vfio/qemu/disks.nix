@@ -111,12 +111,14 @@
       ];
       device = mkMerge [
         {
+          cli.dependsOn = [ cfg.drives.${name}.id ];
           settings = {
             id = "${name}-dev";
             drive = cfg.drives.${name}.id;
           };
         }
         (mkIf (config.scsi != null) {
+          cli.dependsOn = [ config.scsi.bus ];
           settings = {
             inherit (config.scsi) channel lun driver;
             scsi-id = config.scsi.id;
@@ -125,6 +127,7 @@
           };
         })
         (mkIf (config.ide != null) {
+          cli.dependsOn = [ config.ide.bus ];
           settings = {
             inherit (config.ide) driver;
             bus = "${config.ide.bus}.${toString config.ide.slot}";
