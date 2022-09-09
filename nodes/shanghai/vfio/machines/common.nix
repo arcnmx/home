@@ -20,8 +20,20 @@
       settings.typename = "iothread";
     }) (nixosConfig.hardware.cpu.info.cores / 2));
   };
+  usb = { config, ... }: {
+    config = {
+      usb.bus = "usb3";
+      pci.devices = {
+        usb3.settings = {
+          driver = "qemu-xhci";
+          p3 = 8;
+          p2 = 8;
+        };
+      };
+    };
+  };
 in {
-  imports = [ iothreads ];
+  imports = [ iothreads usb ];
   options = {
     pci.devices = mkOption {
       type = with types; attrsOf (submodule ({ config, name, ... }: {

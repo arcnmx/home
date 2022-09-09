@@ -32,6 +32,18 @@ in {
         inherit (disks.cow.windows-games-adata-kat) path;
       };
     };
+    usb.host.devices = {
+      nighthawk-x8 = { };
+      naga2014 = { };
+      arctis7p-plus = { };
+      hori.enable = false;
+      xpad = { };
+      nagatrinity.enable = false;
+      gmmk.enable = false;
+      shift.enable = false;
+      yubikey5-kat = { };
+      yubikey5c-kat.enable = false;
+    };
     netdevs = {
       hostnet0.settings = {
         type = "bridge";

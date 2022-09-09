@@ -59,6 +59,14 @@ in {
         inherit (disks.mapped.windows-games-bpx) path;
       };
     };
+    usb.host.devices = {
+      svse5 = { };
+      gmmk.enable = false;
+      hori.enable = false;
+      xpad.enable = false;
+      nagatrinity.enable = false;
+      shift.enable = false;
+    };
     netdevs = {
       hostnet0.settings = {
         type = "bridge";
