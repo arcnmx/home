@@ -1,4 +1,5 @@
 { nixosConfig, config, pkgs, lib, ... }: with lib; let
+  cfg = config.programs.screenstub;
   windows = pkgs.writeShellScriptBin "windows" ''
     tmux new-session -d -s windows \
       "cd ~/projects/arc.github/vfio; echo vm windows run; $SHELL -i" \; \
@@ -10,7 +11,7 @@
   rundir = "/run/user/${toString nixosConfig.users.users.${config.home.username}.uid}/vfio/running";
   qmp_socket = rundir + "/qmp";
   ga_socket = rundir + "/qga";
-  inherit (config.programs.screenstub) modifierKey;
+  inherit (cfg) modifierKey;
 in {
   options = {
     programs.screenstub = {
