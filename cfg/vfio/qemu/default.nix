@@ -10,6 +10,7 @@
         modules = [
           (import (inputs.arc + "/modules/misc")).qemu
           ./machine.nix
+          ./install.nix
           ./memory.nix
           ./ivshmem.nix
           ./smp.nix
