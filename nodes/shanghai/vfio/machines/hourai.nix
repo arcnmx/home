@@ -7,6 +7,10 @@ in {
     ./dmi-gigabyte.nix
     ./vfio.nix
   ] ++ trusted.import.nixos "vfio/machines/hourai";
+  options.lookingGlass.vertical = mkOption {
+    type = types.bool;
+    default = true;
+  };
   config = {
     enable = true;
     name = "hourai";
@@ -66,6 +70,10 @@ in {
       xpad.enable = false;
       nagatrinity.enable = false;
       shift.enable = false;
+    };
+    lookingGlass = {
+      enable = config.vfio.gpu == "gtx3080";
+      sizeMB = if config.lookingGlass.vertical then 256 else 128;
     };
     netdevs = {
       hostnet0.settings = {
