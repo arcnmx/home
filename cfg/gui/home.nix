@@ -119,9 +119,11 @@ in {
       interval = "20m";
     };
     home.shell.aliases = {
-      konawall = "systemctl --user restart konawall.service";
-      chrome = "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
+      konawall = mkIf config.services.konawall.enable "systemctl --user restart konawall.service";
+      chrome = mkIf (!config.programs.google-chrome.enable && !config.programs.chromium.enable)
+        "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
+      pavucontrol = "nix run nixpkgs#pavucontrol";
     };
     home.shell.functions = {
       soffice = ''nix shell nixpkgs-big#libreoffice-fresh -c soffice "$@"'';
