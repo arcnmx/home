@@ -2,7 +2,7 @@
   inherit (nixosConfig.hardware.vfio) disks;
 in {
   imports = [
-    ./common.nix ./virtio.nix
+    ./common.nix ./scream.nix ./virtio.nix
     ./windows-q35.nix
     ./vfio.nix
   ] ++ trusted.import.nixos "vfio/machines/goliath";
@@ -43,6 +43,13 @@ in {
       shift.enable = false;
       yubikey5-kat = { };
       yubikey5c-kat.enable = false;
+    };
+    scream = {
+      mode = "ip";
+      ip = {
+        mode = "unicast";
+        port = 4011;
+      };
     };
     netdevs = {
       hostnet0.settings = {

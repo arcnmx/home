@@ -2,7 +2,7 @@
   inherit (nixosConfig.hardware.vfio) disks;
 in {
   imports = [
-    ./common.nix ./virtio.nix
+    ./common.nix ./scream.nix ./virtio.nix
     ./windows-i440fx.nix
     ./dmi-gigabyte.nix
     ./vfio.nix
