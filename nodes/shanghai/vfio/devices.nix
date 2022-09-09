@@ -38,6 +38,58 @@ in {
           };
         };
       };
+      usb.devices = {
+        svse5 = {
+          vendor = "1d79";
+          product = "0100";
+        };
+        hori = {
+          vendor = "10f0";
+          product = "0083";
+        };
+        xpad = {
+          vendor = "045e";
+          product = "0b12";
+        };
+        gmmk = {
+          vendor = "0c45";
+          product = "652f";
+        };
+        shift = {
+          vendor = "04d8";
+          product = "ee65";
+        };
+        nighthawk-x8 = {
+          vendor = "0665";
+          product = "6000";
+        };
+        ax200-bt = {
+          vendor = "8087";
+          product = "0029";
+        };
+        nagatrinity = {
+          vendor = "1532";
+          product = "0067";
+        };
+        naga2014 = {
+          vendor = "1532";
+          product = "0040";
+        };
+        arctis7p-plus = {
+          vendor = "1038";
+          product = "2212";
+        };
+        yubikey5-kat = {
+          vendor = "1050";
+          product = "0407";
+          udev.conditions = [ ''ATTR{bcdDevice}=="0526"'' ];
+        };
+        yubikey5c-kat = {
+          vendor = "1050";
+          product = "0407";
+          udev.conditions = [ ''ATTR{bcdDevice}=="0543"'' ];
+        };
+      };
       disks = {
         mapped = {
           windows-games = {
