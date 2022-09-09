@@ -20,6 +20,7 @@
           ./disks.nix
           ./vfio.nix
           ./scream.nix
+          ./lookingglass.nix
         ];
         specialArgs = {
           nixosConfig = config;
