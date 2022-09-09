@@ -71,6 +71,7 @@ in {
       nagatrinity.enable = false;
       shift.enable = false;
     };
+    spice.usb.enable = true;
     lookingGlass = {
       enable = config.vfio.gpu == "gtx3080";
       sizeMB = if config.lookingGlass.vertical then 256 else 128;

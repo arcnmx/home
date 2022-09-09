@@ -1,5 +1,9 @@
 { config, lib, ... }: with lib; {
   config = {
+    spice = {
+      enable = mkDefault true;
+      bus = config.devices.vserial0.id;
+    };
     objects.rng0.settings = {
       typename = "rng-random";
       id = "rng0-random";
