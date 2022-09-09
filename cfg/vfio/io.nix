@@ -21,6 +21,11 @@
   systemdService = systemd: {
     ${systemd.name} = unmerged.merge systemd.unit;
   };
+  udevPermission = permission: let
+    assignments = optional (permission.owner != null) ''OWNER="${permission.owner}"''
+    ++ optional (permission.group != null) ''GROUP="${permission.group}"''
+    ++ optional (permission.mode != null) ''MODE="${permission.mode}"'';
+  in concatStringsSep ", " assignments;
   permissionType = types.submodule ({ config, ... }: {
     options = {
       owner = mkOption {
@@ -229,11 +234,58 @@
       };
     };
   };
+  usbDeviceModule = { config, name, ... }: {
+    options = {
+      enable = mkEnableOption "USB device" // {
+        default = true;
+      };
+      name = mkOption {
+        type = types.str;
+        default = name;
+      };
+      vendor = mkOption {
+        type = types.strMatching "[0-9a-f]{4}";
+      };
+      product = mkOption {
+        type = types.strMatching "[0-9a-f]{4}";
+      };
+      permission = mkOption {
+        type = permissionType;
+        default = { };
+      };
+      udev.conditions = mkOption {
+        type = with types; listOf str;
+      };
+      out = {
+        udevRule = mkOption {
+          type = types.str;
+        };
+      };
+    };
+    config = {
+      permission.group = mkDefault "plugdev";
+      udev.conditions = mkBefore [
+        ''SUBSYSTEM=="usb"''
+        ''ATTR{idVendor}=="${config.vendor}"''
+        ''ATTR{idProduct}=="${config.product}"''
+      ];
+      out.udevRule = let
+        assignments = udevPermission config.permission;
+      in optionalString (assignments != "")
+        ''${concatStringsSep ", " config.udev.conditions}, ${assignments}'';
+    };
+  };
 in {
   options.hardware.vfio = {
     devices = mkOption {
       type = with types; attrsOf (submodule vfioDeviceModule);
       default = { };
+    };
+    usb = {
+      devices = mkOption {
+        type = with types; attrsOf (submodule usbDeviceModule);
+        default = { };
+      };
     };
     disks = {
       mapped = mkOption {
@@ -249,6 +301,7 @@ in {
   config = {
     systemd.services = mkMerge (map systemdService systemdUnits);
     security.polkit.users = mkMerge (map polkitPermissions systemdUnits);
+    services.udev.extraRules = mkMerge (mapAttrsToList (_: usb: usb.out.udevRule) (filterAttrs (_: usb: usb.enable) cfg.usb.devices));
     boot.modprobe.modules = {
       vfio-pci = let
         vfio-pci-ids = mapAttrsToList (_: dev:
