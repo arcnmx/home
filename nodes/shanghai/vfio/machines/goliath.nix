@@ -35,9 +35,9 @@ in {
     usb.host.devices = {
       nighthawk-x8 = { };
       naga2014 = { };
-      arctis7p-plus = { };
+      arctis7p-plus.hotplug = true;
       hori.enable = false;
-      xpad = { };
+      xpad.hotplug = true;
       nagatrinity.enable = false;
       gmmk.enable = false;
       shift.enable = false;
