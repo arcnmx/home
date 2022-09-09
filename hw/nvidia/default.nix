@@ -5,6 +5,7 @@
     home.profileSettings.nvidia = {
       enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
       patch = mkEnableOption "nvidia-patch" // { default = true; };
+      dynamicBinding = mkEnableOption "dynamic gpu unbinding";
     };
   };
 
@@ -14,7 +15,7 @@
     };
 
     hardware.nvidia = {
-      modesetting.enable = true;
+      modesetting.enable = !config.home.profileSettings.nvidia.dynamicBinding;
       package = let
         inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
         package = if versionAtLeast beta.version stable.version then beta else stable;
@@ -29,6 +30,9 @@
     # xf86-video-nouveau?
     boot = {
       kernelModules = ["i2c-dev"];
+      modprobe.modules = mkIf config.home.profileSettings.nvidia.dynamicBinding {
+        nvidia_drm.blacklist = true;
+      };
     };
     services.xserver.deviceSection = ''
       Driver "nvidia"
@@ -36,6 +40,9 @@
       Option "Coolbits" "28"
     '' + optionalString config.home.profileSettings.nvidia.enableSoftwareI2c ''
       Option "RegistryDwords" "RMUseSwI2c=0x01;RMI2cSpeed=100"
+    '';
+    services.xserver.displayManager.lightdm.extraConfig = mkIf config.home.profileSettings.nvidia.dynamicBinding ''
+      logind-check-graphical=false
     '';
   };
 }
