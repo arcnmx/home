@@ -66,6 +66,13 @@ in {
             ];
             permission.owner = "arc";
           };
+          windows-games-adata-kat = {
+            source = cfg.disks.mapped.windows-games-adata.path;
+            systemd.depends = [
+              cfg.disks.mapped.windows-games-adata.systemd.id
+            ];
+            permission.owner = "kat";
+          };
         };
       };
     };
@@ -87,6 +94,7 @@ in {
         after = requires;
         conflicts = [
           cfg.disks.cow.windows-games-adata-arc.systemd.id
+          cfg.disks.cow.windows-games-adata-kat.systemd.id
         ];
         unitConfig = {
           ConditionPathExists = "!${cfg.disks.cow.windows-games-adata-arc.storage}";
@@ -105,11 +113,16 @@ in {
         };
       };
     };
+    security.polkit.users = {
+      kat.systemd.units = [ "graphical.target" ];
+    };
     services.udev.extraRules = ''
       # my VM disks
       SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="naa.55cd2e404b6f84e5", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="4", ATTR{size}=="125829120", ATTRS{wwid}=="eui.6479a741e0203d76", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
+      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="838860800", ATTRS{wwid}=="nvme.1cc1-324a34303230303035353234-414441544120535838323030504e50-00000001", OWNER="kat"
+      SUBSYSTEM=="usb", ATTR{idVendor}=="1038", ATTR{idProduct}=="2212", GROUP="plugdev"
     '';
   };
 }

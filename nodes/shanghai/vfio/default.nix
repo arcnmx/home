@@ -13,5 +13,6 @@
         ''BusID "PCI:05:0:0"'' # tertiary (chipset slot) GPU
       ];
     };
+    users.users.kat.extraGroups = [ "kvm" "plugdev" ];
   };
 }
