@@ -22,6 +22,7 @@ in {
     eveDdc = mkEnableOption "Eve DDC"; # this doesn't even work yet wtf .-.
   };
   config.programs.screenstub = {
+    vm.name = "hourai3080";
     settings = {
       screens = [
         {

@@ -8,13 +8,15 @@
       split-window -dv "top -H" \; \
       attach
   '';
-  rundir = "/run/vfio/hourai";
-  qmp_socket = rundir + "/qmp";
-  ga_socket = rundir + "/qga";
+  vm = nixosConfig.hardware.vfio.qemu.machines.${cfg.vm.name};
   inherit (cfg) modifierKey;
 in {
   options = {
     programs.screenstub = {
+      vm.name = mkOption {
+        type = with types; nullOr str;
+        default = null;
+      };
       modifierKey = mkOption {
         type = types.str;
         default = "RightCtrl";
@@ -23,26 +25,31 @@ in {
   };
 
   config = {
-    home.packages = [
-      windows
+    home.packages = mkMerge [
+      [ windows ]
+      (mkIf (cfg.vm.name != null && vm.enable) [
+        (mkIf vm.qga.enable vm.exec.qga)
+        (mkIf vm.qmp.enable vm.exec.qmp)
+      ])
     ];
-    home.shell.functions = {
-      qga = ''
-        QEMUCOMM_QGA_SOCKET_PATH=${ga_socket} nix shell github:arcnmx/qemucomm#qemucomm -c qga "$@"
-      '';
-      qmp = ''
-        QEMUCOMM_QMP_SOCKET_PATH=${qmp_socket} nix shell github:arcnmx/qemucomm#qemucomm -c qmp "$@"
-      '';
+    home.shell.aliases = mkIf (cfg.vm.name != null) {
+      qga = mkIf vm.qga.enable vm.exec.qga.name;
+      qmp = mkIf vm.qmp.enable vm.exec.qmp.name;
     };
 
     programs.screenstub = {
       enable = mkDefault true;
       settings = {
-        qemu = mapAttrs (_: mkOptionDefault) {
-          driver = "virtio"; # input-linux
-          routing = "virtio-host"; # qmp
-          inherit qmp_socket ga_socket;
-        };
+        qemu = mkMerge [
+          (mapAttrs (_: mkOptionDefault) {
+            driver = "virtio"; # input-linux
+            routing = "virtio-host"; # qmp
+          })
+          (mkIf (cfg.vm.name != null) {
+            qmp_socket = mkIf vm.qmp.enable (mkOptionDefault vm.qmp.path);
+            ga_socket = mkIf vm.qga.enable (mkOptionDefault vm.qga.path);
+          })
+        ];
         key_remap = mapAttrs (_: mkOptionDefault) {
           # https://docs.rs/input-linux/*/input_linux/enum.Key.html
           LeftMeta = "RightAlt";
