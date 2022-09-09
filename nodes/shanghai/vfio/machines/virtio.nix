@@ -1,5 +1,9 @@
 { config, lib, ... }: with lib; {
   config = {
+    qga = {
+      enable = mkDefault true;
+      bus = config.devices.vserial0.id;
+    };
     spice = {
       enable = mkDefault true;
       bus = config.devices.vserial0.id;
