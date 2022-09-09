@@ -59,6 +59,7 @@ in {
         driftfix = "slew";
       };
     };
+    qmp.enable = true;
     globals.kvm-pit.lost_tick_policy = "delay";
     pci.devices = let
       netdevs = mapAttrs (name: netdev: {
