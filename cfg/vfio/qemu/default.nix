@@ -11,6 +11,7 @@
           (import (inputs.arc + "/modules/misc")).qemu
           ./machine.nix
           ./memory.nix
+          ./ivshmem.nix
           ./smp.nix
           ./exec.nix
           ./ovmf.nix
