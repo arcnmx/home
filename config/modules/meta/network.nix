@@ -50,6 +50,7 @@
             specialArgs = meta.home.specialArgs;
           };
           runners = {
+            inherit pkgs;
             lazy = {
               inherit (meta.runners.lazy) file args;
               attrPrefix = "network.nodes.${name}.runners.run.";
