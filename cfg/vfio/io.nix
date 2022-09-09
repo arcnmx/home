@@ -5,6 +5,7 @@
     mapAttrsToList (_: dev: dev.systemd) cfg.devices
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow
+    ++ mapAttrsToList (_: machine: machine.scream.systemd) (filterAttrs (_: m: m.scream.systemd.enable) cfg.qemu.machines)
     ++ mapAttrsToList (_: machine: machine.systemd) (filterAttrs (_: m: m.enable && m.systemd.enable) cfg.qemu.machines);
   applyPermission = { permission, path }: let
     owner = optionalString (permission.owner != null) permission.owner;
@@ -282,6 +283,24 @@
         type = types.submodule systemdModule;
         default = { };
       };
+      scream = {
+        playback = {
+          user = mkOption {
+            type = with types; nullOr str;
+            default = null;
+          };
+          pulse = {
+            server = mkOption {
+              type = with types; nullOr str;
+              default = null;
+            };
+          };
+        };
+        systemd = mkOption {
+          type = types.submodule systemdModule;
+          default = { };
+        };
+      };
     };
     config = let
       otherMachines = filterAttrs (n: _: n != name) cfg.qemu.machines;
@@ -299,6 +318,40 @@
             StateDirectory = mkIf (hasPrefix "/var/lib/" config.state.path) (removePrefix "/var/lib/" config.state.path);
             RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
             OOMScoreAdjust = -150;
+          };
+        };
+      };
+      scream = {
+        playback.pulse.server = mkIf (config.scream.playback.user != null)
+          (mkDefault "unix:/run/user/${toString nixosConfig.users.users.${config.scream.playback.user}.uid}/pulse/native");
+        systemd = {
+          name = "vm-${name}-scream";
+          enable = config.scream.enable;
+          type = "exec";
+          polkit.user = mkDefault config.systemd.polkit.user;
+          unit = {
+            wantedBy = mkIf (config.scream.mode == "ivshmem") [ config.systemd.id ];
+            conflicts = mapAttrsToList (_: machine: machine.scream.systemd.id) (filterAttrs (_: machine: machine.scream.systemd.enable) sameMachines);
+            unitConfig = {
+              ConditionPathExists = mkIf (
+                config.scream.playback.backend == "pulse"
+                && config.scream.playback.pulse.server != null
+                && hasPrefix "unix:" config.scream.playback.pulse.server
+              ) [
+                (removePrefix "unix:" config.scream.playback.pulse.server)
+              ];
+            };
+            serviceConfig = {
+              Environment = mkMerge [
+                (mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.pulse.server != null) [
+                  "PULSE_SERVER=${config.scream.playback.pulse.server}"
+                ])
+                (mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.user != null) [
+                  "PULSE_COOKIE=${nixosConfig.users.users.${config.scream.playback.user}.home}/.config/pulse/cookie"
+                ])
+              ];
+              ExecStart = config.scream.playback.cli.command;
+            };
           };
         };
       };

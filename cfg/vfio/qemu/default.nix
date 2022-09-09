@@ -19,6 +19,7 @@
           ./usb.nix
           ./disks.nix
           ./vfio.nix
+          ./scream.nix
         ];
         specialArgs = {
           nixosConfig = config;
