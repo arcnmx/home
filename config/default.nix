@@ -41,7 +41,10 @@
 
     specialArgs = {
       inherit channels inputs;
-      trusted = import ./trusted.nix { inherit lib; };
+      trusted = import ./trusted.nix {
+        inherit lib;
+        ${if builtins.getEnv or (_: "") "HOME_TRUSTED" == "0" then "enable" else null} = false;
+      };
       # TODO?
     };
   };

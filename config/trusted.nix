@@ -1,6 +1,7 @@
-{ lib }: with lib; let
-  trustedPath = ./profiles/trusted;
-  enable = builtins.pathExists (trustedPath + "/meta.nix");
+{ lib
+, trustedPath ? ./profiles/trusted
+, enable ? builtins.pathExists (trustedPath + "/meta.nix")
+}: with lib; let
   importModule = root: let
     f = path: if path == "default" then trustedPath + "/${root}.nix" else trustedPath + "/${path}.nix";
   in path: lib.optional enable (f path);
