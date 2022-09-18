@@ -2,6 +2,10 @@
   target = config.deploy.targets.common;
   inherit (target) tf;
 in {
+  imports = [
+    ../../../../cfg/tailscale/meta.nix
+  ];
+
   options = {
     deploy.targets = let
       tfModule = { config, ... }: {

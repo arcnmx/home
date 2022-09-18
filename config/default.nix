@@ -9,6 +9,7 @@
     overlays = [
       channels.paths.arc
       channels.paths.rust
+      ../cfg
     ];
     nixPath = map (ch: "${ch}=${channels.imports.${ch}}") (builtins.attrNames channels.imports);
     nixpkgs = import channels.paths.nixpkgs {

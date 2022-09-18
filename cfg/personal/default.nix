@@ -33,6 +33,7 @@ in {
   imports = [
     ./ddclient.nix
     ../nftables
+    ../tailscale
   ];
 
   config = {
@@ -214,6 +215,9 @@ in {
       startWhenNeeded = true;
       forwardX11 = true;
       permitRootLogin = "yes"; # "prohibit-password"
+    };
+    services.tailscale = {
+      trust = mkDefault true;
     };
     services.locate = {
       enable = mkDefault true;

@@ -2,6 +2,7 @@
   inherit (config.networking) domains;
 in {
   config = {
+    services.tailscale.enable = true;
     deploy.tf = let
       inherit (config.home.profileSettings.gensokyo) zone;
       domain = removeSuffix zone "${config.networking.hostName}.${config.networking.domain}";
