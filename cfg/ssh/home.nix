@@ -14,6 +14,7 @@
     knownHosts = [
       "satorin ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFgcPU64V9VTwqGZ5GtaqXZd1o/T+58/VXsSfp+nUl6Q"
       "shanghai ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEx8KadgtdeLNmQrEGRqoVE/c5zMMBQ3O7SgAsfTOfZK"
+      "nue ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO+8IMEt1mjX02QuaDNDpSmMryxPxFUNMS3O3n03esqN"
     ];
   };
 }

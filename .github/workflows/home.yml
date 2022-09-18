@@ -28,8 +28,8 @@ jobs:
         args: -u .github/workflows/home.yml .ci/workflow.yml
         attrs: nixpkgs.diffutils
         command: diff
-  nixos-satorin:
-    name: build nixos/satorin
+  nixos-nue:
+    name: build nixos/nue
     runs-on: ubuntu-latest
     steps:
     - id: checkout
@@ -44,13 +44,13 @@ jobs:
       name: nix setup
       uses: arcnmx/ci/actions/nix/run@master
       with:
-        attrs: ci.job.nixos-satorin.run.setup
+        attrs: ci.job.nixos-nue.run.setup
         quiet: false
     - id: ci-dirty
       name: nix test dirty
       uses: arcnmx/ci/actions/nix/run@master
       with:
-        attrs: ci.job.nixos-satorin.run.test
+        attrs: ci.job.nixos-nue.run.test
         command: ci-build-dirty
         quiet: false
         stdout: ${{ runner.temp }}/ci.build.dirty
@@ -58,7 +58,7 @@ jobs:
       name: nix test build
       uses: arcnmx/ci/actions/nix/run@master
       with:
-        attrs: ci.job.nixos-satorin.run.test
+        attrs: ci.job.nixos-nue.run.test
         command: ci-build-realise
         ignore-exit-code: true
         quiet: false
@@ -69,7 +69,7 @@ jobs:
       name: nix test results
       uses: arcnmx/ci/actions/nix/run@master
       with:
-        attrs: ci.job.nixos-satorin.run.test
+        attrs: ci.job.nixos-nue.run.test
         command: ci-build-summarise
         quiet: false
         stdin: ${{ runner.temp }}/ci.build.dirty
@@ -81,7 +81,7 @@ jobs:
       name: nix test cache
       uses: arcnmx/ci/actions/nix/run@master
       with:
-        attrs: ci.job.nixos-satorin.run.test
+        attrs: ci.job.nixos-nue.run.test
         command: ci-build-cache
         quiet: false
         stdin: ${{ runner.temp }}/ci.build.cache

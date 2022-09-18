@@ -4,7 +4,7 @@
   ci.gh-actions.enable = true;
   jobs = let
     home = import ../. { };
-    hostnames = [ "satorin" "shanghai" ];
+    hostnames = [ "nue" "shanghai" ];
   in mapAttrs' (k: nameValuePair "nixos-${k}") (genAttrs hostnames (host: let
     inherit (home.network.nodes.${host}.deploy) system;
   in {

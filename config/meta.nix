@@ -5,6 +5,7 @@
     ./profiles/host/cirno/meta.nix
     ./profiles/host/mystia/meta.nix
     ./profiles/host/satorin/meta.nix
+    ./profiles/host/nue/meta.nix
     ./profiles/host/shanghai/meta.nix
   ] ++ trusted.import.meta "default";
   config = {
