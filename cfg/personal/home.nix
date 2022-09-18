@@ -115,7 +115,10 @@ in {
     };
     services.mpd = {
       enable = true;
-      network.startWhenNeeded = true;
+      network = {
+        startWhenNeeded = true;
+        listenAddress = "any";
+      };
       package = pkgs.mpd-youtube-dl;
       dbFile = "${config.services.mpd.dataDir}/mpd.db";
       musicDirectory = config.xdg.userDirs.absolute.music;

@@ -14,5 +14,10 @@
       ];
     };
     users.users.kat.extraGroups = [ "kvm" "plugdev" ];
+    networking.firewall = {
+      allowedUDPPorts = [
+        4011 # scream goliath
+      ];
+    };
   };
 }

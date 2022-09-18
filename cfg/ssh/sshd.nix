@@ -1,7 +1,15 @@
-{ lib, ... }: with lib; {
-  services.openssh = {
+{ config, lib, ... }: with lib; let
+  cfg = config.services.openssh;
+in {
+  options.services.openssh = {
+    port = mkOption {
+      type = types.port;
+      default = 22; # TODO: start using a different port for personal and server machines? way too much spam otherwise...
+    };
+  };
+  config.services.openssh = {
     enable = true;
-    ports = mkDefault [22]; # TODO: start using a different port for personal and server machines? way too much spam otherwise...
+    ports = [ cfg.port ];
     startWhenNeeded = mkDefault false;
     allowSFTP = true;
     gatewayPorts = "yes";

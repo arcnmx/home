@@ -1,5 +1,6 @@
-{ tf, inputs, config, pkgs, lib, ... }:
+{ tf, inputs, config, pkgs, lib, ... }: with lib;
 let
+  inherit (config.networking.firewall) free;
 in {
   imports = [
     ./base16.nix
@@ -18,6 +19,21 @@ in {
     home.profileSettings.base.defaultNameservers = lib.mkOption {
       type = lib.types.bool;
       default = !config.networking.useDHCP;
+    };
+    networking.firewall.free = {
+      enable = mkEnableOption "free-use ports";
+      base = mkOption {
+        type = with types; nullOr port;
+        default = null;
+      };
+      offset = mkOption {
+        type = types.int;
+        default = 132;
+      };
+      size = mkOption {
+        type = types.int;
+        default = 200 - free.offset;
+      };
     };
   };
 
@@ -146,6 +162,11 @@ in {
       wireplumber.enable = lib.mkDefault false; # disable the built-in module
     };
     services.wireplumber.enable = lib.mkDefault false;
+    services.mosh.ports = lib.mkIf (free.base != null) {
+      from = lib.mkDefault (free.base + 600);
+      to = lib.mkDefault (free.base + 700);
+    };
+    services.openssh.ports = lib.mkIf (free.base != null) [ (free.base + 22) ];
 
     security.sudo.enable = true;
     security.sudo.extraConfig = ''
@@ -166,6 +187,21 @@ in {
       nameservers = lib.mkIf config.home.profileSettings.base.defaultNameservers (
         lib.mkDefault [ "8.8.8.8" "1.0.0.1" ]
       );
+      firewall = lib.mkMerge [
+        {
+          allowedTCPPorts = lib.mkIf config.services.openssh.enable config.services.openssh.ports;
+          allowedUDPPortRanges = lib.mkIf config.services.mosh.enable [
+            { inherit (config.services.mosh.ports) from to; }
+          ];
+        } (lib.mkIf (free.enable && free.base != null) {
+          allowedTCPPortRanges = [
+            rec { from = free.base + free.offset; to = from + free.size; }
+          ];
+          allowedUDPPortRanges = [
+            rec { from = free.base + free.offset; to = from + free.size; }
+          ];
+        })
+      ];
     };
 
     systemd = {

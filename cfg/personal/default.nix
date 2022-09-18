@@ -28,8 +28,12 @@
   bluephone = pkgs.writeShellScriptBin "bluephone" ''
     ${pkgs.python3.withPackages (p: with p; [ dbus-python /*pygobject3*/ ])}/bin/python ${./files/bluephone.py} "$@"
   '';
+  inherit (config.networking.firewall) free;
 in {
-  imports = [ ./ddclient.nix ];
+  imports = [
+    ./ddclient.nix
+    ../nftables
+  ];
 
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
@@ -101,17 +105,24 @@ in {
     };
 
     networking = {
-      firewall.enable = false;
-      nftables = {
-        enable = true;
-        ruleset = mkMerge [
-          (mkBefore (builtins.readFile ./files/nftables.conf))
-          (mkIf config.services.yggdrasil.enable ''
-            define yggdrasil_peer_listen_tcp = ${last (splitString ":" (head config.services.yggdrasil.listen))}
-            ${builtins.readFile ./files/nftables-yggdrasil.conf}
-          '')
+      firewall = mkMerge [ {
+        free.enable = mkDefault true;
+        allowedTCPPorts = [
+          5201 # iperf
+          1137 # riifs
         ];
-      };
+        allowedUDPPorts = [
+          4010 # scream
+          1137 # riifs
+        ];
+      } (mkIf (free.enable && free.base != null) {
+        allowedTCPPortRanges = [
+          rec { from = free.base + free.offset; to = from + free.size; }
+        ];
+        allowedUDPPortRanges = [
+          rec { from = free.base + free.offset; to = from + free.size; }
+        ];
+      }) ];
       interfaces.ethb2b = {
         useDHCP = true;
       };
