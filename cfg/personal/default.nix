@@ -110,11 +110,16 @@ in {
         free.enable = mkDefault true;
         allowedTCPPorts = [
           5201 # iperf
+          5000 # mkchromecast
           1137 # riifs
         ];
         allowedUDPPorts = [
           4010 # scream
           1137 # riifs
+          5353 # mkchromecast
+        ];
+        allowedUDPPortRanges = [
+          { from = 32768; to = 61000; } # mkchromecast
         ];
       } (mkIf (free.enable && free.base != null) {
         allowedTCPPortRanges = [
