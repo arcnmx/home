@@ -65,10 +65,10 @@ end
 
 function mod.page.on_open()
 	if vim.fn.exists(':CocDisable') ~= 0 then
-		vim.cmd('CocDisable')
+		vim.cmd('silent! CocDisable')
 	end
 	if vim.fn.exists(':HexokinaseTurnOff') ~= 0 then
-		vim.cmd('HexokinaseTurnOff')
+		vim.cmd('silent! HexokinaseTurnOff')
 	end
 
 	-- remove default page bindings

@@ -7,18 +7,17 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 inoremap <silent><expr> <TAB>
-  \ pumvisible() ? "\<C-n>" :
-  \ <SID>check_back_space() ? "\<TAB>" :
+  \ coc#pum#visible() ? coc#pum#next(1) :
+  \ <SID>check_back_space() ? "\<Tab>" :
   \ coc#refresh()
-inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr> <S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
 " ctrl+space
 inoremap <silent><expr> <C-space> coc#refresh()
-"inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " alt+jk for cycling between completions
-inoremap <expr> <M-j> pumvisible() ? "\<C-n>" : "\<Down>"
-inoremap <expr> <M-k> pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <M-j> coc#pum#visible() ? coc#pum#next(1) : "\<Down>"
+inoremap <expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<Up>"
 inoremap <expr> <M-h> "\<Left>"
 inoremap <expr> <M-l> "\<Right>"
 
