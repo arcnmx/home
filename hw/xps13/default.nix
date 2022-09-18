@@ -28,6 +28,10 @@ in {
   config = {
     home.profileSettings.intel.graphics.enable = true;
 
+    home-manager.users.arc = { ... }: {
+      imports = [ ./home.nix ];
+    };
+
     boot = {
       kernel = {
         arch = "broadwell";

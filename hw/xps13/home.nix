@@ -1,13 +1,13 @@
-{ config, pkgs, lib, ... }: with lib; {
+{ nixosConfig, config, pkgs, lib, ... }: with lib; {
   key = "Dell XPS 13 (9343)";
 
   config = {
-    xsession.profileExtra = ''
+    xsession.profileExtra = mkIf nixosConfig.services.xserver.synaptics.enable ''
       ${pkgs.xorg.xf86inputsynaptics}/bin/syndaemon -K -d -m 100 -i 0.1
     '';
     xsession.windowManager.i3.extraConfig = ''
       workspace 1 output eDP1
-      workspace 0 output HDMI1 DP1
+      workspace 10 output HDMI1 DP1
     '';
     services.polybar.settings = {
       "module/temp" = {
