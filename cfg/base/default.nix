@@ -67,7 +67,8 @@ in {
         ];
         arch = lib.mkIf (lib.versionAtLeast config.boot.kernelPackages.kernel.stdenv.cc.version "11.1") (lib.mkOverride 1400 "x86-64-v3");
       };
-      tmpOnTmpfs = true;
+      cleanTmpDir = lib.mkDefault (!config.boot.tmpOnTmpfs);
+      tmpOnTmpfs = lib.mkDefault true;
       initrd = {
         compressor = lib.mkDefault (pkgs: "${pkgs.zstd}/bin/zstd");
         compressorArgs = lib.mkDefault [ "-19" ];
