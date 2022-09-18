@@ -57,26 +57,9 @@ in {
       }];
 
       synaptics = {
-        enable = true;
-        accelFactor = "0.275";
-        minSpeed = "0.30";
-        maxSpeed = "1.30";
         palmDetect = true; # seems to work on ps/2 but not i2c
         palmMinWidth = 8;
         palmMinZ = 100;
-        twoFingerScroll = true;
-        scrollDelta = -40;
-        tapButtons = true;
-        fingersMap = [1 3 2];
-
-        # Sets up soft buttons at the bottom
-        # First 40% - Left Button
-        # Middle 20% - Middle Button
-        # Right 40% - Right Button
-        additionalOptions = ''
-          Option "ClickPad" "true"
-          Option "SoftButtonAreas" "60% 0 82% 0 40% 59% 82% 0"
-        '';
       };
     };
 

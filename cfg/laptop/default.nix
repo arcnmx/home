@@ -6,6 +6,7 @@
       powerOnBoot = mkDefault false;
     };
     hardware.display.dpms.standbyMinutes = mkDefault 5;
+    networking.wireless.mainInterface.isMain = mkDefault true;
 
     # TODO: fill in wireless.networks or iwd.networks instead of using connman?
     services.connman = {
@@ -28,6 +29,37 @@
       };
       Rank = {
         BandModifier5Ghz = 1.75;
+      };
+    };
+
+    services.xserver = {
+      synaptics = mapAttrs (_: mkDefault) {
+        enable = !config.services.xserver.libinput.enable;
+        accelFactor = "0.275";
+        minSpeed = "0.30";
+        maxSpeed = "1.30";
+        palmDetect = true;
+        palmMinWidth = 8;
+        palmMinZ = 100;
+        twoFingerScroll = true;
+        scrollDelta = -40;
+        tapButtons = true;
+        fingersMap = [1 3 2];
+
+        # Sets up soft buttons at the bottom
+        # First 40% - Left Button
+        # Middle 20% - Middle Button
+        # Right 40% - Right Button
+        additionalOptions = ''
+          Option "ClickPad" "true"
+          Option "SoftButtonAreas" "60% 0 82% 0 40% 59% 82% 0"
+        '';
+      };
+      libinput.touchpad = mapAttrs (_: mkDefault) {
+        accelSpeed = config.services.xserver.synaptics.accelFactor;
+        naturalScrolling = true;
+        tappingDragLock = false; # XXX: timeout is too long and is not configurable
+        clickMethod = "buttonareas";
       };
     };
 

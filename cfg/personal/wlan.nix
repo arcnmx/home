@@ -1,10 +1,5 @@
 { config, lib, ... }: with lib; let
   cfg = config.networking.wireless;
-  macAddresses = {
-    ax210 = "d8:f8:83:36:81:b6";
-    ac7265 = "00:15:00:ec:c6:51";
-    ax200 = "a4:b1:c1:d9:14:df"; # integrated in x570am
-  };
 in {
   options.networking.wireless = with types; {
     mainInterface = {
@@ -17,9 +12,17 @@ in {
         default = null;
       };
       arcCard = mkOption {
-        type = nullOr (enum (attrNames macAddresses));
+        type = nullOr str;
         default = null;
       };
+      isMain = mkOption {
+        type = bool;
+        default = false;
+      };
+    };
+    arcCards = mkOption {
+      type = attrs;
+      default = { };
     };
   };
   config = {
@@ -31,7 +34,9 @@ in {
     };
     systemd.network.links."10-wlan" = mkIf cfg.mainInterface.rename {
       matchConfig = {
-        MACAddress = macAddresses.${cfg.mainInterface.arcCard};
+        MACAddress = let
+          mac = cfg.arcCards.${cfg.mainInterface.arcCard}.mac or null;
+        in mkIf (mac != null) mac;
       };
       linkConfig = {
         Name = cfg.mainInterface.name;
