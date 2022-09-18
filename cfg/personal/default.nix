@@ -219,6 +219,12 @@ in {
     services.tailscale = {
       trust = mkDefault true;
     };
+    services.kanidm = {
+      clientSettings = {
+        verify_ca = mkDefault true;
+        verify_hostnames = mkDefault true;
+      };
+    };
     services.locate = {
       enable = mkDefault true;
       locate = mkDefault pkgs.mlocate;
