@@ -12,7 +12,7 @@
         ${pkgs.connman}/bin/connmanctl disable wifi
         ${pkgs.connman}/bin/connmanctl disable bluetooth
         sleep 2.5
-        ${pkgs.connman}/bin/connmanctl connect ethernet_f2796070f331_cable
+        ${pkgs.connman}/bin/connmanctl connect ethernet_629316761e6d_cable
       '';
       winet = ''
         ${pkgs.connman}/bin/connmanctl disable bluetooth

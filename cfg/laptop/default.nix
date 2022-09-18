@@ -7,7 +7,7 @@
     services.connman = {
       enable = true;
       enableVPN = false;
-      wifi.backend = "iwd";
+      wifi.backend = mkDefault "iwd";
       extraFlags = ["--nodnsproxy"];
       extraConfig = ''
         AllowHostnameUpdates=false
