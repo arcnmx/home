@@ -19,5 +19,10 @@
     systemd.watchdog.enable = false;
     home.hw.xps13.wifi = "ax210";
     hardware.cpu.info.cores = 2;
+
+    hardware.display = {
+      monitors.internal.dpi.target = 96 * 2;
+      fontScale = 0.95;
+    };
   };
 }

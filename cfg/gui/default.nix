@@ -7,6 +7,22 @@
   inherit (pkgs.arc.packages.personal) openrazer-dpi;
 in
 {
+  options = {
+    hardware.display = {
+      dpi = mkOption {
+        type = types.float;
+        default = 96.0;
+      };
+      dpiScale = mkOption {
+        type = types.float;
+        default = 1.0;
+      };
+      fontScale = mkOption {
+        type = types.float;
+        default = 1.0;
+      };
+    };
+  };
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     home.profileSettings.base.duc = pkgs.duc;

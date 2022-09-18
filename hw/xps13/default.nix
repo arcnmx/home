@@ -8,15 +8,6 @@ in {
   ];
   options = {
     home.hw.xps13 = {
-      lieDpi = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Lie about the screen's DPI";
-      };
-      dpi = mkOption {
-        type = types.int;
-        default = if cfg.lieDpi then 96 else 166;
-      };
       wifi = mkOption {
         type = types.enum [ "7265" "ax210" ];
         default = "7265";
@@ -59,12 +50,30 @@ in {
       };
     };
 
+    hardware.display = {
+      enable = true;
+      monitors = {
+        internal = {
+          output = "eDP1";
+          xserver.sectionName = "Monitor[0]";
+          primary = true;
+          width = 1920;
+          height = 1080;
+          size = {
+            diagonal = 13.3;
+            width = 292;
+            height = 165;
+          };
+        };
+      };
+      dpi = config.hardware.display.monitors.internal.dpi.out.dpi;
+    };
     services.xserver = {
       xrandrHeads = [{
         output = "eDP1";
         primary = true;
-        monitorConfig = mkIf (!cfg.lieDpi) ''
-          DisplaySize 292 165 # millimeters
+        monitorConfig = ''
+          DisplaySize ${toString (292 * config.hardware.display.dpiScale)} ${toString (165 * config.hardware.display.dpiScale)} # millimeters
         '';
       }];
       videoDrivers = ["intel"];

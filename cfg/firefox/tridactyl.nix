@@ -4,6 +4,7 @@
     urxvt = "${pkgs.rxvt-unicode-arc}/bin/urxvt";
     vim = config.home.sessionVariables.EDITOR;
     firefox = "${config.programs.firefox.package}/bin/firefox";
+    scalePx = sz: config.lib.gui.fontSizeStr sz + "px";
   in {
     enable = true;
     sanitise = {
@@ -14,16 +15,16 @@
       custom = ''
         :root.TridactylThemeCustom {
             --tridactyl-hintspan-font-family: monospace, courier, sans-serif;
-            --tridactyl-hintspan-font-size: 12px;
+            --tridactyl-hintspan-font-size: ${scalePx 12};
             --tridactyl-hintspan-fg: #fff;
             --tridactyl-hintspan-bg: #000088;
             --tridactyl-hintspan-border-color: #000;
-            --tridactyl-hintspan-border-width: 1px;
+            --tridactyl-hintspan-border-width: ${scalePx 1};
             --tridactyl-hintspan-border-style: dashed;
             --tridactyl-hint-bg: #ffff99;
-            --tridactyl-hint-outline: 1px dotted #000;
+            --tridactyl-hint-outline: ${scalePx 1} dotted #000;
             --tridactyl-hint-active-bg: #00ff00;
-            --tridactyl-hint-active-outline: 1px dotted #000;
+            --tridactyl-hint-active-outline: ${scalePx 1} dotted #000;
         }
 
         :root.TridactylThemeCustom .TridactylHintElem {
@@ -31,9 +32,9 @@
         }
 
         :root.TridactylThemeCustom span.TridactylHint {
-            padding: 1px;
-            margin-top: 8px;
-            margin-left: -8px;
+            padding: ${scalePx 1};
+            margin-top: ${scalePx 8};
+            margin-left: ${scalePx (-8)};
             opacity: 0.9;
             text-shadow: black -1px -1px 0px, black -1px 0px 0px, black -1px 1px 0px, black 1px -1px 0px, black 1px 0px 0px, black 1px 1px 0px, black 0px 1px 0px, black 0px -1px 0px !important;
         }

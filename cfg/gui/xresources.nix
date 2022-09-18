@@ -92,6 +92,14 @@ in {
         "16" = "16-108-100-100-c-80";
         "20" = "20-145-100-100-c-100";
       };
+      findTamzenSize = sz:
+        if sz <= 10 then 9
+        else if sz <= 12 then 12
+        else if sz <= 13 then 13
+        else if sz <= 14 then 14
+        else if sz <= 15 then 15
+        else if sz < 20 then 16
+        else 20;
       #tamzenName = "tamsyn";
       tamzenName = "tamzen";
       #tamzenName = "tamzenforpowerline";
@@ -104,7 +112,8 @@ in {
         options'' = if length options' > 0 then ":${concatStringsSep ":" (toList options)}" else "";
       in "xft:${name}${options''}";
 
-      fontsTamzen = size: style: let
+      fontsTamzen = targetSize: style: let
+        size = findTamzenSize targetSize;
         tamzenStyle = if style == normal || style == italic then normal else bold;
       in [(tamzen size tamzenStyle)] ++ (map (font: xft font ["pixelsize=${toString size}"]) fallbacks);
       fontsTtf = name: size: style:
@@ -112,15 +121,17 @@ in {
         (map (font: xft font ["size=${toString size}"]) fallbacks);
 
       fontcommands = fonts: size: map (style: fontcommand style (fonts size style)) [normal bold italic ibold];
-      inherit (config.lib.gui) fontSize;
+      inherit (config.lib.gui) fontSize dpiSize;
     in {
       "URxvt.font" = fontsTtf monospace (fontSize 9) normal;
       "URxvt.boldFont" = fontsTtf monospace (fontSize 9) bold;
       "URxvt.italicFont" = fontsTtf monospace (fontSize 9) italic;
       "URxvt.boldItalicFont" = fontsTtf monospace (fontSize 9) ibold;
 
+      "URxvt.keysym.C-minus" = commands (fontcommands fontsTamzen (dpiSize 7));
       "URxvt.keysym.C-0" = commands (fontcommands (fontsTtf monospace) (fontSize 9));
-      "URxvt.keysym.C-minus" = commands (fontcommands fontsTamzen 12);
+      "URxvt.keysym.C-9" = commands (fontcommands (fontsTtf monospace) (fontSize 10));
+      "URxvt.keysym.C-8" = commands (fontcommands (fontsTtf monospace) (fontSize 11));
       "URxvt.keysym.C-equal" = commands (fontcommands (fontsTtf monospace) (fontSize 12));
       #"URxvt*background" = "rgba:ffdd/ff66/ee33/ee88"; # light
       #"URxvt*background" = "rgba:0000/22bb/3366/ee00"; # dark
