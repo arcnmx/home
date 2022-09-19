@@ -28,8 +28,12 @@ in {
       };
     }
     (mkIf cfg.enable {
+      systemd.network.wait-online.ignoredInterfaces = [ cfg.interfaceName ];
       networking.firewall = {
-        allowedUDPPorts = [ cfg.port ];
+        allowedUDPPorts = [
+          cfg.port
+          3478 # STUN
+        ];
         trustedInterfaces = mkIf cfg.trust [ cfg.interfaceName ];
       };
     })
