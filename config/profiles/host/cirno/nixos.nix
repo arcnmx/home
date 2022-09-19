@@ -31,7 +31,7 @@ in {
       interfaces.enp0s3 = {
         # NOTE: it's ens3 on amd machines fyi
         useDHCP = true;
-        ipv6 = {
+        ipv6 = mkIf (!config.networking.interfaces.enp0s3.useDHCP) {
           addresses = [
             {
               address = addr_ipv6_nix;
