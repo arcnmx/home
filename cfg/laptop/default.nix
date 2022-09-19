@@ -5,7 +5,7 @@
 
     # TODO: fill in wireless.networks or iwd.networks instead of using connman?
     services.connman = {
-      enable = true;
+      enable = mkDefault true;
       enableVPN = false;
       wifi.backend = mkDefault "iwd";
       extraFlags = ["--nodnsproxy"];
@@ -39,25 +39,28 @@
         RUN+="${pkgs.coreutils}/bin/chmod g+w %S%p/brightness"
     '';
 
-    systemd.services.net-suspend = {
-      before = ["sleep.target"];
-      unitConfig = {
-        StopWhenUnneeded = "yes";
+    systemd.network.wait-online.anyInterface = true;
+    systemd.services = {
+      net-suspend = rec {
+        description = "stop wifi+bluetooth before sleep";
+        wantedBy = [ "sleep.target" ];
+        before = wantedBy;
+        conflicts = [ "bluetooth.service" ];
+        unitConfig.StopWhenUnneeded = true;
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = mkMerge [
+            [ "${pkgs.coreutils}/bin/true" ]
+            (mkIf config.services.connman.enable [
+              "${pkgs.connman}/bin/connmanctl disable wifi"
+            ])
+          ];
+          ExecStop = mkIf config.services.connman.enable [
+            "${pkgs.connman}/bin/connmanctl enable wifi"
+            "${pkgs.connman}/bin/connmanctl scan wifi"
+          ];
+        };
       };
-
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = [
-          "${config.systemd.package}/bin/systemctl stop bluetooth"
-          "${pkgs.connman}/bin/connmanctl disable wifi"
-        ];
-        ExecStop = [
-          #"/usr/bin/systemctl start bluetooth"
-          "${pkgs.connman}/bin/connmanctl enable wifi"
-          "${pkgs.connman}/bin/connmanctl scan wifi"
-        ];
-      };
-      wantedBy = ["sleep.target"];
     };
   };
 }

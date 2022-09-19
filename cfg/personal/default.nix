@@ -91,6 +91,7 @@ in {
     hardware.xpadneo.enable = true;
     hardware.enableAllFirmware = true;
 
+    systemd.network.wait-online.anyInterface = mkDefault true;
     systemd.network.links = {
       "10-b2b128" = {
         matchConfig = {
@@ -252,7 +253,11 @@ in {
     };
     services.physlock.enable = true;
     security.sudo.wheelNeedsPassword = false;
-    systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = -100;
+    systemd.services = mkMerge [ {
+      nix-daemon.serviceConfig.OOMScoreAdjust = -100;
+    } (mkIf (config.systemd.network.enable && config.services.connman.enable) {
+      systemd-networkd-wait-online.enable = mkDefault false;
+    }) ];
     systemd.mounts = let
       hugepages = { where, options }: {
         before = ["sysinit.target"];
