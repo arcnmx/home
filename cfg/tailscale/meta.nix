@@ -58,7 +58,10 @@ in {
     };
   };
   config = {
-    network.tailscale.devices = mapListToAttrs (dev: nameValuePair dev.name dev) (tf.resources.tailnet.importAttr "devices");
+    network.tailscale.devices = optionalAttrs tf.state.enable (mapListToAttrs
+      (dev: nameValuePair dev.name dev)
+      (tf.resources.tailnet.importAttr "devices")
+    );
     deploy.targets = {
       common.tf = {
         resources = {

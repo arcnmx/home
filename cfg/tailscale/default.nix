@@ -1,8 +1,12 @@
-{ target, tf, pkgs, config, lib, ... }: with lib; let
+{ meta, target, tf, pkgs, config, lib, ... }: with lib; let
   cfg = config.services.tailscale;
   StateDirectory = "tailscale";
   loginState = "/var/lib/${StateDirectory}/login";
   enable = cfg.enable && cfg.login.enable;
+  otherDevices = filterAttrs (_: dev:
+    dev.shortName != config.networking.hostName
+    && elem dev.user meta.network.tailscale.users
+  ) meta.network.tailscale.devices;
 in {
   options = {
     services.tailscale = {
@@ -36,9 +40,12 @@ in {
         ];
         trustedInterfaces = mkIf cfg.trust [ cfg.interfaceName ];
       };
+      networking.hosts = listToAttrs (concatMap (dev:
+        map (addr: nameValuePair addr [ dev.shortName ]) dev.addresses
+      ) (attrValues otherDevices));
     })
     (mkIf (cfg.enable && cfg.login.enable) {
-      systemd.services.tailscale-login = rec {
+      systemd.services.login-tailscale = rec {
         wants = [ "network-online.target" ];
         wantedBy = [ "tailscaled.service" ];
         after = wantedBy ++ wants;
