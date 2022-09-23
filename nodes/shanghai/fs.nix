@@ -52,6 +52,8 @@
           enable = true;
           options = [
             "luks" "discard" "noauto" "nofail"
+            # https://wiki.archlinux.org/title/Dm-crypt/Specialties#Disable_workqueue_for_increased_solid_state_drive_(SSD)_performance
+            "no-read-workqueue" "no-write-workqueue"
           ];
         };
       };
