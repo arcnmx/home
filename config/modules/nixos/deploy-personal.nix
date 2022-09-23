@@ -43,6 +43,9 @@
             include ${userConfig.secrets.files.taskserver-creds.path}
           '';
         };
+        mpc.servers = mkIf userConfig.services.mpd.enable {
+          local.password = resources.mpd_password.getAttr "result";
+        };
       };
       services = {
         mpd = {

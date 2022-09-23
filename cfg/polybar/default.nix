@@ -141,13 +141,14 @@
         format.warn.foreground = warn-colour;
       };
       "module/mpd" = let
-        ncmpcpp = config.programs.ncmpcpp;
-      in mkIf ncmpcpp.enable {
+        inherit (config.programs) mpc;
+        default = mpc.servers.${mpc.defaultServer} or { enable = false; };
+      in mkIf mpc.enable {
         type = "internal/mpd";
 
-        host = mkIf (ncmpcpp.mpdHost != null) ncmpcpp.mpdHost;
-        password = mkIf (ncmpcpp.mpdPassword != null) ncmpcpp.mpdPassword;
-        port = mkIf (ncmpcpp.mpdPort != null) ncmpcpp.mpdPort;
+        host = mkIf default.enable default.connection.host;
+        password = mkIf (default.enable && default.password != null) default.password;
+        port = mkIf (default.enable && default.out.MPD_PORT != null) default.out.MPD_PORT;
 
         interval = 1;
         label-song = "♪ %artist% - %title%";

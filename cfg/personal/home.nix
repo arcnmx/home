@@ -1,13 +1,9 @@
-{ base16, config, pkgs, lib, ... } @ args: with lib; let
+{ base16, meta, nixosConfig, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
-  mpc = pkgs.writeShellScriptBin "mpc" ''
-    export MPD_HOST=${escapeShellArg config.programs.ncmpcpp.settings.mpd_host}
-    ${pkgs.mpc_cli}/bin/mpc "$@"
-  '';
   mplay = pkgs.writeShellScriptBin "mplay" ''
     COUNT=$#
-    ${mpc}/bin/mpc add "$@" &&
-      ${mpc}/bin/mpc play $(($(${mpc}/bin/mpc playlist | wc -l) - COUNT + 1))
+    mpc add "$@" &&
+      mpc play $(($(mpc playlist | wc -l) - COUNT + 1))
   '';
   cfg = config.home.profileSettings.personal;
 in {
@@ -47,7 +43,7 @@ in {
       radare2
       electrum-cli
       jq yq
-      mpc mplay
+      mplay
       pinentry.curses
       #TODO: benc bsync snar-snapper
     ];
@@ -197,11 +193,21 @@ in {
       };
     };
     programs.pulsemixer = {
-      enable = config.home.nixosConfig.hardware.pulseaudio.enable or pkgs.hostPlatform.isLinux || config.home.nixosConfig.services.pipewire.enable or false;
+      enable = nixosConfig.hardware.pulseaudio.enable or pkgs.hostPlatform.isLinux || nixosConfig.services.pipewire.enable or false;
       configContent.keys = {
         next-mode = "J";
         prev-mode = "K";
         mute = "m, `";
+      };
+    };
+    programs.mpc = {
+      enable = mkDefault true;
+      servers.shanghai = {
+        enable = mkDefault (nixosConfig.networking.hostName != "shanghai");
+        connection = {
+          address = "shanghai";
+          binding = meta.network.nodes.shanghai.networking.bindings.mpd;
+        };
       };
     };
     programs.filebin = {

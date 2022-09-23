@@ -3,7 +3,6 @@
 in {
   config.programs.ncmpcpp = {
     enable = mkDefault true;
-    mpdHost = mkIf config.services.mpd.enable "/run/user/1000/mpd/socket";
     settings = mapAttrs (_: mkDefault) {
       data_fetching_delay = false;
       playlist_disable_highlight_delay = 0;

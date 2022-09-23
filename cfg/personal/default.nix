@@ -39,6 +39,7 @@ in {
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     home.profileSettings.base.defaultNameservers = true;
+    home.os.enable = mkDefault true;
 
     deploy.personal.enable = true;
     console = {
