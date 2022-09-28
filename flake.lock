@@ -20,6 +20,43 @@
         "type": "github"
       }
     },
+    "fl-config": {
+      "locked": {
+        "lastModified": 1653159448,
+        "narHash": "sha256-PvB9ha0r4w6p412MBPP71kS/ZTBnOjxL0brlmyucPBA=",
+        "owner": "flakelib",
+        "repo": "fl",
+        "rev": "fcefb9738d5995308a24cda018a083ccb6b0f460",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "ref": "config",
+        "repo": "fl",
+        "type": "github"
+      }
+    },
+    "flakelib": {
+      "inputs": {
+        "fl-config": "fl-config",
+        "std": [
+          "std"
+        ]
+      },
+      "locked": {
+        "lastModified": 1669759641,
+        "narHash": "sha256-Zc6rZC0gTLZ9AzGG6vlImkYZGRf0bdMNk1fwS06ZqnU=",
+        "owner": "flakelib",
+        "repo": "fl",
+        "rev": "ac03e98777f3f03e694f1bcf0c6a6a304734a263",
+        "type": "github"
+      },
+      "original": {
+        "owner": "flakelib",
+        "repo": "fl",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -108,12 +145,14 @@
     "root": {
       "inputs": {
         "arc": "arc",
+        "flakelib": "flakelib",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-big": "nixpkgs-big",
         "qemucomm": "qemucomm",
         "rust": "rust",
         "std": "std",
+        "systemd2mqtt": "systemd2mqtt",
         "tf": "tf"
       }
     },
@@ -152,6 +191,32 @@
       "original": {
         "owner": "flakelib",
         "repo": "std",
+        "type": "github"
+      }
+    },
+    "systemd2mqtt": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust": [
+          "rust"
+        ]
+      },
+      "locked": {
+        "lastModified": 1670903054,
+        "narHash": "sha256-SQY8eqtnF4FV1GP+jjHSG+sOKxnbtgfCkgNK3BEpBIA=",
+        "owner": "arcnmx",
+        "repo": "systemd2mqtt",
+        "rev": "71dcf9ad5a90edd38ddae447622fa4d3b21c6985",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "repo": "systemd2mqtt",
         "type": "github"
       }
     },

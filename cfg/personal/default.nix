@@ -48,6 +48,9 @@ in {
     deploy.personal.enable = true;
     deploy.tf.variables = {
       CRATES_TOKEN_ARC.bitw.name = "crates-arcnmx";
+      SYSTEMD2MQTT_PASSWORD = mkIf config.services.systemd2mqtt.enable {
+        bitw.name = "mqtt-systemd2mqtt";
+      };
     };
     console = {
       packages = [pkgs.tamzen];
@@ -182,6 +185,10 @@ in {
       systemd.units = singleton "dpms-standby.service";
     };
 
+    services.systemd2mqtt = mkIf tf.state.enable {
+      mqtt.secretPassword = mkIf config.services.systemd2mqtt.enable tf.variables.SYSTEMD2MQTT_PASSWORD.ref;
+    };
+
     services.udev.extraRules = let
       localGroup = "users";
       assignLocalGroup = ''GROUP="${localGroup}"'';
@@ -232,7 +239,10 @@ in {
     ];
 
     users = {
-      users.arc.extraGroups = [ "uinput" "plugdev" "input" "adbusers" ];
+      users.arc = {
+        extraGroups = [ "uinput" "plugdev" "input" "adbusers" ];
+        systemd.translate.system.enable = mkDefault true;
+      };
       groups = {
         uinput = { };
         adbusers = { };

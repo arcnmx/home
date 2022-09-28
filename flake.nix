@@ -2,6 +2,10 @@
   description = "nix/home";
   inputs = {
     std.url = "github:flakelib/std";
+    flakelib = {
+      url = "github:flakelib/fl";
+      inputs.std.follows = "std";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     nixpkgs-big.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -23,6 +27,14 @@
     qemucomm = {
       url = "github:arcnmx/qemucomm";
       flake = false;
+    };
+    systemd2mqtt = {
+      url = "github:arcnmx/systemd2mqtt";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        rust.follows = "rust";
+        flakelib.follows = "flakelib";
+      };
     };
   };
   outputs = { self, ... }@inputs: {

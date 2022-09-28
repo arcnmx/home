@@ -34,6 +34,12 @@ in
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     home.profileSettings.base.duc = pkgs.duc;
+    users.users.arc.systemd.translate.units = [ "graphical-session.target" ];
+    services.systemd2mqtt.units = {
+      ${toString config.users.users.arc.systemd.translate.units."graphical-session.target".systemTarget.name} = {
+        settings.readonly = true;
+      };
+    };
 
     # TODO: alsa fallback to pulse mixer (see shanghai /etc/asound.conf)
 

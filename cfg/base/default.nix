@@ -6,7 +6,9 @@ in {
   imports = [
     ./base16.nix
     ./personal.nix
+    ./systemd2mqtt.nix
     ../ssh/sshd.nix
+    inputs.systemd2mqtt.nixosModules.default
   ];
 
   options = {
@@ -155,6 +157,12 @@ in {
         enable = lib.mkDefault (config.services.pipewire.enable && !config.services.wireplumber.enable);
       };
       wireplumber.enable = lib.mkDefault false; # disable the built-in module
+    };
+    services.systemd2mqtt = {
+      mqtt = {
+        url = mkOptionDefault null;
+        username = mkDefault "systemd";
+      };
     };
     services.wireplumber.enable = lib.mkDefault false;
     services.mosh.ports = lib.mkIf (free.base != null) {

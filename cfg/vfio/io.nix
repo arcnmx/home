@@ -1,6 +1,7 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
   nixosConfig = config;
+  systemd2mqtt = config.services.systemd2mqtt;
   hmp = machineConfig: cmd: if machineConfig.qemucomm.enable
     then "${getExe machineConfig.exec.qmp} hmp ${escapeShellArg cmd}"
     else "echo ${escapeShellArg cmd} | ${getExe machineConfig.exec.monitor}";
@@ -27,6 +28,9 @@
       systemd.units = [ systemd.id ];
     };
   };
+  mqttUnits = systemd: mkIf systemd.mqtt.enable [
+    systemd.id
+  ];
   systemdService = systemd: {
     ${systemd.name} = unmerged.merge systemd.unit;
   };
@@ -59,6 +63,9 @@
   systemdModule = { config, ... }: {
     options = {
       enable = mkEnableOption "systemd service" // {
+        default = true;
+      };
+      mqtt.enable = mkEnableOption "systemd2mqtt control" // {
         default = true;
       };
       name = mkOption {
@@ -148,6 +155,7 @@
       path = "/dev/mapper/${config.name}";
       systemd = {
         name = "vfio-mapdisk-${config.name}";
+        mqtt.enable = mkDefault false;
         polkit.user = config.permission.owner;
         script = ''
           ${nixosConfig.lib.arc-vfio.map-disk}/bin/map-disk ${config.source} ${config.name} ${config.mbr.id} ${toString config.mbr.partType}
@@ -200,6 +208,7 @@
       storage = mkIf (config.mode == "N") (mkOptionDefault "/tmp/qemu-cow-${config.name}");
       systemd = {
         name = "vfio-cowdisk-${config.name}";
+        mqtt.enable = mkDefault false;
         polkit.user = config.permission.owner;
         script = ''
           ${nixosConfig.lib.arc-vfio.cow-disk}/bin/cow-disk ${config.source} ${config.name} ${config.mode} ${config.storage} ${toString config.sizeMB}
@@ -241,6 +250,7 @@
     config = {
       systemd = {
         name = "vfio-reserve-${name}";
+        mqtt.enable = mkDefault false;
         script = mkMerge (
           optional config.unbindVts "${nixosConfig.lib.arc-vfio.unbind-vts}/bin/unbind-vts"
           ++ singleton "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci ${if config.host != null then config.host else "${config.vendor}:${config.product}"}"
@@ -478,6 +488,7 @@ in {
   config = {
     systemd.services = mkMerge (map systemdService systemdUnits);
     security.polkit.users = mkMerge (map polkitPermissions systemdUnits);
+    services.systemd2mqtt.units = mkMerge (map mqttUnits systemdUnits);
     systemd.tmpfiles.rules = mkMerge (mapAttrsToList (_: machine: [
       "d ${machine.state.path} 0750 ${machine.state.owner} kvm -"
       "d ${machine.state.runtimePath} 0750 ${machine.state.owner} kvm -"

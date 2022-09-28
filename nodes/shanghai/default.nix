@@ -24,6 +24,7 @@
 
     services.ddclient.enable = true;
     services.ofono.enable = true;
+    services.systemd2mqtt.enable = true;
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     hardware.openrazer.enable = true;
 
@@ -51,6 +52,9 @@
           '';
         };
       };
+    };
+    services.systemd2mqtt.units = {
+      "dpms-standby.service".settings.invert = true;
     };
 
     users = {

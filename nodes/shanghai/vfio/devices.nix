@@ -194,6 +194,7 @@ in {
     security.polkit.users = {
       kat.systemd.units = [ "graphical.target" ];
     };
+    services.systemd2mqtt.units = [ "graphical.target" ];
     services.udev.extraRules = ''
       # my VM disks
       SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="naa.55cd2e404b6f84e5", OWNER="arc"

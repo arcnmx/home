@@ -170,6 +170,7 @@
 in {
   config = {
     security.polkit.users.kat.systemd.units = [ "mradio.service" ];
+    services.systemd2mqtt.units = mkIf config.services.mradio.enable [ "mradio.service" ];
     services.mradio = {
       enable = mkDefault true;
       user = "arc";
