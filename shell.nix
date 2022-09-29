@@ -13,6 +13,7 @@ in pkgs.mkShell {
     export HOME_HOSTNAME=$(hostname -s)
     export HOME_UID=$(id -u)
     export HOME_USER=$(id -un)
+    export SSH_AUTH_SOCK=/run/user/$HOME_UID/gnupg/S.gpg-agent.ssh
     export NIX_PATH="$NIX_PATH:home=${toString ./config}"
   '';
 }
