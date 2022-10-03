@@ -106,8 +106,8 @@
         randomEncryption.enable = true;
       }
       {
-        # 32G BPX
-        device = "/dev/disk/by-partuuid/8a7fdfac-14bc-431e-9907-1069ec937e88";
+        # 32G SN770
+        device = "/dev/disk/by-partuuid/0002fc58-b222-4fd3-80a4-a442137352ee";
         randomEncryption.enable = true;
       }
     ];

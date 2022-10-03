@@ -27,9 +27,10 @@
           imports = [ ./hourai.nix ];
           vfio.gpu = "gtx1650";
         };
-        hourai-adata = { ... }: {
+        hourai-nocow = { ... }: {
           imports = [ hourai3080 ];
           disks.games-adata.enable = false;
+          disks.games-sn770.enable = false;
         };
         goliath1650 = { config, ... }: {
           imports = [ ./goliath.nix ];

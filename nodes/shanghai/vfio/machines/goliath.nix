@@ -9,6 +9,7 @@ in {
   config = {
     systemd.wants = [
       (mkIf config.disks.games-adata.enable disks.cow.windows-games-adata-kat.systemd.id)
+      (mkIf config.disks.games-sn770.enable disks.cow.windows-games-sn770-kat.systemd.id)
     ];
     enable = true;
     name = "goliath";
@@ -25,11 +26,15 @@ in {
     disks = {
       windows = {
         scsi.lun = 0;
-        path = "/dev/disk/by-partlabel/windows-kat";
+        path = "/dev/disk/by-partlabel/goliath-sn770";
       };
       games-adata = {
         scsi.lun = 1;
         inherit (disks.cow.windows-games-adata-kat) path;
+      };
+      games-sn770 = {
+        scsi.lun = 2;
+        inherit (disks.cow.windows-games-sn770-kat) path;
       };
     };
     usb.host.devices = {

@@ -25,8 +25,10 @@ in {
     systemd.depends = [
       (mkIf config.disks.games-adata.enable disks.cow.windows-games-adata-arc.systemd.id)
       (mkIf config.disks.games-adata-arc.enable "windows-games-adata-arc.service")
+      (mkIf config.disks.games-sn770.enable disks.cow.windows-games-sn770-arc.systemd.id)
+      (mkIf config.disks.games-sn770-arc.enable "windows-games-sn770-arc.service")
       disks.mapped.windows-games-sabrent.systemd.id
-      disks.mapped.windows-games-bpx.systemd.id
+      disks.mapped.windows-games-sn850x.systemd.id
       disks.mapped.windows-games.systemd.id
     ];
     disks = {
@@ -58,9 +60,22 @@ in {
         scsi.lun = config.disks.games-adata.scsi.lun;
         path = "/dev/disk/windows-games-adata-arc";
       };
-      games-bpx = {
+      games-sn770 = {
         scsi.lun = 6;
-        inherit (disks.mapped.windows-games-bpx) path;
+        inherit (disks.cow.windows-games-sn770-arc) path;
+      };
+      games-sn770-arc = {
+        enable = !config.disks.games-sn770.enable;
+        scsi.lun = config.disks.games-sn770.scsi.lun;
+        path = "/dev/disk/windows-games-sn770-arc";
+      };
+      games-sn850x = {
+        scsi.lun = 7;
+        inherit (disks.mapped.windows-games-sn850x) path;
+        device.settings = {
+          logical_block_size = 4096;
+          physical_block_size = 4096;
+        };
       };
     };
     usb.host.devices = {

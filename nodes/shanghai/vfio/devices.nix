@@ -1,5 +1,6 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
+  windowsGames = [ "windows-games-adata" "windows-games-sn770" ];
 in {
   config = {
     home.profileSettings.nvidia.dynamicBinding = true;
@@ -9,13 +10,13 @@ in {
           enable = true;
           vendor = "10de";
           product = "2206";
-          host = "0c:00.0";
+          host = "0d:00.0";
         };
         gtx3080-audio = {
           enable = true;
           vendor = "10de";
           product = "1aef";
-          host = "0c:00.1";
+          host = "0d:00.1";
           systemd.unit = rec {
             wantedBy = [ cfg.devices.gtx3080.systemd.id ];
             bindsTo = wantedBy;
@@ -24,14 +25,14 @@ in {
         gtx1650 = {
           vendor = "10de";
           product = "1f82";
-          host = "05:00.0";
+          host = "06:00.0";
           unbindVts = true;
           systemd.unit.conflicts = [ "graphical.target" "bind1650.service" ];
         };
         gtx1650-audio = {
           vendor = "10de";
           product = "10fa";
-          host = "05:00.1";
+          host = "06:00.1";
           systemd.unit = rec {
             wantedBy = [ cfg.devices.gtx1650.systemd.id ];
             bindsTo = wantedBy;
@@ -102,35 +103,39 @@ in {
             mbr.id = "954e3dd3";
             permission.owner = "arc";
           };
-          windows-games-bpx = {
-            source = "/dev/disk/by-partlabel/windows-games-bpx";
-            mbr.id = "3fa0fceb";
+          windows-games-sn850x = {
+            source = "/dev/disk/by-partlabel/windows-games-sn850x";
+            mbr.id = "26ca4c08";
             permission.owner = "arc";
           };
           windows-games-adata = {
             source = "/dev/disk/by-partlabel/windows-games-adata";
             mbr.id = "58ec08ca";
           };
+          windows-games-sn770 = {
+            source = "/dev/disk/by-partlabel/windows-games-sn770";
+            mbr.id = "dd8f10de";
+          };
         };
-        cow = {
-          windows-games-adata-arc = {
-            source = cfg.disks.mapped.windows-games-adata.path;
-            storage = "/mnt/data/hourai/adata-snapshot-overlay";
+        cow = mkMerge (flip map windowsGames (windows-games: {
+          "${windows-games}-arc" = {
+            source = cfg.disks.mapped.${windows-games}.path;
+            storage = "/mnt/data/hourai/${windows-games}-snapshot-overlay";
             mode = "P";
             sizeMB = 1024 * 16;
             systemd.depends = [
-              cfg.disks.mapped.windows-games-adata.systemd.id
+              cfg.disks.mapped.${windows-games}.systemd.id
             ];
             permission.owner = "arc";
           };
-          windows-games-adata-kat = {
-            source = cfg.disks.mapped.windows-games-adata.path;
+          "${windows-games}-kat" = {
+            source = cfg.disks.mapped.${windows-games}.path;
             systemd.depends = [
-              cfg.disks.mapped.windows-games-adata.systemd.id
+              cfg.disks.mapped.${windows-games}.systemd.id
             ];
             permission.owner = "kat";
           };
-        };
+        }));
       };
     };
     systemd.services = {
@@ -146,30 +151,29 @@ in {
           RemainAfterExit = true;
         };
       };
-      windows-games-adata-arc = rec {
-        requires = [ cfg.disks.mapped.windows-games-adata.systemd.id ];
-        after = requires;
-        conflicts = [
-          cfg.disks.cow.windows-games-adata-arc.systemd.id
-          cfg.disks.cow.windows-games-adata-kat.systemd.id
-        ];
-        unitConfig = {
-          ConditionPathExists = "!${cfg.disks.cow.windows-games-adata-arc.storage}";
-        };
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = [
-            "${pkgs.coreutils}/bin/ln -s ${cfg.disks.mapped.windows-games-adata.path} /dev/disk/windows-games-adata-arc"
-            "${pkgs.coreutils}/bin/chown arc ${cfg.disks.mapped.windows-games-adata.path}"
-          ];
-          ExecStop = [
-            "${pkgs.coreutils}/bin/rm -f /dev/disk/windows-games-adata-arc"
-            "${pkgs.coreutils}/bin/chown root ${cfg.disks.mapped.windows-games-adata.path}"
-          ];
-        };
+    } // flip mapListToAttrs windowsGames (windows-games: nameValuePair "${windows-games}-arc" rec {
+      requires = [ cfg.disks.mapped.${windows-games}.systemd.id ];
+      after = requires;
+      conflicts = [
+        cfg.disks.cow."${windows-games}-arc".systemd.id
+        cfg.disks.cow."${windows-games}-kat".systemd.id
+      ];
+      unitConfig = {
+        ConditionPathExists = "!${cfg.disks.cow."${windows-games}-arc".storage}";
       };
-    };
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = [
+          "${pkgs.coreutils}/bin/ln -s ${cfg.disks.mapped.${windows-games}.path} /dev/disk/${windows-games}-arc"
+          "${pkgs.coreutils}/bin/chown arc ${cfg.disks.mapped.${windows-games}.path}"
+        ];
+        ExecStop = [
+          "${pkgs.coreutils}/bin/rm -f /dev/disk/${windows-games}-arc"
+          "${pkgs.coreutils}/bin/chown root ${cfg.disks.mapped.${windows-games}.path}"
+        ];
+      };
+    });
     security.polkit.users = {
       kat.systemd.units = [ "graphical.target" ];
     };
