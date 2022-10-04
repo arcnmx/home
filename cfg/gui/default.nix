@@ -43,11 +43,6 @@ in
       exportConfiguration = true;
       displayManager.startx.enable = true;
 
-      serverLayoutSection = ''
-        Option "StandbyTime" "0"
-        Option "SuspendTime" "0"
-        Option "OffTime" "10"
-      '';
       inputClassSections = [
         ''
           Identifier "adcignore"

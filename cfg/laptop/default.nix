@@ -2,6 +2,7 @@
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     hardware.bluetooth.enable = true;
+    hardware.display.dpms.standbyMinutes = mkDefault 5;
 
     # TODO: fill in wireless.networks or iwd.networks instead of using connman?
     services.connman = {

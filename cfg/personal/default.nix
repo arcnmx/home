@@ -47,9 +47,10 @@ in {
       font = "Tamzen7x14";
       earlySetup = true;
       getty = {
-        greetingPrefix =
-          ''\e[H\e[2J'' + # topleft
-          ''\e[9;10]''; # setterm blank/powersave = 10 minutes
+        greetingPrefix = let
+          dpms = config.hardware.display.dpms or { };
+        in ''\e[H\e[2J'' # topleft
+        + optionalString dpms.enable or true ''\e[9;${toString dpms.standbyMinutes or 10}]''; # setterm blank/powersave
         greeting =
           "\n" +
           lib.concatStringsSep "\n" nixos +
