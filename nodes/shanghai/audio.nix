@@ -169,23 +169,14 @@
   inherit (config) networking;
 in {
   config = {
-    security.polkit.users.kat.systemd.units = [ "mradio-bedroom.service" ];
-    systemd.services.mradio-bedroom = mkIf (networking.domain != null) {
-      requisite = [ "home-manager-arc.service" ];
-      path = [ pkgs.mkchromecast ];
-      script = ''
-        exec mkchromecast -n "Bedroom speaker" --source-url "http://${networking.hostName}.${networking.domain}:${toString (networking.firewall.free.base + 101)}"
-      '';
-      serviceConfig = {
-        User = "arc";
-        Type = "exec";
-        Restart = "on-failure";
-        RestartSec = 1;
-      };
-      unitConfig = {
-        StartLimitBurst = 5;
-        StartLimitIntervalSec = 8;
-      };
+    security.polkit.users.kat.systemd.units = [ "mradio.service" ];
+    services.mradio = {
+      enable = mkDefault true;
+      user = "arc";
+      url = let
+        host = networking.hostName + optionalString (networking.domain != null) ".${networking.domain}";
+        port = networking.firewall.free.base + 101;
+      in "http://${host}:${toString port}";
     };
     services.wireplumber = {
       enable = true;

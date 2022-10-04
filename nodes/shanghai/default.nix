@@ -8,6 +8,7 @@
     ../../cfg/cross.nix
     ../../cfg/vfio
     ../../cfg/trusted.nix
+    ./mradio.nix
     ./audio.nix
     ./network.nix
     ./fs.nix
