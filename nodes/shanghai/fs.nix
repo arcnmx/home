@@ -108,5 +108,38 @@
         randomEncryption.enable = true;
       }
     ];
+
+    services.target = let
+      plugin = "block"; # "pscsi" passthrough just caused a kernel panic so use block instead
+    in {
+      enable = true;
+      storageObjects = {
+        hgst = {
+          inherit plugin;
+          dev = "/dev/disk/by-id/ata-HGST_HDN724040ALE640_PK2334PEK42A2T";
+        };
+        seagate0 = {
+          inherit plugin;
+          dev = "/dev/disk/by-id/ata-ST4000DM000-1F2168_Z304RM7G";
+        };
+      };
+      targets.default.portGroups = {
+        big = {
+          tag = 1;
+          parameters = {
+            DataDigest = "None";
+          };
+          portal."[::]" = { };
+          lun = {
+            hgst.index = 0;
+            seagate0.index = 1;
+          };
+          node.tewi.lun = {
+            hgst = { };
+            seagate0 = { };
+          };
+        };
+      };
+    };
   };
 }
