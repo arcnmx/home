@@ -29,6 +29,8 @@
         };
         hourai-nocow = { ... }: {
           imports = [ hourai3080 ];
+          scream.enable = false;
+          hotplug.enable = false;
           disks.games-adata.enable = false;
           disks.games-sn770.enable = false;
         };
