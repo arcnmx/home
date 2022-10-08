@@ -36,6 +36,7 @@ in {
     ./wlan.nix
     ../nftables
     ../tailscale
+    ../yubikey
     ../task
     ../mpd
     ../ssh/personal.nix

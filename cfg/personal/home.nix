@@ -112,10 +112,10 @@ in {
     ];
     #services.lorri.enable = true;
     services.gpg-agent = {
-      enable = true;
-      enableExtraSocket = true;
-      enableScDaemon = false;
-      enableSshSupport = true;
+      enable = mkDefault true;
+      enableExtraSocket = mkDefault true;
+      enableScDaemon = mkDefault false;
+      enableSshSupport = mkDefault true;
       pinentryFlavor = mkDefault null;
       extraConfig = mkMerge [
         "auto-expand-secmem 0x30000" # otherwise "gpg: public key decryption failed: Cannot allocate memory"
