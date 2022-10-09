@@ -26,7 +26,6 @@
     };
     hardware.bluetooth = {
       enable = true;
-      package = pkgs.bluezFull;
     };
     hardware.pulseaudio = {
       package = pkgs.pulseaudioFull;

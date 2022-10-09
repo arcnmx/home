@@ -53,9 +53,9 @@ in {
       systemPackages = with pkgs; [
         pciutils
         iputils
-        utillinux
+        util-linux
         coreutils
-        iproute
+        iproute2
       ] ++ lib.optionals (!config.home.minimalSystem) [
         bind.dnsutils
         config.home.profileSettings.base.duc

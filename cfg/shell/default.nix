@@ -2,7 +2,7 @@
 let
   shellInit = ''
     if [[ $TERM = rxvt-unicode* || $TERM = linux ]]; then
-      TERM=linux ${pkgs.utillinux}/bin/setterm -regtabs 2
+      TERM=linux ${pkgs.util-linux}/bin/setterm -regtabs 2
     fi
   '';
   shellLogin = ''

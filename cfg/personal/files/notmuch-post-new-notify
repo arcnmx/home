@@ -2,7 +2,7 @@
 
 export PATH="$PATH:@libnotify@/bin:@jq@/bin:@gnused@/bin:@coreutils@/bin"
 
-# listing icons: fd . $(nix eval --raw nixpkgs.gnome3.adwaita-icon-theme)|sed -e 's/^.*\///'|sed -e 's/\..*$//' |sort|uniq|less
+# listing icons: fd . $(nix eval --raw nixpkgs.gnome.adwaita-icon-theme)|sed -e 's/^.*\///'|sed -e 's/\..*$//' |sort|uniq|less
 #NOTIFY_ICON=mail-unread
 NOTIFY_ICON=mail-message-new
 if true; then # depends on theme used?

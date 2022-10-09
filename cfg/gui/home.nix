@@ -94,7 +94,7 @@ in {
       scrot
       xsel
       xorg.xinit
-      xdg_utils
+      xdg-utils
       xdg-open
       arc.packages.personal.emxc
       rxvt-unicode-arc
@@ -102,7 +102,7 @@ in {
       gioTerminal
     ] ++ optionals config.gtk.enable [
       evince
-      gnome3.adwaita-icon-theme
+      gnome.adwaita-icon-theme
     ];
 
     services.picom = {
@@ -181,11 +181,11 @@ in {
       };
       iconTheme = {
         name = "Adwaita";
-        package = pkgs.gnome3.adwaita-icon-theme;
+        package = pkgs.gnome.adwaita-icon-theme;
       };
       theme = {
         name = "Adwaita";
-        package = pkgs.gnome3.gnome-themes-extra;
+        package = pkgs.gnome.gnome-themes-extra;
       };
       gtk3 = {
         extraConfig = {
