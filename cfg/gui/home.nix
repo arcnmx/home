@@ -135,6 +135,7 @@ in {
       chrome = mkIf (!config.programs.google-chrome.enable && !config.programs.chromium.enable)
         "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
+      parsec = "nix run --impure nixpkgs#parsec-bin";
       pavucontrol = "nix run nixpkgs#pavucontrol";
     };
     home.shell.functions = {
