@@ -119,6 +119,7 @@
       { key = "R"; cmd = "reloadhard"; }
       { key = "d"; cmd = "tabclose"; }
 
+      { key = "`"; cmd = null; } # remove default binding: `gobble 1 markjump`
       { key = "``"; cmd = "tab #"; }
 
       { key = "j"; cmd = "scrollline 6"; }
