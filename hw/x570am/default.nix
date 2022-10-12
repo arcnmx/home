@@ -55,6 +55,7 @@
           label in6 "DRAM A/B"
       '';
     };
+    networking.wireless.mainInterface.arcCard = "ax200";
     systemd.network = let inherit (config.systemd.network) links; in {
       networks.eno1 = {
         inherit (links."10-eth") matchConfig;
@@ -72,15 +73,6 @@
         };
       };
       links = {
-        "10-wlan" = {
-          matchConfig = {
-            MACAddress = "a4:b1:c1:d9:14:df";
-          };
-          linkConfig = {
-            Name = "wlan";
-            NamePolicy = "";
-          };
-        };
         "10-eth" = {
           matchConfig = {
             MACAddress = "18:c0:4d:08:87:bd";

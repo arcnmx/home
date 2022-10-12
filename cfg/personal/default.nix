@@ -32,6 +32,7 @@
 in {
   imports = [
     ./ddclient.nix
+    ./wlan.nix
     ../nftables
     ../tailscale
   ];

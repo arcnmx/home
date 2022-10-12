@@ -17,8 +17,9 @@
     system.stateVersion = "22.05";
 
     systemd.watchdog.enable = false;
-    home.hw.xps13.wifi = "ax210";
     hardware.cpu.info.cores = 2;
+
+    boot.kernel.bleedingEdge = true;
 
     hardware.display = {
       monitors.internal.dpi.target = 96 * 2;

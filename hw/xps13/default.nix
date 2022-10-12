@@ -6,15 +6,6 @@ in {
     ../intel
     ../../cfg/laptop
   ];
-  options = {
-    home.hw.xps13 = {
-      wifi = mkOption {
-        type = types.enum [ "7265" "ax210" ];
-        default = "7265";
-        description = "WiFi chip currently installed";
-      };
-    };
-  };
 
   config = {
     home.profileSettings.intel.graphics.enable = true;
@@ -26,7 +17,6 @@ in {
     boot = {
       kernel = {
         arch = "broadwell";
-        bleedingEdge = mkIf (config.home.hw.xps13.wifi == "ax210") true;
       };
       initrd.availableKernelModules = [
         "xhci_pci" "ehci_pci" "ahci" "sd_mod" "rtsx_pci_sdmmc"
@@ -36,19 +26,6 @@ in {
     # boot.kernelParams = ["i915.enable_execlists=0"]; # try if getting freezes
     # boot.kernelParams = ["i915.enable_psr=1"]; # try for powersaving
     # boot.kernelParams = ["intel_idle.max_cstate=1"]; # try to fix baytrail freeze?
-
-    systemd.network.links."10-wlan" = mkIf (!config.networking.wireless.iwd.enable) {
-      matchConfig = {
-        MACAddress = mkMerge [
-          (mkIf (config.home.hw.xps13.wifi == "7265") "00:15:00:ec:c6:51")
-          (mkIf (config.home.hw.xps13.wifi == "ax210") "d8:f8:83:36:81:b6")
-        ];
-      };
-      linkConfig = {
-        Name = "wlan";
-        NamePolicy = "";
-      };
-    };
 
     hardware.display = {
       enable = true;
@@ -68,6 +45,7 @@ in {
       };
       dpi = config.hardware.display.monitors.internal.dpi.out.dpi;
     };
+
     services.xserver = {
       xrandrHeads = [{
         output = "eDP1";

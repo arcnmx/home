@@ -222,7 +222,7 @@
       };
       "module/net-wlan" = {
         type = "internal/network";
-        interface = mkIf (! nixosConfig.networking.wireless.iwd.enable or false) (mkDefault "wlan");
+        interface = mkIf (nixosConfig.networking.wireless.mainInterface.name or null != null) (mkDefault nixosConfig.networking.wireless.mainInterface.name);
         label = {
           connected = {
             text = "📶 %essid% %downspeed:9%";
