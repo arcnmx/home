@@ -173,6 +173,7 @@ in {
     services.mradio = {
       enable = mkDefault true;
       user = "arc";
+      targetDevice = "Bedroom Speakers";
       url = let
         host = networking.hostName + optionalString (networking.domain != null) ".${networking.domain}";
         port = networking.firewall.free.base + 101;
