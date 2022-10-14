@@ -3,6 +3,10 @@
   StateDirectory = "tailscale";
   loginState = "/var/lib/${StateDirectory}/login";
   enable = cfg.enable && cfg.login.enable;
+  ownDevices = attrValues (filterAttrs (_: dev:
+    dev.shortName == config.networking.hostName
+    && elem dev.user meta.network.tailscale.users
+  ) meta.network.tailscale.devices);
   otherDevices = filterAttrs (_: dev:
     dev.shortName != config.networking.hostName
     && elem dev.user meta.network.tailscale.users
@@ -13,6 +17,12 @@ in {
       trust = mkOption {
         type = types.bool;
         default = false;
+      };
+      device = mkOption {
+        type = types.nullOr types.attrs;
+        default = if ownDevices != [ ]
+          then head ownDevices
+          else null;
       };
       login = {
         enable = mkEnableOption "enroll";
@@ -63,21 +73,32 @@ in {
       secrets.files.tailnet-activation = {
         text = tf.resources.tailnet-activation.refAttr "key";
       };
-      deploy.tf.resources.tailnet-activation = {
-        provider = "tailscale";
-        type = "tailnet_key";
-        inputs = {
-          reusable = false;
-          preauthorized = cfg.login.authorized;
+      deploy.tf.resources = {
+        tailnet-activation = {
+          provider = "tailscale";
+          type = "tailnet_key";
+          inputs = {
+            reusable = false;
+            preauthorized = cfg.login.authorized;
+          };
+          lifecycle.ignoreChanges = "all";
+          connection = tf.deploy.systems.${config.networking.hostName}.connection.set;
+          provisioners = singleton {
+            when = "destroy";
+            remote-exec.command = ''
+              tailscale logout || true
+              rm -f ${loginState}
+            '';
+          };
         };
-        lifecycle.ignoreChanges = "all";
-        connection = tf.deploy.systems.${config.networking.hostName}.connection.set;
-        provisioners = singleton {
-          when = "destroy";
-          remote-exec.command = ''
-            tailscale logout || true
-            rm -f ${loginState}
-          '';
+        tailnet-properties = {
+          enable = cfg.device != null;
+          provider = "tailscale";
+          type = "device_key";
+          inputs = {
+            device_id = cfg.device.id;
+            key_expiry_disabled = true;
+          };
         };
       };
     })
