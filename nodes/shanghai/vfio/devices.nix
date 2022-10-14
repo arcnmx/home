@@ -199,7 +199,7 @@ in {
       SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="naa.55cd2e404b6f84e5", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="4", ATTR{size}=="125829120", ATTRS{wwid}=="eui.6479a741e0203d76", OWNER="arc"
       SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
-      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="838860800", ATTRS{wwid}=="nvme.1cc1-324a34303230303035353234-414441544120535838323030504e50-00000001", OWNER="kat"
+      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="2", ATTR{size}=="838860800", ATTRS{wwid}=="eui.e8238fa6bf530001001b448b4bcd741f", OWNER="kat"
       SUBSYSTEM=="usb", ATTR{idVendor}=="1038", ATTR{idProduct}=="2212", GROUP="plugdev"
     '';
   };
