@@ -88,7 +88,7 @@ in {
     };
     spice.usb.enable = true;
     lookingGlass = {
-      enable = config.vfio.gpu == "gtx3080";
+      enable = config.vfio.gpu == "rtx3080";
       sizeMB = if config.lookingGlass.vertical then 256 else 128;
     };
     netdevs = {

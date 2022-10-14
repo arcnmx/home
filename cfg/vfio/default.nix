@@ -21,6 +21,9 @@
           ignore_msrs = mkDefault true;
           report_ignored_msrs = mkDefault false;
         };
+        vfio-pci.options = {
+          disable_vga = mkDefault false;
+        };
         kvmfr.options = {
           static_size_mb = "64";
         };

@@ -30,13 +30,18 @@
   systemdService = systemd: {
     ${systemd.name} = unmerged.merge systemd.unit;
   };
-  udevPermission = permission: let
-    assignments = optional (permission.owner != null) ''OWNER="${permission.owner}"''
+  udevPermission = permission:
+    optional (permission.owner != null) ''OWNER="${permission.owner}"''
     ++ optional (permission.group != null) ''GROUP="${permission.group}"''
     ++ optional (permission.mode != null) ''MODE="${permission.mode}"'';
-  in concatStringsSep ", " assignments;
+  reserve-pci-driver = pkgs.writeShellScript "reserve-pci.sh" ''
+    printf '%s\n' "$1" > /sys/bus/pci/devices/$2/driver_override
+  '';
   permissionType = types.submodule ({ config, ... }: {
     options = {
+      enable = mkEnableOption "permissions" // {
+        default = config.owner != null || config.group != null || config.mode != null;
+      };
       owner = mkOption {
         type = with types; nullOr str;
         default = null;
@@ -212,6 +217,7 @@
   vfioDeviceModule = { config, name, ... }: {
     options = {
       enable = mkEnableOption "VFIO device";
+      reserve = mkEnableOption "VFIO reserve";
       vendor = mkOption {
         type = types.strMatching "[0-9a-f]{4}";
       };
@@ -228,19 +234,33 @@
         type = types.submodule systemdModule;
         default = { };
       };
+      udev.rule = mkOption {
+        type = types.separatedString ", ";
+      };
     };
     config = {
       systemd = {
         name = "vfio-reserve-${name}";
         script = mkMerge (
           optional config.unbindVts "${nixosConfig.lib.arc-vfio.unbind-vts}/bin/unbind-vts"
-          ++ singleton "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci ${config.vendor}:${config.product}"
+          ++ singleton "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci ${if config.host != null then config.host else "${config.vendor}:${config.product}"}"
         );
-        unit.serviceConfig = {
-          RuntimeDirectory = config.systemd.name;
-          ExecStop = "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci STOP";
+        unit = {
+          wantedBy = mkIf (config.enable && config.reserve) [ "multi-user.target" ];
+          serviceConfig = {
+            RuntimeDirectory = config.systemd.name;
+            ExecStop = "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci STOP";
+          };
         };
       };
+      udev.rule = mkMerge [
+        (mkBefore ''SUBSYSTEM=="pci"'')
+        (mkBefore ''ACTION=="add"'')
+        (mkIf (config.host != null) ''KERNEL=="${config.host}"'')
+        ''ATTR{vendor}=="0x${config.vendor}"''
+        ''ATTR{device}=="0x${config.product}"''
+        (mkAfter ''RUN+="${reserve-pci-driver} vfio-pci %k"'')
+      ];
     };
   };
   usbDeviceModule = { config, name, ... }: {
@@ -262,26 +282,23 @@
         type = permissionType;
         default = { };
       };
-      udev.conditions = mkOption {
-        type = with types; listOf str;
-      };
-      out = {
-        udevRule = mkOption {
-          type = types.str;
+      udev = {
+        enable = mkEnableOption "udev rule" // {
+          default = config.permission.enable;
+        };
+        rule = mkOption {
+          type = types.separatedString ", ";
         };
       };
     };
     config = {
       permission.group = mkDefault "plugdev";
-      udev.conditions = mkBefore [
-        ''SUBSYSTEM=="usb"''
+      udev.rule = mkMerge ([
+        (mkBefore ''SUBSYSTEM=="usb"'')
+        (mkBefore ''ACTION=="add"'')
         ''ATTR{idVendor}=="${config.vendor}"''
         ''ATTR{idProduct}=="${config.product}"''
-      ];
-      out.udevRule = let
-        assignments = udevPermission config.permission;
-      in optionalString (assignments != "")
-        ''${concatStringsSep ", " config.udev.conditions}, ${assignments}'';
+      ] ++ (map mkAfter (udevPermission config.permission)));
     };
   };
   hotplugDeviceModule = machineName: machineConfig: { config, ... }: {
@@ -465,12 +482,15 @@ in {
       "d ${machine.state.path} 0750 ${machine.state.owner} kvm -"
       "d ${machine.state.runtimePath} 0750 ${machine.state.owner} kvm -"
     ]) (filterAttrs (_: m: m.enable) cfg.qemu.machines));
-    services.udev.extraRules = mkMerge (mapAttrsToList (_: usb: usb.out.udevRule) (filterAttrs (_: usb: usb.enable) cfg.usb.devices));
+    services.udev.extraRules = mkMerge (
+      mapAttrsToList (_: usb: usb.udev.rule) (filterAttrs (_: usb: usb.enable && usb.udev.enable) cfg.usb.devices)
+      ++ mapAttrsToList (_: dev: dev.udev.rule) (filterAttrs (_: dev: dev.reserve) cfg.devices)
+    );
     boot.modprobe.modules = {
       vfio-pci = let
         vfio-pci-ids = mapAttrsToList (_: dev:
           "${dev.vendor}:${dev.product}"
-        ) (filterAttrs (_: dev: dev.enable) cfg.devices);
+        ) (filterAttrs (_: dev: (dev.enable && !dev.reserve)) cfg.devices);
       in mkIf (vfio-pci-ids != [ ]) {
         options.ids = concatStringsSep "," vfio-pci-ids;
       };

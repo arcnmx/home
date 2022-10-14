@@ -20,7 +20,7 @@
         hourai3080 = { config, ... }: {
           imports = [ ./hourai.nix ];
           config = {
-            vfio.gpu = "gtx3080";
+            vfio.gpu = "rtx3080";
           };
         };
         hourai1650 = { ... }: {
@@ -43,7 +43,7 @@
         goliath3080 = { config, ... }: {
           imports = [ ./goliath.nix ];
           config = {
-            vfio.gpu = "gtx3080";
+            vfio.gpu = "rtx3080";
           };
         };
       };

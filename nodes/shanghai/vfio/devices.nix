@@ -6,36 +6,42 @@ in {
     home.profileSettings.nvidia.dynamicBinding = true;
     hardware.vfio = {
       devices = {
-        gtx3080 = {
-          enable = true;
+        rtx3080 = {
+          #enable = true;
+          #reserve = true;
           vendor = "10de";
           product = "2206";
-          host = "0d:00.0";
+          host = "0000:0d:00.0";
         };
-        gtx3080-audio = {
-          enable = true;
+        rtx3080-audio = {
+          #enable = true;
+          reserve = true;
           vendor = "10de";
           product = "1aef";
-          host = "0d:00.1";
+          host = "0000:0d:00.1";
           systemd.unit = rec {
-            wantedBy = [ cfg.devices.gtx3080.systemd.id ];
+            wantedBy = [ cfg.devices.rtx3080.systemd.id ];
             bindsTo = wantedBy;
           };
         };
         gtx1650 = {
           vendor = "10de";
           product = "1f82";
-          host = "06:00.0";
+          host = "0000:06:00.0";
           unbindVts = true;
-          systemd.unit.conflicts = [ "graphical.target" "bind1650.service" ];
+          systemd.unit = {
+            conflicts = [ "graphical.target" "nvidia-x11.service" ];
+            after = [ "display-manager.service" ];
+          };
         };
         gtx1650-audio = {
           vendor = "10de";
           product = "10fa";
-          host = "06:00.1";
+          host = "0000:06:00.1";
           systemd.unit = rec {
             wantedBy = [ cfg.devices.gtx1650.systemd.id ];
             bindsTo = wantedBy;
+            after = [ "display-manager.service" ];
           };
         };
       };
@@ -83,12 +89,12 @@ in {
         yubikey5-kat = {
           vendor = "1050";
           product = "0407";
-          udev.conditions = [ ''ATTR{bcdDevice}=="0526"'' ];
+          udev.rule = ''ATTR{bcdDevice}=="0526"'';
         };
         yubikey5c-kat = {
           vendor = "1050";
           product = "0407";
-          udev.conditions = [ ''ATTR{bcdDevice}=="0543"'' ];
+          udev.rule = ''ATTR{bcdDevice}=="0543"'';
         };
       };
       disks = {
@@ -139,17 +145,28 @@ in {
       };
     };
     systemd.services = {
-      bind1650 = rec {
-        wantedBy = [ "display-manager.service" ];
-        before = wantedBy;
-        bindsTo = wantedBy;
-        script = ''
-          echo 0000:05:00.0 > /sys/bus/pci/drivers/nvidia/bind
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
+      nvidia-x11 = let
+        gtx1650 = cfg.devices.gtx1650.host;
+        rtx3080 = cfg.devices.rtx3080.host;
+      in {
+        path = [ config.systemd.package config.hardware.nvidia.package.nvidia_x11_bin ];
+        script = mkMerge [
+          (mkIf cfg.devices.rtx3080.reserve (mkAfter ''
+            if [[ ! -L /sys/bus/pci/drivers/nvidia/${rtx3080} ]] && ! systemctl is-active ${cfg.devices.rtx3080.systemd.id}; then
+              echo > /sys/bus/pci/devices/${rtx3080}/driver_override
+              echo ${rtx3080} > /sys/bus/pci/drivers/nvidia/bind || true
+            fi
+          ''))
+          (mkAfter ''
+            if [[ -L /sys/bus/pci/drivers/nvidia/${rtx3080} ]]; then
+              nvidia-smi drain -p ${rtx3080} -m 1 || true
+            fi
+            if [[ ! -L /sys/bus/pci/drivers/nvidia/${gtx1650} ]]; then
+              echo > /sys/bus/pci/devices/${gtx1650}/driver_override
+              echo ${gtx1650} > /sys/bus/pci/drivers/nvidia/bind
+            fi
+          '')
+        ];
       };
     } // flip mapListToAttrs windowsGames (windows-games: nameValuePair "${windows-games}-arc" rec {
       requires = [ cfg.disks.mapped.${windows-games}.systemd.id ];

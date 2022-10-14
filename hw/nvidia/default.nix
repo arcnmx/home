@@ -33,6 +33,9 @@
       kernelModules = ["i2c-dev"];
       modprobe.modules = mkIf config.home.profileSettings.nvidia.dynamicBinding {
         nvidia_drm.blacklist = true;
+        nvidia_modeset.blacklist = true;
+        nvidia.blacklist = true;
+        nvidia-uvm.blacklist = true;
       };
     };
     services.xserver.deviceSection = ''
@@ -45,5 +48,23 @@
     services.xserver.displayManager.lightdm.extraConfig = mkIf config.home.profileSettings.nvidia.dynamicBinding ''
       logind-check-graphical=false
     '';
+    systemd.services = mkIf (config.home.profileSettings.nvidia.dynamicBinding && config.services.xserver.enable) {
+      nvidia-x11 = rec {
+        restartIfChanged = false;
+        path = [ pkgs.kmod ];
+        script = ''
+          modprobe -a nvidia-uvm nvidia
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+      };
+      display-manager = rec {
+        wants = [ "nvidia-x11.service" ];
+        after = wants;
+        bindsTo = wants;
+      };
+    };
   };
 }
