@@ -31,6 +31,9 @@ in {
     home.file = {
       ".electrum".source = mkOutOfStoreSymlink "${config.xdg.configHome}/electrum/";
     };
+    home.sessionVariables = {
+      SYSTEMD_PAGERSECURE = "1";
+    };
     home.packages = with pkgs; [
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
       gnupg
