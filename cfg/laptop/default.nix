@@ -17,6 +17,16 @@
         SingleConnectedTechnology=false
       '';
     };
+    networking.wireless.iwd.settings = {
+      General = {
+        RoamThreshold = -60;
+        RoamThreshold5G = -86;
+        RoamRetryInterval = 30;
+      };
+      Rank = {
+        BandModifier5Ghz = 1.75;
+      };
+    };
 
     boot.kernel.sysctl = {
       "vm.swappiness" = 1;

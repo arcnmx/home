@@ -136,6 +136,14 @@ in {
       interfaces.ethb2b = {
         useDHCP = true;
       };
+      wireless.iwd.settings = {
+        Network.EnableIPv6 = mkDefault true;
+        Rank.BandModifier5Ghz = mkDefault 1.25;
+        Scan = {
+          InitialPeriodicScanInterval = mkDefault 4;
+          MaximumPeriodicScanInterval = mkDefault 180;
+        };
+      };
     };
 
     # allow wheel to do things without password
