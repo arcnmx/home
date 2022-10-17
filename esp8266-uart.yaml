@@ -1,0 +1,7 @@
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: GPIO0
+  tx_pin: GPIO1
+  baud_rate: 9600

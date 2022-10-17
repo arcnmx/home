@@ -1,1 +1,5 @@
-!include { file: s31.yaml, vars: { id: "003" } }
+substitutions:
+  id: "003"
+
+packages:
+  s31: !include s31.yaml
