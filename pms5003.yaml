@@ -1,0 +1,11 @@
+sensor:
+  - platform: pmsx003
+    type: PMSX003
+    pm_1_0:
+      name: ${friendly_name} PM1
+    pm_2_5:
+      name: ${friendly_name} PM2.5
+    pm_10_0:
+      name: ${friendly_name} PM10
+    # To forward data as it comes in from the sensor over UART
+    update_interval: 0s

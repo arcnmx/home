@@ -3,7 +3,7 @@ substitutions:
 
 esphome:
   name: ${node_name}
-  build_path: ../build/${node_name}
+  build_path: ./build/${node_name}
 
 wifi:
   ssid: !secret wifi_ssid
