@@ -1,4 +1,4 @@
-{ base16, config, pkgs, lib, ... }: with lib; {
+{ base16, nixosConfig, config, pkgs, lib, ... }: with lib; {
   services.i3gopher.enable = config.xsession.windowManager.i3.enable;
   xsession.windowManager.i3 = let
     run = pkgs.writeShellScriptBin "run" ''
@@ -23,7 +23,9 @@
     #lock = "${pkgs.physlock}/bin/physlock -dms";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
     sleep = "${pkgs.coreutils}/bin/sleep";
-    xset = "${pkgs.xorg.xset}/bin/xset";
+    dpms-off = if nixosConfig.services.dpms-standby.enable
+      then "${nixosConfig.services.dpms-standby.control} start"
+      else "${getExe pkgs.xorg.xset}/bin/xset dpms force off";
     pactl = "${config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio}/bin/pactl";
     playerctl = "${config.services.playerctld.package}/bin/playerctl";
     pkill = "${pkgs.procps}/bin/pkill";
@@ -184,9 +186,9 @@
         "XF86AudioPrev" = "exec --no-startup-id ${playerctl} previous ${bar-refresh}";
         "ctrl+XF86AudioPrev" = "exec --no-startup-id ${playerctl} seek 10- ${bar-refresh}";
 
-        "--release ${mod}+p" = "exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off";
+        "--release ${mod}+p" = "exec --no-startup-id ${sleep} 0.2 && ${dpms-off}";
 
-        "--release ${mod}+bracketleft" = "exec --no-startup-id ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${xset} dpms force off && ${lock}";
+        "--release ${mod}+bracketleft" = "exec --no-startup-id ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${dpms-off} && ${lock}";
 
         "${mod}+shift+Escape" = "exit";
 

@@ -1,4 +1,4 @@
-{ base16, meta, nixosConfig, config, pkgs, lib, ... } @ args: with lib; let
+{ base16, meta, nixosConfig, options, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   mplay = pkgs.writeShellScriptBin "mplay" ''
     COUNT=$#
@@ -151,6 +151,8 @@ in {
         PartOf = [ "mpd.service" ];
       };
     };
+    services.${if options ? services.idle then "idle" else null}.enable =
+      mkIf config.xsession.enable (mkDefault true);
     programs.zsh = {
       dirHashes = {
         gen = "${config.xdg.userDirs.documents}/gensokyo";

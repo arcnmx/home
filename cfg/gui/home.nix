@@ -17,6 +17,7 @@
 in {
   imports = [
     ./xresources.nix
+    ./idle.nix
     ../i3.nix
     ../imv.nix
     ../polybar

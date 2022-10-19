@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: with lib; let
+{ pkgs, options, config, lib, ... }: with lib; let
   c1 = ''\e[22;34m'';
   c2 = ''\e[1;35m'';
   nixos = [
@@ -167,6 +167,14 @@ in {
       config.boot.kernelPackages.cpupower
       strace
     ] ++ optional config.services.ofono.enable bluephone;
+
+    services.${if options ? services.dpms-standby then "dpms-standby" else null} = {
+      enable = mkIf config.services.xserver.enable (mkDefault true);
+      user = mkIf config.services.xserver.displayManager.startx.enable (mkDefault "arc");
+    };
+    security.polkit.users."" = mkIf config.services.dpms-standby.enable or false {
+      systemd.units = singleton "dpms-standby.service";
+    };
 
     services.udev.extraRules = let
       localGroup = "users";

@@ -7,6 +7,10 @@
   inherit (pkgs.arc.packages.personal) openrazer-dpi;
 in
 {
+  imports = [
+    ./dpms-standby.nix
+  ];
+
   options = {
     hardware.display = {
       dpi = mkOption {

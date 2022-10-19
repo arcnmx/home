@@ -3,11 +3,11 @@
     "arc": {
       "flake": false,
       "locked": {
-        "lastModified": 1665429014,
-        "narHash": "sha256-XTOpeTCUGxWLaDG7/x9ILzz1Kl2qhDkexdAqumrpk0o=",
+        "lastModified": 1666212340,
+        "narHash": "sha256-Htg+q5DsLilEEk+SrwCDxvt3dEA1ui4DlLOj1pMYCXs=",
         "owner": "arcnmx",
         "repo": "nixexprs",
-        "rev": "01b87317457ba25a44736ae31bffce3b13dd2c9f",
+        "rev": "bb3fedd5ec344f540d4d07659f1cae5a91e997b8",
         "type": "github"
       },
       "original": {
