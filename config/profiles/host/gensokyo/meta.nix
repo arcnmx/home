@@ -61,6 +61,17 @@ in {
           accountKeyPem = tf.resources.acme_key.refAttr "private_key_pem";
         };
       };
+      dns.records = mapAttrs (host: address: {
+        inherit (config.network.tailscale) zone;
+        domain = "${host}.local";
+        a = {
+          inherit address;
+        };
+      }) {
+        diapergenie = "10.1.1.1";
+        gensokyo = "10.1.1.4";
+        komeijinet = "10.1.1.5";
+      };
       resources = {
         acme_key = {
           provider = "tls";
