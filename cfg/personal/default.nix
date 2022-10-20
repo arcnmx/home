@@ -1,4 +1,4 @@
-{ pkgs, options, config, lib, ... }: with lib; let
+{ tf, pkgs, options, config, lib, ... }: with lib; let
   c1 = ''\e[22;34m'';
   c2 = ''\e[1;35m'';
   nixos = [
@@ -35,6 +35,9 @@ in {
     ./wlan.nix
     ../nftables
     ../tailscale
+    ../task
+    ../mpd
+    ../ssh/personal.nix
   ];
 
   config = {
@@ -43,6 +46,9 @@ in {
     home.os.enable = mkDefault true;
 
     deploy.personal.enable = true;
+    deploy.tf.variables = {
+      CRATES_TOKEN_ARC.bitw.name = "crates-arcnmx";
+    };
     console = {
       packages = [pkgs.tamzen];
       font = "Tamzen7x14";

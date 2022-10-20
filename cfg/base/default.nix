@@ -1,9 +1,11 @@
 { tf, inputs, config, pkgs, lib, ... }: with lib;
 let
   inherit (config.networking.firewall) free;
+  inherit (config.deploy.tf.import) common;
 in {
   imports = [
     ./base16.nix
+    ./personal.nix
     ../ssh/sshd.nix
   ];
 
@@ -105,15 +107,10 @@ in {
     programs.command-not-found.enable = lib.mkDefault false;
     services.udisks2.enable = lib.mkDefault (!config.home.minimalSystem);
 
-    deploy.tf.variables.github-access = {
-      export = true;
-      bitw.name = "github-public-access";
-    };
-
     nix = {
       distributedBuilds = true;
       accessTokens = lib.mkIf tf.state.enable {
-        "github.com" = tf.variables.github-access.get;
+        "github.com" = common.outputs.github-access.import;
       };
       experimentalFeatures = [ "nix-command" "flakes" "recursive-nix" "ca-derivations" "impure-derivations" ];
       settings = {

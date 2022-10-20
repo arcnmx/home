@@ -38,6 +38,7 @@
       metaConfig
       ./modules/meta/default.nix
       ./meta.nix # main entry point?
+      ../cfg
     ];
 
     specialArgs = {

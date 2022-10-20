@@ -1,4 +1,4 @@
-{ target, meta, config, lib, ... }: with lib; let
+{ target, tf, meta, config, lib, ... }: with lib; let
   cfg = config.deploy.tf;
 in {
   options.deploy.tf = mkOption {
@@ -33,6 +33,11 @@ in {
       import = genAttrs cfg.imports (target: meta.deploy.targets.${target}.tf);
       out.set = removeAttrs cfg cfg.attrs;
     };
-    _module.args.tf = mapNullable (target: target.tf) target;
+    _module.args.tf = mapNullable (target: target.tf // {
+      inherit (config.deploy.tf) import;
+    }) target;
+    home-manager.extraSpecialArgs = {
+      inherit tf;
+    };
   };
 }

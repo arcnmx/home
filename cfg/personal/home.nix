@@ -1,4 +1,4 @@
-{ base16, meta, nixosConfig, options, config, pkgs, lib, ... } @ args: with lib; let
+{ base16, meta, tf, nixosConfig, options, config, pkgs, lib, ... } @ args: with lib; let
   inherit (config.lib.file) mkOutOfStoreSymlink;
   mplay = pkgs.writeShellScriptBin "mplay" ''
     COUNT=$#
@@ -8,11 +8,9 @@
   cfg = config.home.profileSettings.personal;
 in {
   imports = [
-    ./ncmpcpp.nix
     ./email.nix
     ../vim/personal.nix
     ../weechat
-    ../task
   ];
   options = {
     home.profileSettings.personal = {
@@ -112,45 +110,6 @@ in {
       ];
       #defaultCacheTtl = 31536000; maxCacheTtl = 31536000; defaultCacheTtlSsh = 31536000; maxCacheTtlSsh = 31536000; # doing a bad remove me later thanks
     };
-    services.mpd = {
-      enable = true;
-      network = {
-        startWhenNeeded = true;
-        listenAddress = "any";
-      };
-      package = pkgs.mpd-youtube-dl;
-      dbFile = "${config.services.mpd.dataDir}/mpd.db";
-      musicDirectory = config.xdg.userDirs.absolute.music;
-      extraConfig = ''
-        restore_paused "yes"
-        metadata_to_use "artist,artistsort,album,albumsort,albumartist,albumartistsort,title,track,name,genre,date,composer,performer,comment,disc,musicbrainz_artistid,musicbrainz_albumid,musicbrainz_albumartistid,musicbrainz_trackid,musicbrainz_releasetrackid"
-        auto_update "yes"
-        max_output_buffer_size "65536"
-
-        follow_outside_symlinks "yes"
-        follow_inside_symlinks "yes"
-
-        default_permissions "read"
-
-        audio_output {
-          type "pulse"
-          name "speaker"
-        }
-        input {
-          plugin "youtube-dl"
-          executable "${pkgs.yt-dlp}/bin/yt-dlp"
-        }
-      '';
-    };
-    services.mpdris2.enable = mkDefault config.services.mpd.enable;
-    systemd.user.services.mpdris2 = mkIf config.services.mpdris2.enable {
-      Install = mkForce {
-        WantedBy = [ "mpd.service" ];
-      };
-      Unit = {
-        PartOf = [ "mpd.service" ];
-      };
-    };
     services.${if options ? services.idle then "idle" else null}.enable =
       mkIf config.xsession.enable (mkDefault true);
     programs.zsh = {
@@ -205,16 +164,6 @@ in {
         mute = "m, `";
       };
     };
-    programs.mpc = {
-      enable = mkDefault true;
-      servers.shanghai = {
-        enable = mkDefault (nixosConfig.networking.hostName != "shanghai");
-        connection = {
-          address = "shanghai";
-          binding = meta.network.nodes.shanghai.networking.bindings.mpd;
-        };
-      };
-    };
     programs.filebin = {
       enable = !config.home.minimalSystem;
       extraConfig = ''
@@ -248,6 +197,15 @@ in {
         #inherit (pkgs.nodePackages) vscode-html-languageserver-bin vscode-css-languageserver-bin vscode-json-languageserver;
         src = ./files/kak-lsp.toml;
       };
+      "cargo/config" = mkIf tf.state.enable {
+        source = mkOutOfStoreSymlink config.secrets.files.cargo-config.path;
+      };
+    };
+    secrets.files = {
+      cargo-config.text = ''
+        [registry]
+        token = "${tf.variables.CRATES_TOKEN_ARC.ref}"
+      '';
     };
 
     programs.ssh.strictHostKeyChecking = "accept-new";

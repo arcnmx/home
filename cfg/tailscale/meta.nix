@@ -16,7 +16,7 @@
       };
       shortName = mkOption {
         type = types.str;
-        default = removeSuffix ("." + replaceStrings [ "@" ] [ "." ] config.user) config.name;
+        default = head (splitString "." config.name);
       };
       user = mkOption {
         type = types.str;
@@ -60,7 +60,7 @@ in {
   config = {
     network.tailscale.devices = optionalAttrs tf.state.enable (mapListToAttrs
       (dev: nameValuePair dev.name dev)
-      (tf.resources.tailnet.importAttr "devices")
+      tf.outputs.tailnet.import
     );
     deploy.targets = {
       common.tf = {
@@ -70,13 +70,10 @@ in {
             type = "devices";
             dataSource = true;
           };
-          tailnet-null = {
-            provider = "null";
-            type = "resource";
-            inputs.triggers = {
-              tailnet = tf.lib.tf.terraformExpr "sha256(jsonencode(${tf.resources.tailnet.namedRef}.devices))";
-            };
-          };
+        };
+        outputs.tailnet = {
+          sensitive = true;
+          value = tf.resources.tailnet.refAttr "devices";
         };
       };
       archive.tf = {

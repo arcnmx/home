@@ -8,7 +8,9 @@ in {
         ipLog = mkDefault true;
         requestLimit = mkDefault (1024*1024*16); # task sync doesn't know how to do things in pieces :<
         organisations.arc.users = singleton "arc";
-        pki.manual.ca.cert = pkgs.writeText "taskd.ca.pem" (config.deploy.tf.import.common.resources.taskserver_ca.importAttr "cert_pem");
+        pki.manual.ca = mkIf tf.state.enable {
+          cert = pkgs.writeText "taskd.ca.pem" (tf.import.common.resources.taskserver_ca.importAttr "cert_pem");
+        };
       };
     };
 
