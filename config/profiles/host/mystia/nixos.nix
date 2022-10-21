@@ -17,8 +17,8 @@
     };
 
     home-manager.users.root.services.sshd.authorizedKeys = singleton "${tf.resources.ssh_home.getAttr "public_key_openssh"} home-deploy";
+    deploy.imports = [ "common" ];
     deploy.tf = {
-      imports = [ "common" ];
       deploy.systems.${name} = {
         connection = tf.resources.server.connection.set;
         triggers.copy.server = tf.resources.server.refAttr "id";

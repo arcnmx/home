@@ -5,9 +5,12 @@ in {
     boot.loader.secure-boot = mkIf tf.state.enable {
       enable = mkDefault true;
       keyPath = config.secrets.files.secureboot-key.path;
-      certPath = "${pkgs.writeText "secureboot.pem" (resources.secureboot_cert_pem.getAttr "content")}";
+      certPath = config.secrets.files.secureboot-cert.path;
     };
-    secrets.files.secureboot-key.text = resources.secureboot_key.refAttr "private_key_pem";
+    secrets.files = {
+      secureboot-key.text = resources.secureboot_key.refAttr "private_key_pem";
+      secureboot-cert.text = resources.secureboot_cert_pem.refAttr "content";
+    };
     deploy.tf = {
       inherit (import ./tf.nix {
         inherit (config) networking;

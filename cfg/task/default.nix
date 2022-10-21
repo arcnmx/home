@@ -27,13 +27,10 @@ in {
       };
     };
     deploy.tf = {
-      resources = {
-        taskserver_ca_key_ref.enable = true;
-      } // (import ./tf.nix {
-        inherit (meta.deploy.targets) common;
+      inherit (import ./tf.nix {
         inherit (config) networking;
-        inherit resources lib;
-      }).resources;
+        inherit tf resources lib;
+      }) resources;
       variables = {
         TASKD_CREDS_ARC.bitw.name = "taskd-arc";
       };

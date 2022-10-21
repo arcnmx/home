@@ -26,7 +26,7 @@
     };
     config = {
       ssl = {
-        pem = mkIf config.ssl.enable tf.acme.certs.${config.fqdn}.out.getFullchainPem;
+        certPath = mkIf config.ssl.enable nixosConfig.secrets.files."${config.fqdn}.pem".path;
         keyPath = mkIf config.ssl.enable nixosConfig.secrets.files.${config.fqdn}.path;
       };
     };
@@ -53,9 +53,15 @@ in {
         dnsNames = singleton domain.ssl.fqdn ++ domain.ssl.fqdnAliases;
       }) sslDomains;
     };
-    secrets.files = mapAttrs' (attr: domain: nameValuePair domain.fqdn {
-      text = tf.acme.certs.${domain.fqdn}.out.refPrivateKeyPem;
-      inherit (domain.ssl.secret) owner;
-    }) sslDomains;
+    secrets.files = foldAttrList (mapAttrsToList (attr: domain: {
+      ${domain.fqdn} = {
+        text = tf.acme.certs.${domain.fqdn}.out.refPrivateKeyPem;
+        inherit (domain.ssl.secret) owner;
+      };
+      "${domain.fqdn}.pem" = {
+        text = tf.acme.certs.${domain.fqdn}.out.refFullchainPem;
+        inherit (domain.ssl.secret) owner;
+      };
+    }) sslDomains);
   };
 }

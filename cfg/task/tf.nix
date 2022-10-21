@@ -1,4 +1,4 @@
-{ resources, common, networking, lib }: with lib; {
+{ tf, resources, networking, lib }: with lib; {
   resources = {
     taskserver_client_key = {
       provider = "tls";
@@ -29,8 +29,8 @@
       type = "locally_signed_cert";
       inputs = {
         cert_request_pem = resources.taskserver_client_csr.refAttr "cert_request_pem";
-        ca_private_key_pem = resources.taskserver_ca_key_ref.refAttr "content";
-        ca_cert_pem = common.tf.resources.taskserver_ca.importAttr "cert_pem";
+        ca_private_key_pem = tf.import.common.output.refAttr "outputs.exports_sensitive.taskserver_ca_key.private_key_pem";
+        ca_cert_pem = tf.import.common.output.refAttr "outputs.exports.taskserver_ca.cert_pem";
 
         allowed_uses = [
           "digital_signature"

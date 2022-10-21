@@ -19,7 +19,7 @@ in {
         };
       };
       local = mkIf (cfg.enable && tf.state.enable) {
-        password = resources.mpd_password.getAttr "result";
+        password = tf.import.common.output.import.exports_sensitive.mpd_password.result;
       };
     };
   };
@@ -53,7 +53,7 @@ in {
           executable "${pkgs.yt-dlp}/bin/yt-dlp"
         }
       '' (mkIf tf.state.enable ''
-        password "${resources.mpd_password.refAttr "result"}@read,add,control"
+        password "${tf.import.common.output.refAttr "outputs.exports_sensitive.mpd_password.result"}@read,add,control"
         password "${resources.mpd_password_admin.refAttr "result"}@read,add,control,admin"
       '') ];
       configPath = mkIf tf.state.enable config.secrets.files.mpd-config.path;

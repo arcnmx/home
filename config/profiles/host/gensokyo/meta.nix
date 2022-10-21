@@ -8,24 +8,8 @@ in {
         config = {
           acme = {
             account = {
-              accountKeyPem = mkDefault (config.resources.acme_key_ref.refAttr "content");
+              accountKeyPem = mkDefault (config.resources.common_state.refAttr "outputs.acme_key.private_key_pem");
               emailAddress = mkDefault tf.acme.account.emailAddress;
-            };
-          };
-          resources = {
-            acme_key_ref = {
-              enable = mkDefault config.acme.enable;
-              provider = "local";
-              type = "file";
-              dataSource = true;
-              inputs.filename = tf.resources.acme_key_file.importAttr "filename";
-            };
-            taskserver_ca_key_ref = {
-              enable = mkDefault false;
-              provider = "local";
-              type = "file";
-              dataSource = true;
-              inputs.filename = tf.resources.taskserver_ca_key_file.importAttr "filename";
             };
           };
         };
@@ -77,30 +61,12 @@ in {
             ecdsa_curve = "P384";
           };
         };
-        acme_key_file = {
-          provider = "local";
-          type = "sensitive_file";
-          inputs = {
-            content = tf.resources.acme_key.refAttr "private_key_pem";
-            filename = toString (tf.terraform.dataDir + "/acme.priv.pem");
-            file_permission = "0600";
-          };
-        };
         taskserver_ca_key = {
           provider = "tls";
           type = "private_key";
           inputs = {
             algorithm = "RSA";
             rsa_bits = 2048;
-          };
-        };
-        taskserver_ca_key_file = {
-          provider = "local";
-          type = "sensitive_file";
-          inputs = {
-            content = tf.resources.taskserver_ca_key.refAttr "private_key_pem";
-            filename = toString (tf.terraform.dataDir + "/taskserver_ca.priv.pem");
-            file_permission = "0600";
           };
         };
         taskserver_ca = {
@@ -122,6 +88,14 @@ in {
             early_renewal_hours = 365 * 24;
           };
           lifecycle.ignoreChanges = singleton "subject";
+        };
+      };
+      outputs = {
+        acme_key = {
+          sensitive = true;
+          value = {
+            private_key_pem = tf.resources.acme_key.refAttr "private_key_pem";
+          };
         };
       };
     };

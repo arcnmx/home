@@ -59,8 +59,8 @@ in {
     };
 
     home-manager.users.root.services.sshd.authorizedKeys = singleton "${removeSuffix "\n" (tf.resources.ssh_home.getAttr "public_key_openssh")} home-deploy";
+    deploy.imports = [ "common" ];
     deploy.tf = {
-      imports = [ "common" ];
       deploy.gcroot.enable = true;
       deploy.systems.${name} = {
         connection = tf.resources.server.connection.set;
