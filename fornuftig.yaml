@@ -1,5 +1,5 @@
 substitutions:
-  node_name: fornuftig
+  node_name: fornuftig-001
   friendly_name: FORNÜFTIG
 
 packages:
@@ -36,7 +36,7 @@ binary_sensor:
     internal: true
     id: in_d1
     pin:
-      number: D1
+      number: D7
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -46,7 +46,7 @@ binary_sensor:
     internal: true
     id: in_d5
     pin:
-      number: D5
+      number: D6
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -57,7 +57,7 @@ binary_sensor:
     internal: true
     id: in_d6
     pin:
-      number: D6
+      number: D5
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -68,7 +68,7 @@ binary_sensor:
     internal: true
     id: in_d7
     pin:
-      number: D7
+      number: D1
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -78,7 +78,7 @@ binary_sensor:
 
 output:
   - platform: gpio
-    pin: D2
+    pin: D4
     id: gpio_d2
     inverted: true
   - platform: gpio
@@ -86,7 +86,7 @@ output:
     id: gpio_d3
     inverted: true
   - platform: gpio
-    pin: D4
+    pin: D2
     id: gpio_d4
     inverted: true
   - platform: template
