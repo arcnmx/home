@@ -1,0 +1,8 @@
+sensor:
+  - platform: scd4x
+    co2:
+      name: "Bedroom CO2"
+    temperature:
+      name: "Bedroom Temperature 2"
+    humidity:
+      name: "Bedroom Humidity 2"

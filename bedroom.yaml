@@ -5,7 +5,7 @@ substitutions:
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
   dht22: !include dht22.yaml
-  ccs811: !include ccs811.yaml
+  scd41: !include scd41.yaml
   pms5003: !include pms5003.yaml
   i2c: !include esp8266-i2c.yaml
   uart: !include esp8266-uart.yaml
