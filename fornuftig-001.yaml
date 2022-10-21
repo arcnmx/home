@@ -1,0 +1,5 @@
+substitutions:
+  id: "001"
+
+packages:
+  fornuftig: !include fornuftig.yaml

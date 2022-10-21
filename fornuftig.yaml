@@ -1,5 +1,5 @@
 substitutions:
-  node_name: fornuftig-001
+  node_name: fornuftig-${id}
   friendly_name: FORNÜFTIG
 
 packages:
