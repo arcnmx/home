@@ -33,6 +33,8 @@ text_sensor:
   - platform: template
     name: ${friendly_name} Uptime
     id: uptime_human
+    entity_category: diagnostic
+    disabled_by_default: true
     icon: mdi:clock-start
 
 binary_sensor:
