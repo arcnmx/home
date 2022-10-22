@@ -31,6 +31,7 @@
   inherit (config.networking.firewall) free;
 in {
   imports = [
+    ./remote-user.nix
     ./ddclient.nix
     ./wlan.nix
     ../nftables
