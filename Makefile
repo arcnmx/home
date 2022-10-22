@@ -3,7 +3,7 @@ all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1 fornuftig-001 outdoor bedroom
 clean:
 	rm -r ./build/
 
-DEPS_GENERIC :=
+DEPS_GENERIC := generic.yaml
 DEPS_ESP8266 := esp8266-generic.yaml $(DEPS_GENERIC)
 DEPS_ESP8266_D1 := esp8266-d1-mini.yaml $(DEPS_ESP8266)
 DEPS_ESP8266_1M := esp8266-esp01_1m.yaml $(DEPS_ESP8266)
