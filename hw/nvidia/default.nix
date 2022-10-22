@@ -29,7 +29,6 @@
     services.xserver.videoDrivers = ["nvidia"];
     # xf86-video-nouveau?
     boot = {
-      kernelPackages = mkIf (versionOlder pkgs.linuxPackages.nvidiaPackages.stable.version "515.65.02") (mkForce pkgs.linuxPackages_5_19); # TODO: 6.0-rc is currently broken :<
       kernelModules = ["i2c-dev"];
       modprobe.modules = mkIf config.home.profileSettings.nvidia.dynamicBinding {
         nvidia_drm.blacklist = true;
