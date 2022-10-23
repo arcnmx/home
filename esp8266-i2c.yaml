@@ -1,4 +1,4 @@
 i2c:
   sda: GPIO4
   scl: GPIO5
-  frequency: 400kHz
+  frequency: 80kHz
