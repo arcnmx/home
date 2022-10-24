@@ -2,7 +2,9 @@ sensor:
   - platform: scd4x
     co2:
       name: "Bedroom CO2"
+      id: scd41_co2
     temperature:
       name: "Bedroom Temperature 2"
+      id: scd41_temp
     humidity:
       name: "Bedroom Humidity 2"

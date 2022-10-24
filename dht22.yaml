@@ -3,8 +3,10 @@ sensor:
     pin: GPIO16
     temperature:
       name: ${friendly_name} Temperature
+      id: dht22_temp
     humidity:
       name: ${friendly_name} Humidity
+      id: dht22_hum
     model: dht22
     # the sampling rate of the DHT22 is 0.5Hz -> 1/0.5 -> 2
     update_interval: 2s

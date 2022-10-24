@@ -9,10 +9,4 @@ packages:
   pms5003: !include pms5003.yaml
   i2c: !include esp8266-i2c.yaml
   uart: !include esp8266-uart.yaml
-
-display:
-  - platform: ssd1306_i2c
-    model: "SSD1306 128x64"
-    id: bedroom_display
-    address: 0x3C
-    contrast: 50%
+  sensorfriend: !include sensorfriend.yaml

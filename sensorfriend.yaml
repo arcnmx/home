@@ -1,0 +1,22 @@
+font:
+  - file: "fonts/cozette.bdf"
+    id: cozette
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    id: ssd1306_display
+    address: 0x3C
+    contrast: 50%
+    lambda: |-
+      if (id(pms5003_pm10).has_state()) {
+        it.printf(128, 0, id(cozette), TextAlign::TOP_RIGHT , "1 %.0f", id(pms5003_pm1).state);
+        it.printf(128, 32, id(cozette), TextAlign::CENTER_RIGHT , "2.5 %.0f", id(pms5003_pm25).state);
+        it.printf(128, 64, id(cozette), TextAlign::BOTTOM_RIGHT , "10 %.0f", id(pms5003_pm10).state);
+      }
+      if (id(scd41_temp).has_state()) {
+        it.printf(0, 0, id(cozette), TextAlign::TOP_LEFT , "%.1f°", id(dht22_temp).state);
+      }
+      if (id(scd41_co2).has_state()) {
+        it.printf(0, 64, id(cozette), TextAlign::BOTTOM_LEFT , "%.0fppm", id(scd41_co2).state);
+      }
