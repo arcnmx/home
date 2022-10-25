@@ -1,10 +1,10 @@
 font:
-  - file: "fonts/cozette.bdf"
+  - file: ${fonts_root}/cozette.bdf
     id: cozette
 
 display:
   - platform: ssd1306_i2c
-    model: "SSD1306 128x64"
+    model: SSD1306 128x64
     id: ssd1306_display
     address: 0x3C
     contrast: 50%
