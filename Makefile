@@ -7,9 +7,11 @@ DEPS_GENERIC := generic.yaml
 DEPS_ESP8266 := esp8266-generic.yaml $(DEPS_GENERIC)
 DEPS_ESP8266_D1 := esp8266-d1-mini.yaml $(DEPS_ESP8266)
 DEPS_ESP8266_1M := esp8266-esp01_1m.yaml $(DEPS_ESP8266)
+DEPS_ESP8266_I2C := esp8266-i2c.yaml
+DEPS_ESP8266_UART := esp8266-uart.yaml
 DEPS_S31 := s31.yaml $(DEPS_ESP8266_1M)
 DEPS_FORNUFTIG := fornuftig.yaml $(DEPS_ESP8266_D1)
-DEPS_FRIEND := $(DEPS_ESP8266_D1) esp8266-i2c.yaml esp8266-uart.yaml
+DEPS_SENSORFRIEND := sensorfriend.yaml $(DEPS_ESP8266_D1) $(DEPS_ESP8266_I2C) $(DEPS_ESP8266_UART)
 
 s31-000: build/s31-000/firmware.elf
 s31-001: build/s31-001/firmware.elf
@@ -31,5 +33,7 @@ build/s31-002/firmware.elf: $(DEPS_S31)
 build/s31-003/firmware.elf: $(DEPS_S31)
 build/swb1/firmware.elf: $(DEPS_ESP8266_1M)
 build/fornuftig-001/firmware.elf: $(DEPS_FORNUFTIG)
-build/outdoor/firmware.elf: $(DEPS_FRIEND) dht22.yaml ccs811.yaml
-build/bedroom/firmware.elf: $(DEPS_FRIEND) dht22.yaml ccs811.yaml pms5003.yaml
+build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml
+build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml
+
+.PHONY: all clean
