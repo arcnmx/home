@@ -2,6 +2,6 @@ logger:
   baud_rate: 0
 
 uart:
-  rx_pin: GPIO0
-  tx_pin: GPIO1
+  rx_pin: RX
+  tx_pin: TX
   baud_rate: 9600
