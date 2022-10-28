@@ -1,13 +1,6 @@
 self: super: {
-  terraform-providers = super.terraform-providers // {
-    tailscale = self.terraform-providers.mkProvider rec {
-      owner = "tailscale";
-      provider-source-address = "registry.terraform.io/${owner}/${owner}";
-      repo = "terraform-provider-tailscale";
-      rev = "v${version}";
-      hash = "sha256-/qC8TOtoVoBTWeAFpt2TYE8tlYBCCcn/mzVQ/DN51YQ=";
-      vendorHash = "sha256-8EIxqKkVO706oejlvN79K8aEZAF5H2vZRdr5vbQa0l4=";
-      version = "0.13.5";
-    };
+  python3Packages = super.python3Packages // {
+    openrazer-daemon = super.lib.warn "https://github.com/NixOS/nixpkgs/issues/194095"
+      self.python3Packages.callPackage (self.path + "/pkgs/development/python-modules/openrazer/daemon.nix") { };
   };
 }
