@@ -62,8 +62,11 @@ in {
         unrar = ''
           nix shell --impure nixpkgs#unrar -c unrar "$@"
         '';
-        lorri-init = ''
-          echo 'use ${if config.services.lorri.useNix || !config.services.lorri.enable then "nix" else "lorri"}' > .envrc
+        direnv-init = ''
+          printf '%s\n%s' \
+            "export CI_PLATFORM=impure" \
+            "use ${if config.services.lorri.useNix || !config.services.lorri.enable then "\${1-nix}" else "lorri"}" \
+            > .envrc
         '' + optionalString config.services.lorri.enable ''
           for nixfile in $PWD/shell.nix; do # default.nix?
             if [[ -e $nixfile ]]; then
