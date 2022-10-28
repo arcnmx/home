@@ -13,6 +13,10 @@ in
 
   options = {
     hardware.display = {
+      oled = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+      };
       dpi = mkOption {
         type = types.float;
         default = 96.0;

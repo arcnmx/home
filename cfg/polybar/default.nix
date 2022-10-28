@@ -1,15 +1,41 @@
-{ base16, nixosConfig, config, pkgs, lib, ... } @ args: with lib; {
+{ base16, nixosConfig, config, pkgs, lib, ... } @ args: with lib; let
+  enableOled = nixosConfig.hardware.display.oled != [ ];
+in {
   services.polybar = {
     enable = true;
     script = let
       xrandr = filter: "${pkgs.xorg.xrandr}/bin/xrandr -q | ${pkgs.gnugrep}/bin/grep -F ' ${filter}' | ${pkgs.coreutils}/bin/cut -d' ' -f1";
+      oled = ''
+        export POLYBAR_OLED_SEP="$(printf "%$((RANDOM % 3 + 1))s")"
+        export POLYBAR_OLED_MARGIN=$((RANDOM % 6))
+        if [[ $((RANDOM % 2)) -eq 0 ]]; then
+          export POLYBAR_OLED_BOOL_BOTTOM=true
+        fi
+        export POLYBAR_OLED_WM_MARGIN=$((RANDOM % 8))
+        OLED_RAND=$RANDOM
+        export POLYBAR_OLED_PADDING_LEFT=$((OLED_RANDOM % 12))
+        export POLYBAR_OLED_PADDING_RIGHT=$((OLED_RANDOM % 12))
+        OLED_RAND=$RANDOM
+        export POLYBAR_OLED_BORDER_TOP=$((OLED_RANDOM % 4))
+        export POLYBAR_OLED_BORDER_BOTTOM=$((OLED_RANDOM % 4))
+        OLED_RAND=$RANDOM
+        export POLYBAR_OLED_BORDER_LEFT=$((OLED_RANDOM % 4))
+        export POLYBAR_OLED_BORDER_RIGHT=$((OLED_RANDOM % 4))
+      '';
     in mkIf config.xsession.enable ''
       primary=$(${xrandr "connected primary"})
       for display in $(${xrandr "connected"}); do
         export POLYBAR_MONITOR=$display
         export POLYBAR_MONITOR_PRIMARY=$([[ $primary = $display ]] && echo true || echo false)
         export POLYBAR_TRAY_POSITION=$([[ $primary = $display ]] && echo right || echo none)
-        polybar arc &
+        POLYBAR_BAR=arc
+        ${optionalString enableOled ''
+          if echo ${escapeShellArg (toString nixosConfig.hardware.display.oled)} | ${pkgs.gnugrep}/bin/grep -w -q "$POLYBAR_MONITOR"; then
+            POLYBAR_BAR=oled
+            ${oled}
+          fi
+        ''}
+        polybar $POLYBAR_BAR &
       done
     '';
     package = pkgs.polybarFull;
@@ -76,6 +102,28 @@
         };
         module-margin = 0;
         #click-right = ""; menu of some sort?
+      };
+      "bar/oled" = mkIf enableOled {
+        "inherit" = "bar/arc";
+        separator.text = "\${env:POLYBAR_OLED_SEP: }";
+        module-margin = "\${env:POLYBAR_OLED_MARGIN:0}";
+        bottom = "\${env:POLYBAR_OLED_BOOL_BOTTOM:false}";
+        padding = {
+          left = "\${env:POLYBAR_OLED_PADDING_LEFT:1}";
+          right = "\${env:POLYBAR_OLED_PADDING_RIGHT:0}";
+        };
+        border = {
+          left.size = "\${env:POLYBAR_OLED_BORDER_LEFT:0}";
+          right.size = "\${env:POLYBAR_OLED_BORDER_RIGHT:0}";
+          top.size = "\${env:POLYBAR_OLED_BORDER_TOP:0}";
+          bottom.size = "\${env:POLYBAR_OLED_BORDER_BOTTOM:0}";
+        };
+      };
+      "global/wm" = mkIf enableOled {
+        margin = rec {
+          bottom = "\${env:POLYBAR_OLED_WM_MARGIN:0}";
+          top = bottom;
+        };
       };
       "module/i3" = mkIf config.xsession.windowManager.i3.enable {
         type = "internal/i3";
