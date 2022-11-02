@@ -92,7 +92,7 @@ in {
           length = 64;
           upper = false;
           lower = true;
-          number = true;
+          numeric = true;
           special = false;
         };
       };
