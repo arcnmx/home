@@ -9,12 +9,17 @@
         owner = mkOption {
           type = types.str;
         };
+        group = mkOption {
+          type = types.str;
+          default = "keys";
+        };
       };
     };
     config = {
       enable = mkDefault true;
       secret = {
-        owner = mkIf (domain.nginx.enable && nixosConfig.services.nginx.enable) nixosConfig.services.nginx.user;
+        owner = mkIf (domain.nginx.enable && nixosConfig.services.nginx.enable) (mkDefault nixosConfig.services.nginx.user);
+        group = mkIf nixosConfig.services.nginx.enable (mkDefault nixosConfig.services.nginx.group);
       };
     };
   };
@@ -56,11 +61,13 @@ in {
     secrets.files = foldAttrList (mapAttrsToList (attr: domain: {
       ${domain.fqdn} = {
         text = tf.acme.certs.${domain.fqdn}.out.refPrivateKeyPem;
-        inherit (domain.ssl.secret) owner;
+        inherit (domain.ssl.secret) owner group;
+        mode = "0440";
       };
       "${domain.fqdn}.pem" = {
         text = tf.acme.certs.${domain.fqdn}.out.refFullchainPem;
-        inherit (domain.ssl.secret) owner;
+        inherit (domain.ssl.secret) owner group;
+        mode = "0444";
       };
     }) sslDomains);
   };
