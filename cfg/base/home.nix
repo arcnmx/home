@@ -239,13 +239,6 @@ in {
       enable = !config.home.minimalSystem;
       enableFishIntegration = false;
       #config = { };
-      stdlib = ''
-        use_flake() {
-          watch_file flake.nix
-          watch_file flake.lock
-          eval "$(nix print-dev-env --profile "$(direnv_layout_dir)/flake-profile")"
-        }
-      '';
     };
 
     dconf.enable = lib.mkDefault false; # TODO: is this just broken?

@@ -13,6 +13,7 @@
     };
     ignores = [
       ".envrc"
+      ".direnv/"
     ];
     extraConfig = {
       user = {
