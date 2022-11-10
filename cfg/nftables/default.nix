@@ -11,6 +11,13 @@
     ports = if isInt port then toString port else "${toString port.from}-${toString port.to}";
   in ''${type} dport ${ports} accept'';
   allowed = mapInterface firewall;
+  nftables-trusted = pkgs.writeText "nftables-trusted.conf" ''
+    table inet filter {
+      chain input_loopback {
+        iifname { ${concatStringsSep ", " firewall.trustedInterfaces} } accept
+      }
+    }
+  '';
   nftables-ports = pkgs.writeText "nftables-ports.conf" ''
     table inet filter {
       chain input_ports {
@@ -34,6 +41,9 @@ in {
         ''
           include "${nftables-ports}"
         ''
+        (mkIf (firewall.trustedInterfaces != [ ]) ''
+          include "${nftables-trusted}"
+        '')
         (mkIf config.services.yggdrasil.enable (mkAfter ''
           table inet filter {
             chain input_ports {
