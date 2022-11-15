@@ -16,6 +16,9 @@
       ".direnv/"
     ];
     extraConfig = {
+      core = {
+        pager = ''sed 's/\t/  /g' | $PAGER''; # TODO: unsure how to get page/vim to handle tabs, so...
+      };
       user = {
         useConfigOnly = true;
       };
