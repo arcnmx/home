@@ -205,26 +205,26 @@ in {
     programs.rustfmt = {
       enable = true;
       package = lib.mkDefault null;
-      config = {
-        edition = "2018";
+      config = rec {
+        edition = "2021";
         unstable_features = true;
-        skip_children = true;
         wrap_comments = true;
         hard_tabs = true;
         tab_spaces = 2;
         max_width = 120;
         comment_width = 100;
         condense_wildcard_suffixes = true;
-        format_code_in_doc_comments = true;
+        format_code_in_doc_comments = !hard_tabs; # would be good if it didn't also use hard tabs...
         #format_strings = true;
         match_arm_blocks = false;
         #match_block_trailing_comma = true;
         overflow_delimited_expr = true;
-        merge_imports = true;
         imports_granularity = "One";
+        group_imports = "One";
         reorder_impl_items = true;
+        force_multiline_blocks = false;
         newline_style = "Unix";
-        normalize_comments = true;
+        normalize_comments = false;
         #normalize_doc_attributes = true; # except when have I ever explicitly used #[doc = ...]?
         #report_fixme, report_todo
         #struct_lit_single_line = false;

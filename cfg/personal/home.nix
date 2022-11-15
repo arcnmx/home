@@ -190,7 +190,9 @@ in {
       ];
     };
     programs.rustfmt = {
-      package = pkgs.rustfmt-nightly;
+      package = pkgs.rustfmt.override {
+        asNightly = true;
+      };
     };
 
     xdg.configFile = {
