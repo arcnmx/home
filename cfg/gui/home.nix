@@ -108,7 +108,6 @@ in {
 
     services.picom = {
       enable = mkDefault true;
-      experimentalBackends = mkDefault true;
       package = mkDefault pkgs.picom-next;
       opacityRules = [
         # https://wiki.archlinux.org/index.php/Picom#Tabbed_windows_(shadows_and_transparency)

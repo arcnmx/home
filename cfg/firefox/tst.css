@@ -129,16 +129,11 @@ tab-item .extra-items-container.behind::after {
   display: none;
 }
 
-/* sidebar should be allowed to be tiny! */
-#sidebar {
-  min-width: 100px !important;
-}
-
 /* auto-hide sidebar */
 #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] {
   overflow: hidden;
-  min-width: 40px;
-  max-width: 40px;
+  min-width: 40px !important;
+  max-width: 40px !important;
   transition: all 0.2s ease;
   border-right: 1px solid #0c0c0d;
   z-index: 2;
