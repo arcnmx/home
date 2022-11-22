@@ -10,11 +10,11 @@
     };
     arc = {
       url = "github:arcnmx/nixexprs";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     rust = {
       url = "github:arcnmx/nixexprs-rust";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     tf = {
       url = "github:arcnmx/tf-nix";

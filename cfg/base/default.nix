@@ -122,19 +122,17 @@ in {
         (lib.mkDefault pkgs.nix)
         (lib.mkIf (!config.home.minimalSystem) pkgs.nix-readline)
       ];
-      registry = {
-        nixpkgs.to = {
-          type = "github";
-          owner = "NixOS";
-          repo = "nixpkgs";
-          inherit (inputs.nixpkgs.sourceInfo) lastModified rev narHash;
+      registry = let
+        mapFlake = { sourceInfo, ... }: {
+          to = {
+            inherit (sourceInfo) type lastModified rev narHash;
+          } // optionalAttrs (sourceInfo.type == "github") {
+            inherit (sourceInfo) repo owner;
+          };
         };
-        nixpkgs-big.to = {
-          type = "github";
-          owner = "NixOS";
-          repo = "nixpkgs";
-          inherit (inputs.nixpkgs-big.sourceInfo) lastModified rev narHash;
-        };
+      in mapAttrs (_: mapFlake) {
+        inherit (inputs) nixpkgs nixpkgs-big rust arc;
+      } // {
         ci = {
           to = {
             type = "github";
