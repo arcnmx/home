@@ -97,10 +97,20 @@ function mod.page.on_disconnect()
 end
 
 if not repeated then
-	vim.cmd("autocmd User PageOpen lua require('arc-config').page.on_open()")
-	vim.cmd("autocmd User PageDisconnect lua require('arc-config').page.on_disconnect()")
+	vim.api.nvim_create_augroup("pageuser", { clear = true })
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "PageOpen",
+		group = "pageuser",
+		callback = mod.page.on_open,
+	})
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "PageDisconnect",
+		group = "pageuser",
+		callback = mod.page.on_disconnect,
+	})
 
 	if is_page then
+		vim.g.coc_start_at_startup = false
 		vim.g.surround_no_mappings = 1
 		vim.g.Hexokinase_ftEnabled = {}
 	end
