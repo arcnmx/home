@@ -149,7 +149,7 @@ in {
         gtx1650 = cfg.devices.gtx1650.host;
         rtx3080 = cfg.devices.rtx3080.host;
       in {
-        path = [ config.systemd.package config.hardware.nvidia.package.nvidia_x11_bin ];
+        path = [ config.systemd.package config.hardware.nvidia.package.bin ];
         script = mkMerge [
           (mkIf cfg.devices.rtx3080.reserve (mkAfter ''
             if [[ ! -L /sys/bus/pci/drivers/nvidia/${rtx3080} ]] && ! systemctl is-active ${cfg.devices.rtx3080.systemd.id}; then
