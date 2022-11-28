@@ -637,6 +637,63 @@
       inherit defaults;
     };
   };
+  githubSecretType = { config }: types.submoduleWith {
+    modules = singleton ({ config, name, github, ... }: {
+      options = {
+        enable = mkEnableOption "secret" // {
+          default = true;
+        };
+        name = mkOption {
+          type = types.str;
+          default = name;
+        };
+        value = mkOption {
+          type = types.nullOr types.str;
+        };
+        encrypted = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        environment = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        out = {
+          secretResourceName = mkOption {
+            type = types.str;
+            default = "${github.repo}-github-secret-${config.name}";
+          };
+          setRepoResources = mkOption {
+            type = types.attrsOf types.unspecified;
+            default = { };
+          };
+        };
+      };
+      config = {
+        value = mkIf (config.encrypted != null) (mkOptionDefault null);
+        out = {
+          setRepoResources = mkIf config.enable {
+            ${config.out.secretResourceName} = {
+              provider = github.provider.reference;
+              type = mkDefault (if config.environment != null
+                then "actions_environment_secret"
+                else "actions_secret");
+              inputs = {
+                repository = mkDefault (github.out.repoResource.refAttr "name");
+                secret_name = mkDefault config.name;
+                encrypted_value = mkIf (config.encrypted != null) (mkDefault config.encrypted);
+                plaintext_value = mkIf (config.value != null) (mkDefault config.value);
+                environment = mkIf (config.environment != null) (mkDefault config.environment);
+              };
+            };
+          };
+        };
+      };
+    });
+    specialArgs = {
+      github = config;
+    };
+  };
   githubRemoteType = { defaults }: types.submoduleWith {
     modules = singleton ({ config, name, defaults, ... }: {
       options = {
@@ -658,6 +715,12 @@
         private = mkOption {
           type = types.bool;
           default = false;
+        };
+        actions = {
+          secrets = mkOption {
+            type = types.attrsOf (githubSecretType { inherit config; });
+            default = { };
+          };
         };
         out = {
           url = mkOption {
@@ -697,18 +760,20 @@
             fetch = if config.private then config.out.sshCloneUrl else config.out.httpsCloneUrl;
             push = config.out.sshCloneUrl;
           };
-          setRepoResources = mkIf config.create {
+          setRepoResources = mkMerge (singleton {
             ${config.out.repoResourceName} = {
               provider = config.provider.reference;
               type = mkDefault "repository";
+              dataSource = !config.create;
               inputs = mkMerge [ {
                 name = mkDefault config.repo;
+              } (mkIf config.create ({
                 #description = mkIf (config.description != null) (mkDefault config.description);
                 visibility = if config.private then "private" else "public";
                 # TODO: many other attrs could go here...
-              } (cfg.defaults.providerConfig.github or { }) ];
+              } // cfg.defaults.providerConfig.github or { })) ];
             };
-          };
+          } ++ (mapAttrsToList (_: secret: secret.out.setRepoResources) config.actions.secrets));
         };
       } ];
     });
@@ -855,7 +920,7 @@
           remoteConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${name}.${k}") config.extraConfig);
         in {
           setRepoResources = mkMerge [
-            (mkIf (config.github != null && config.github.create) config.github.out.setRepoResources)
+            (mkIf (config.github != null) config.github.out.setRepoResources)
             (mkIf (config.google != null && config.google.create) config.google.out.setRepoResources)
             (mkIf (config.bitbucket != null && config.bitbucket.create) config.bitbucket.out.setRepoResources)
             (mkIf (config.aws != null && config.aws.create) config.aws.out.setRepoResources)
