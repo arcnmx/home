@@ -44,6 +44,7 @@ in {
   imports = [
     ../../modules/shell-deprecation-aliases.nix
     ./ls.nix
+    ./nix.nix
     ./direnv-histfile.nix
   ];
   home.shell = {
@@ -65,10 +66,6 @@ in {
       }
     ];
     functions = {
-      # helper for use with `nix -I $(nixpkgs unstable)`
-      nixpkgs = ''
-        echo "nixpkgs=https://nixos.org/channels/$1/nixexprs.tar.xz"
-      '';
       prargs = ''
         printf '"%b"\n' "$0" "$@" | ${pkgs.coreutils}/bin/nl -v0 -s": "
       '';
