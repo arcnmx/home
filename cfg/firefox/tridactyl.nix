@@ -192,17 +192,18 @@
       searchengine = "g";
       "searchurls.g" = "https://encrypted.google.com/search?q=%s";
       "searchurls.gh" = "https://github.com/search?q=%s";
-      "searchurls.ghc" = "https://github.com/%s1/search?q=%s2";
-      "searchurls.ghf" = "https://github.com/%s1/search?q=filename%3a%s2";
-      "searchurls.ghp" = "https://github.com/%s1/pulls?q=%s2";
-      "searchurls.ghi" = "https://github.com/%s1/issues?q=is%3aissue+%s2";
-      "searchurls.gha" = "https://github.com/%s1/issues?q=%s2";
+      "searchurls.ghc" = "https://github.com/%s1/%s2/search?q=%s3";
+      "searchurls.ghf" = "https://github.com/%s1/%s2/search?q=filename%3a%s3";
+      "searchurls.ghp" = "https://github.com/%s1/%s2/pulls?q=%s3";
+      "searchurls.ghi" = "https://github.com/%s1/%s2/issues?q=is%3aissue+%s3";
+      "searchurls.gha" = "https://github.com/%s1/%s2/issues?q=%s3";
       "searchurls.w" = "https://en.wikipedia.org/wiki/Special:Search?search=%s";
       "searchurls.ddg" = "https://duckduckgo.com/?q=%s";
       "searchurls.r" = "https://reddit.com/r/%s";
       "searchurls.rs" = "https://doc.rust-lang.org/std/index.html?search=%s";
       "searchurls.crates" = "https://lib.rs/search?q=%s";
-      "searchurls.docs" = "https://docs.rs/%s1/*/?search=%s2";
+      "searchurls.docs" = "https://docs.rs/%s/latest/";
+      "searchurls.doc" = "https://docs.rs/%s1/latest/?search=%s2";
       "searchurls.nixos" = "https://search.nixos.org/options?channel=unstable&from=0&size=1000&sort=alpha_asc&query=%s";
       "searchurls.aur" = "https://aur.archlinux.org/packages/?K=%s";
       "searchurls.yt" = "https://www.youtube.com/results?search_query=%s";
@@ -210,6 +211,9 @@
       "searchurls.gw2" = "https://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=%s&go=Go&ns0=1";
       "searchurls.gw2i" = "https://gw2efficiency.com/account/overview?filter.name=%s";
       "searchurls.gw2c" = "https://gw2efficiency.com/crafting/recipe-search?filter.orderBy=name&filter.search=%s";
+      "searchurls.tf" = "https://registry.terraform.io/search/providers?q=%s";
+      "searchurls.tfd" = "https://registry.terraform.io/providers/%s1/%s2/latest/docs";
+      "searchurls.tfdh" = "https://registry.terraform.io/providers/hashicorp/%s/latest/docs";
 
       putfrom = "selection";
       # set yankto selection
