@@ -62,6 +62,12 @@ in {
         unrar = ''
           nix shell --impure nixpkgs#unrar -c unrar "$@"
         '';
+        asciidoctor = ''
+          nix shell nixpkgs#asciidoctor -c asciidoctor "$@"
+        '';
+        pandoc = ''
+          nix shell nixpkgs#pandoc -c pandoc "$@"
+        '';
         direnv-init = ''
           printf '%s\n%s' \
             "export CI_PLATFORM=impure" \

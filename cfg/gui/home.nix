@@ -61,7 +61,15 @@ in {
           PULSE_PROP="media.role=phone" nix shell --impure nixpkgs#discord -c Discord "$@"
         '';
         ffr = ''
-          nix shell nixpkgs#flashplayer-standalone -c flashplayer http://www.flashflashrevolution.com/~velocity/R^3.swf
+          local FILE=$(mktemp --tmpdir tmp.XXXXXXXX.swf)
+          local URL="http://www.flashflashrevolution.com/~velocity/R^3.swf"
+          curl -Lsqo "$FILE" "$URL" &&
+            nix shell nixpkgs#lightspark -c lightspark --url "$URL" "$FILE"
+        '';
+        twitch = ''
+          local URL="https://twitch.tv/$1"
+          shift
+          mpv "$URL" "$@"
         '';
         monstercatfm = ''
           mplay ytdl://http://twitch.tv/monstercat

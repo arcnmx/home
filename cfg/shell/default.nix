@@ -66,8 +66,8 @@ in {
       }
     ];
     functions = {
-      prargs = ''
-        printf '"%b"\n' "$0" "$@" | ${pkgs.coreutils}/bin/nl -v0 -s": "
+      strings = mkIf pkgs.hostPlatform.isLinux ''
+        nix shell nixpkgs#binutils -c strings "$@"
       '';
       dict = ''
         ${pkgs.curl}/bin/curl "dict://dict.org/$1:$2"
@@ -104,6 +104,24 @@ in {
       grep = "rg";
     }) ];
   };
+  home.packages = let
+    prargs = pkgs.writeShellScriptBin "prargs" ''
+      printf '$# %i\n' "$#"
+
+      if [[ $0 != *prargs ]]; then
+        count=0
+        args=("$0" "$@")
+      else
+        count=1
+        args=("$@")
+      fi
+
+      for arg in "''${args[@]}"; do
+        printf '%2s: "%b"\n' "$count" "$arg"
+        count=$((count+1))
+      done
+    '';
+  in [ prargs ];
   programs.bash = {
     enable = true;
     historyFile = "${config.xdg.dataHome}/bash/history";

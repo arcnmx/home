@@ -31,6 +31,21 @@ in {
       ryzen-watch = ''
         sudo watch -ctn1 'ryzen_monitor -u0'
       '';
+      duc = ''
+        if [[ $# -eq 0 ]] || [[ $# -ne 0 && "$1" = -* ]]; then
+          command duc "$@"
+          return
+        fi
+        SUBCOMMAND=$1
+        shift
+        if [[ $SUBCOMMAND = index ]] && [[ "$(id -u)" != 0 ]]; then
+          sudo duc "$SUBCOMMAND" --database=/mnt/enc/duc.db "$@"
+        elif [[ $SUBCOMMAND != help ]]; then
+          command duc "$SUBCOMMAND" --database=/mnt/enc/duc.db "$@"
+        else
+          command duc "$SUBCOMMAND" "$@"
+        fi
+      '';
     };
     home.scratch.enable = true;
     programs.zsh.initExtra = ''
