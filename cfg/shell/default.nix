@@ -30,14 +30,15 @@ let
     #zstyle ':completion:*' matcher-list 'r:|?=** m:{a-z\-}={A-Z\_}'
     zstyle ':completion:*:complete:pass:*:*' matcher 'r:|[./_-]=** r:|=*' 'l:|=* r:|=*'
 
-    bindkey '^ ' autosuggest-accept
-
     ${concatStringsSep "\n" (map (opt: "setopt ${opt}") zshOpts)}
 
     source ${./zshrc-vimode}
     if [[ $USER = $DEFAULT_USER && -z ''${SSH_CLIENT-} ]]; then
       ZSH_TAB_TITLE_DEFAULT_DISABLE_PREFIX=true
     fi
+  '' + optionalString config.programs.zsh.enableAutosuggestions ''
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    bindkey '^ ' autosuggest-accept
   '';
 in {
   imports = [
