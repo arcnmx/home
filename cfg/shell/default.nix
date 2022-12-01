@@ -43,6 +43,7 @@ in {
   imports = [
     ../../modules/shell-deprecation-aliases.nix
     ./ls.nix
+    ./direnv-histfile.nix
   ];
   home.shell = {
     aliases = mkMerge [
@@ -197,4 +198,8 @@ in {
     "bash"
     "zsh"
   ];
+  programs.direnv = {
+    enable = !config.home.minimalSystem;
+    enableFishIntegration = false;
+  };
 }

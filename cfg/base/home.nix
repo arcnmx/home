@@ -235,12 +235,6 @@ in {
       };
     };
 
-    programs.direnv = {
-      enable = !config.home.minimalSystem;
-      enableFishIntegration = false;
-      #config = { };
-    };
-
     dconf.enable = lib.mkDefault false; # TODO: is this just broken?
   };
 }
