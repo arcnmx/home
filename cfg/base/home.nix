@@ -30,7 +30,7 @@ in {
   };
 
   config = {
-    home.stateVersion = mkDefault "22.05";
+    home.stateVersion = mkDefault "22.11";
     home.file = {
       ".gnupg".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/gnupg";
       ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {

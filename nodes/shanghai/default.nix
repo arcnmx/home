@@ -20,7 +20,7 @@
       imports = [ ./home.nix ];
     };
 
-    system.stateVersion = "22.05";
+    system.stateVersion = "22.11";
 
     services.ddclient.enable = true;
     services.ofono.enable = true;
