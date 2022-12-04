@@ -4,7 +4,7 @@
   options = {
     home.profileSettings.nvidia = {
       enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
-      patch = mkEnableOption "nvidia-patch" // { default = false; };
+      patch = mkEnableOption "nvidia-patch" // { default = true; };
       dynamicBinding = mkEnableOption "dynamic gpu unbinding";
     };
   };
