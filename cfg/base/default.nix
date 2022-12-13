@@ -145,6 +145,7 @@ in {
         };
       };
     };
+    nixpkgs.overlays = mkIf config.home.minimalSystem [ (import ../shell/zsh-vanilla-overlay.nix) ];
 
     services.yggdrasil = mkMerge [ {
       ifName = "y";
