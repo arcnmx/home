@@ -33,7 +33,7 @@ in {
   config = let
     enabledDevices = filterAttrs (_: vfio: vfio.enable) cfg.devices;
   in mkIf cfg.enable {
-    systemd.depends = mapAttrsToList (_: vfio: vfiocfg.devices.${vfio.name}.systemd.id) enabledDevices;
+    systemd.depends = mapAttrsToList (_: vfio: vfiocfg.devices.${vfio.name}.vfio.id) enabledDevices;
     pci.devices = mapAttrs (name: vfio: {
       settings = mapAttrs (_: mkOptionDefault) {
         driver = "vfio-pci";

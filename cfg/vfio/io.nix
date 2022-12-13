@@ -5,8 +5,11 @@
   hmp = machineConfig: cmd: if machineConfig.qemucomm.enable
     then "${getExe machineConfig.exec.qmp} hmp ${escapeShellArg cmd}"
     else "echo ${escapeShellArg cmd} | ${getExe machineConfig.exec.monitor}";
-  systemdUnits =
-    mapAttrsToList (_: dev: dev.systemd) cfg.devices
+  systemdUnits' =
+    concatLists (mapAttrsToList (_: dev: [
+      dev.vfio dev.bind
+      dev.gpu.nvidia.drain dev.gpu.nvidia.persist
+    ]) cfg.devices)
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.mapped
     ++ mapAttrsToList (_: disk: disk.systemd) cfg.disks.cow
     ++ concatLists (mapAttrsToList
@@ -15,6 +18,7 @@
     )
     ++ mapAttrsToList (_: machine: machine.scream.systemd) (filterAttrs (_: m: m.scream.systemd.enable) cfg.qemu.machines)
     ++ mapAttrsToList (_: machine: machine.systemd) (filterAttrs (_: m: m.enable && m.systemd.enable) cfg.qemu.machines);
+  systemdUnits = filter (service: service.enable) systemdUnits';
   applyPermission = { permission, path }: let
     owner = optionalString (permission.owner != null) permission.owner;
     group = optionalString (permission.group != null) permission.group;
@@ -23,7 +27,7 @@
     cmds = optional (permission.owner != null || permission.group != null) chown
     ++ optional (permission.mode != null) chmod;
   in concatStringsSep "\n" cmds;
-  polkitPermissions = systemd: mkIf systemd.enable {
+  polkitPermissions = systemd: {
     ${systemd.polkit.user} = {
       systemd.units = [ systemd.id ];
     };
@@ -223,7 +227,29 @@
       };
     };
   };
-  vfioDeviceModule = { config, name, ... }: {
+  vfioDeviceModule = let
+    canRun = pkgs.writeShellScriptBin "service-precondition" ''
+      SERVICE="$1"
+      if ${systemctl} is-active "$SERVICE" > /dev/null; then
+        echo "conflicting service "$SERVICE" is running" >&2
+        exit 1
+      fi
+    '';
+    bindStop = pkgs.writeShellScriptBin "pci-bind-stop" ''
+      DRIVER="$1"
+      HOST="$2"
+      if [[ -L /sys/bus/pci/drivers/$DRIVER/$HOST ]]; then
+        echo $HOST > /sys/bus/pci/drivers/$DRIVER/unbind
+      fi
+    '';
+    systemctl = "${config.systemd.package}/bin/systemctl";
+    smi = "${config.hardware.nvidia.package.bin}/bin/nvidia-smi";
+    smiValue = value:
+      if value == true then "1"
+      else if value == false then "0"
+      else if isList value then concatMapStringsSep "," smiValue value
+      else toString value;
+  in { config, name, ... }: {
     options = {
       enable = mkEnableOption "VFIO device";
       reserve = mkEnableOption "VFIO reserve";
@@ -239,17 +265,57 @@
         default = null;
         example = "02:00.0";
       };
-      systemd = mkOption {
+      driver = mkOption {
+        type = with types; nullOr str;
+        default = null;
+      };
+      vfio = mkOption {
+        type = types.submodule systemdModule;
+        default = { };
+      };
+      bind = mkOption {
         type = types.submodule systemdModule;
         default = { };
       };
       udev.rule = mkOption {
         type = types.separatedString ", ";
       };
+      gpu = {
+        enable = mkEnableOption "GPU" // {
+          default = elem config.driver [ "nvidia" "amdgpu" ];
+        };
+        primary = mkOption {
+          type = types.bool;
+          default = false;
+        };
+        nvidia = {
+          enable = mkEnableOption "NVIDIA GPU" // {
+            default = config.driver == "nvidia";
+          };
+          uuid = mkOption {
+            type = with types; nullOr (strMatching "GPU-[-0-9a-f]*");
+            default = null;
+          };
+          settings = mkOption {
+            type = with types; attrsOf (oneOf [ int bool (listOf int) ]);
+            default = { };
+          };
+          drain = mkOption {
+            type = types.submodule systemdModule;
+            default = { };
+          };
+          persist = mkOption {
+            type = types.submodule systemdModule;
+            default = { };
+          };
+        };
+      };
     };
-    config = {
-      systemd = {
-        name = "vfio-reserve-${name}";
+    config = let
+      hardConflict = false;
+    in {
+      vfio = {
+        name = "pci-${name}-vfio";
         mqtt.enable = mkDefault false;
         script = mkMerge (
           optional config.unbindVts "${nixosConfig.lib.arc-vfio.unbind-vts}/bin/unbind-vts"
@@ -257,9 +323,84 @@
         );
         unit = {
           wantedBy = mkIf (config.enable && config.reserve) [ "multi-user.target" ];
+          conflicts = mkIf config.gpu.primary [ "graphical.target" ];
+          after = mkIf config.gpu.primary [ "display-manager.service" ];
+          before = mkIf config.gpu.nvidia.enable [ "nvidia-x11.service" ];
           serviceConfig = {
-            RuntimeDirectory = config.systemd.name;
+            RuntimeDirectory = config.vfio.name;
+            ExecStartPre = mkIf config.bind.enable [ "${systemctl} stop ${config.bind.id}" ];
             ExecStop = "${nixosConfig.lib.arc-vfio.reserve-pci}/bin/reserve-pci STOP";
+          };
+        };
+      };
+      bind = {
+        name = "pci-${name}-bind";
+        enable = mkDefault (config.driver != null && config.host != null);
+        mqtt.enable = mkDefault false;
+        unit = rec {
+          wants = mkIf config.gpu.nvidia.enable [ "nvidia-x11.service" ];
+          bindsTo = mkIf config.gpu.nvidia.enable [ "nvidia-x11.service" ];
+          after = mkMerge [
+            [ config.vfio.id ]
+            (mkIf config.gpu.nvidia.enable [
+              "nvidia-x11.service"
+            ])
+          ];
+          conflicts = mkIf hardConflict [ config.vfio.id ];
+          script = mkMerge [ ''
+            if [[ ! -L /sys/bus/pci/drivers/${config.driver}/${config.host} ]]; then
+              echo > /sys/bus/pci/devices/${config.host}/driver_override
+              echo ${config.host} > /sys/bus/pci/drivers/${config.driver}/bind
+            fi
+          '' (mkIf config.gpu.nvidia.enable (mkAfter ''
+            ${smi} drain -p ${config.host} -m 0 || true
+          '')) ];
+          serviceConfig = {
+            ExecStartPre = mkIf (!hardConflict) [ "${getExe canRun} ${config.vfio.id}" ];
+            ExecStop = [ "${getExe bindStop} ${config.driver} ${config.host}" ];
+          };
+        };
+      };
+      gpu.nvidia = {
+        drain = {
+          name = "pci-${name}-drain";
+          enable = mkDefault config.gpu.nvidia.enable;
+          mqtt.enable = mkDefault false;
+          unit = rec {
+            wantedBy = mkIf (config.gpu.nvidia.enable && !config.gpu.primary && !config.reserve) [ "nvidia-x11.service" ];
+            requisite = [ config.bind.id "nvidia-x11.service" ];
+            bindsTo = requisite;
+            after = requisite;
+            serviceConfig = {
+              ExecStart = [
+                "${smi} drain -p ${config.host} -m 1"
+              ];
+              ExecStop = [
+                "${smi} drain -p ${config.host} -m 0"
+              ];
+            };
+          };
+        };
+        persist = {
+          # NOTE: Persistence mode is deprecated and will be removed in a future release. Please use nvidia-persistenced instead.
+          name = "pci-${name}-persist";
+          enable = mkDefault config.gpu.nvidia.enable;
+          mqtt.enable = mkDefault false;
+          unit = rec {
+            requires = [ config.bind.id "nvidia-x11.service" ];
+            conflicts = [ config.vfio.id config.gpu.nvidia.drain.id ];
+            bindsTo = requires;
+            after = requires;
+            serviceConfig = {
+              ExecStart = [
+                "${smi} -i ${config.gpu.nvidia.uuid} --persistence-mode=1"
+              ] ++ mapAttrsToList (flag: value:
+                "${smi} -i ${config.gpu.nvidia.uuid} --${flag}=${escapeShellArg (smiValue value)}"
+              ) config.gpu.nvidia.settings;
+              ExecStop = [
+                "${smi} -i ${config.gpu.nvidia.uuid} --persistence-mode=0"
+              ];
+            };
           };
         };
       };
@@ -486,7 +627,13 @@ in {
     };
   };
   config = {
-    systemd.services = mkMerge (map systemdService systemdUnits);
+    systemd.services = mkMerge (map systemdService systemdUnits ++ singleton {
+      display-manager = rec {
+        wants = mapAttrsToList (_: dev: dev.bind.id) (filterAttrs (_: dev: dev.gpu.enable && dev.gpu.primary) cfg.devices);
+        bindsTo = wants;
+        after = mapAttrsToList (_: dev: dev.bind.id) (filterAttrs (_: dev: dev.gpu.enable) cfg.devices);
+      };
+    });
     security.polkit.users = mkMerge (map polkitPermissions systemdUnits);
     services.systemd2mqtt.units = mkMerge (map mqttUnits systemdUnits);
     systemd.tmpfiles.rules = mkMerge (mapAttrsToList (_: machine: [
