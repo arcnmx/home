@@ -146,11 +146,22 @@ in {
       };
     };
 
-    services.yggdrasil = {
+    services.yggdrasil = mkMerge [ {
       ifName = "y";
       nodeInfoPrivacy = true;
       group = "wheel";
-    };
+    } (mkIf (free.base != null) {
+        listen = [
+          "tcp://[::]:${toString (free.base + 99)}"
+          "tls://[::]:${toString (free.base + 98)}"
+        ];
+        multicastInterfaces = singleton {
+          Regex = ".*";
+          Beacon = true; Listen = true;
+          Port = free.base + 97; Priority = 0;
+        };
+      })
+    ];
 
     services.pipewire = {
       media-session = {
@@ -192,7 +203,12 @@ in {
       );
       firewall = lib.mkMerge [
         {
-          allowedTCPPorts = lib.mkIf config.services.openssh.enable config.services.openssh.ports;
+          allowedTCPPorts = mkMerge [
+            (lib.mkIf config.services.openssh.enable config.services.openssh.ports)
+            (mkIf (free.base != null && config.services.yggdrasil.enable) [
+              (free.base + 97) (free.base + 98) (free.base + 99)
+            ])
+          ];
           allowedUDPPortRanges = lib.mkIf config.services.mosh.enable [
             { inherit (config.services.mosh.ports) from to; }
           ];
