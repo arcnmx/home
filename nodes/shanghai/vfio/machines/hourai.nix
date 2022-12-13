@@ -12,7 +12,7 @@ in {
     default = true;
   };
   config = {
-    enable = true;
+    enable = mkDefault true;
     name = "hourai";
     virtio.enable = true;
     memory.sizeMB = 8 * 1024;

@@ -11,7 +11,7 @@ in {
       (mkIf config.disks.games-adata.enable disks.cow.windows-games-adata-kat.systemd.id)
       (mkIf config.disks.games-sn770.enable disks.cow.windows-games-sn770-kat.systemd.id)
     ];
-    enable = true;
+    enable = mkDefault true;
     name = "goliath";
     state.owner = "kat";
     virtio.enable = true;

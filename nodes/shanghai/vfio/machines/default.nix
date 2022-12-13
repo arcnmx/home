@@ -1,4 +1,10 @@
-{ pkgs, lib, config, ... }: with lib; {
+{ pkgs, lib, config, ... }: with lib; let
+  cowEnable = config.hardware.vfio.qemu.machines.hourai-nocow.enable;
+  toggleSharedDisks = { ... }: {
+    disks.games-adata.enable = cowEnable;
+    disks.games-sn770.enable = cowEnable;
+  };
+in {
   config = {
     hardware.vfio = {
       qemu.machines = rec {
@@ -18,16 +24,17 @@
           };
         };
         hourai3080 = { config, ... }: {
-          imports = [ ./hourai.nix ];
+          imports = [ ./hourai.nix toggleSharedDisks ];
           config = {
             vfio.gpu = "rtx3080";
           };
         };
         hourai1650 = { ... }: {
-          imports = [ ./hourai.nix ];
+          imports = [ ./hourai.nix toggleSharedDisks ];
           vfio.gpu = "gtx1650";
         };
         hourai-nocow = { ... }: {
+          enable = false;
           imports = [ hourai3080 ];
           scream.enable = false;
           hotplug.enable = false;
@@ -35,13 +42,13 @@
           disks.games-sn770.enable = false;
         };
         goliath1650 = { config, ... }: {
-          imports = [ ./goliath.nix ];
+          imports = [ ./goliath.nix toggleSharedDisks ];
           config = {
             vfio.gpu = "gtx1650";
           };
         };
         goliath3080 = { config, ... }: {
-          imports = [ ./goliath.nix ];
+          imports = [ ./goliath.nix toggleSharedDisks ];
           config = {
             vfio.gpu = "rtx3080";
           };
