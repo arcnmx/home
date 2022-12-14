@@ -38,7 +38,7 @@
       cmd_duration = {
         format = "[~$duration]($style)";
         style = "${bg} fg:${comment}";
-        show_notifications = config.services.dunst.enable || config.services.kdeconnect.enable;
+        show_notifications = mkIf false (config.services.dunst.enable || config.services.kdeconnect.enable);
       };
       directory = {
         truncation_length = 0;
