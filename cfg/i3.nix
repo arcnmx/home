@@ -201,6 +201,9 @@
         "${mod}+n" = "focus next";
         "${mod}+m" = "focus prev";
 
+        "${mod}+control+n" = "focus next sibling";
+        "${mod}+control+m" = "focus prev sibling";
+
         "${mod}+control+${left}" = "focus output left";
         "${mod}+control+${down}" = "focus output down";
         "${mod}+control+${up}" = "focus output up";
