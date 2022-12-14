@@ -303,14 +303,14 @@
           enableremote = mapAttrsToList (k: v: "${k}=${gitString v}") config.enableConfig;
           enableCommands = let
             trustCommand = {
-              "trusted" = "trust";
+              "trusted" = [ "trust" "--force" ];
               "semitrusted" = "semitrust";
               "untrusted" = "untrust";
               "dead" = "dead";
             }.${config.trust};
           in optionals (config.group != [ ]) (map (g: [ "git" "annex" "group" config.name g ]) config.group)
             ++ optional (config.wanted != null) [ "git" "annex" "wanted" config.name config.wanted ]
-            ++ optional (config.trust != null) [ "git" "annex" trustCommand config.name ];
+            ++ optional (config.trust != null) ([ "git" "annex" ] ++ toList trustCommand ++ [ config.name ]);
         };
       };
     });
@@ -917,7 +917,7 @@
           (mkIf (config.s3 != null) (mapAttrs (_: mkDefault) config.s3.gitConfig))
         ];
         out = let
-          remoteConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${name}.${k}") config.extraConfig);
+          remoteConfig = gitConfigCommands (mapAttrs' (k: nameValuePair "remote.${config.name}.${k}") config.extraConfig);
         in {
           setRepoResources = mkMerge [
             (mkIf (config.github != null) config.github.out.setRepoResources)
@@ -933,29 +933,29 @@
           };
           add =
             (if config.annex.enable then optional config.annex.enableRemote (
-              [ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote
+              [ "git" "annex" "enableremote" config.name ] ++ config.annex.out.enableremote
             ) ++ config.annex.out.enableCommands else [
-              [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
+              [ "git" "remote" "add" config.name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
-              [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
+              [ "git" "remote" "set-url" "--push" config.name config.out.cloneUrl.push ]
             ]) ++ remoteConfig;
           set =
-            []/*(if config.annex.enable then optional config.annex.enableRemote (
-              [ "git" "annex" "enableremote" name ] ++ config.annex.out.enableremote
+            (if config.annex.enable then optional config.annex.enableRemote (
+              [ "git" "annex" "enableremote" config.name ] ++ config.annex.out.enableremote
             ) ++ config.annex.out.enableCommands else [
-              [ "git" "remote" "set-url" name config.out.cloneUrl.fetch ]
+              [ "git" "remote" "set-url" config.name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
-              [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
-            ]) ++ remoteConfig*/;
+              [ "git" "remote" "set-url" "--push" config.name config.out.cloneUrl.push ]
+            ]) ++ remoteConfig;
           init =
             (if config.annex.enable then [
-              ([ "git" "annex" "initremote" name ] ++ builtins.head config.annex.out.initremote)
-            ] ++ map (ir: [ "git" "annex" "enableremote" name ] ++ ir) (builtins.tail config.annex.out.initremote)
+              ([ "git" "annex" "initremote" config.name ] ++ builtins.head config.annex.out.initremote)
+            ] ++ map (ir: [ "git" "annex" "enableremote" config.name ] ++ ir) (builtins.tail config.annex.out.initremote)
             ++ config.annex.out.enableCommands
             else [
-              [ "git" "remote" "add" name config.out.cloneUrl.fetch ]
+              [ "git" "remote" "add" config.name config.out.cloneUrl.fetch ]
             ] ++ optionals (config.out.cloneUrl.push != config.out.cloneUrl.fetch) [
-              [ "git" "remote" "set-url" "--push" name config.out.cloneUrl.push ]
+              [ "git" "remote" "set-url" "--push" config.name config.out.cloneUrl.push ]
             ]) ++ remoteConfig;
         };
       };
