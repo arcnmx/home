@@ -48,6 +48,7 @@ in {
           "media.eme.enabled" = true; # whee drm
           "gfx.webrender.all.qualified" = true;
           "gfx.webrender.all" = true;
+          "webgl.enable-draft-extensions" = true;
           "layers.acceleration.force-enabled" = true;
           "gfx.canvas.azure.accelerated" = true;
           "browser.ctrlTab.recentlyUsedOrder" = false;
