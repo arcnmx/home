@@ -130,6 +130,8 @@ in {
       "URxvt.boldItalicFont" = fontsTtf monospace (fontSize 9) ibold;
 
       "URxvt.keysym.C-minus" = commands (fontcommands fontsTamzen (dpiSize 7));
+      "URxvt.keysym.C-1" = commands (fontcommands fontsTamzen (dpiSize 8));
+      "URxvt.keysym.C-2" = commands (fontcommands (fontsTtf monospace) (fontSize 8));
       "URxvt.keysym.C-0" = commands (fontcommands (fontsTtf monospace) (fontSize 9));
       "URxvt.keysym.C-9" = commands (fontcommands (fontsTtf monospace) (fontSize 10));
       "URxvt.keysym.C-8" = commands (fontcommands (fontsTtf monospace) (fontSize 11));
