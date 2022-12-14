@@ -1,4 +1,4 @@
-{ ... }: {
+{ lib, ... }: with lib; {
   config = {
     boot = {
       loader = {
@@ -28,11 +28,6 @@
         device = "/mnt/efi/EFI/nixos";
         fsType = "none";
         options = ["bind"];
-      };
-      "/mnt/bigdata" = {
-        device = "/dev/disk/by-uuid/2354ffd4-67b6-49e6-90f1-22cc2a116ff1";
-        fsType = "btrfs";
-        options = [ "x-systemd.automount" "noauto" "rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "space_cache" "autodefrag" "subvol=/bigdata" "nofail" ];
       };
       "/" = {
         device = "/dev/disk/by-uuid/76b9ccba-7d5f-4ceb-b0aa-476c63ebb60f";
