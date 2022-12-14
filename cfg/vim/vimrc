@@ -9,7 +9,7 @@ set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set laststatus=1
-set colorcolumn=100
+set colorcolumn=80,100,120
 set scrolloff=4
 set linebreak showbreak=↪ " ↳
 set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
@@ -46,6 +46,8 @@ let g:vim_markdown_folding_disabled=1
 
 au BufRead,BufNewFile *.kt setlocal filetype=kotlin
 au BufRead,BufNewFile *.as setlocal filetype=javascript
+
+au FileType gitcommit setlocal colorcolumn=50,72
 
 xmap <M-C> y:call SendViaOSC52(getreg('"'))<cr>
 
