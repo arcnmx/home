@@ -26,6 +26,10 @@
       nixosModule = { name, config, meta, modulesPath, lib, ... }: with lib; {
         imports = [ ../nixos ];
         options.nixpkgs = {
+          path = mkOption {
+            type = types.path;
+            default = pkgs.path;
+          };
           crossOverlays = mkOption {
             type = types.listOf types.unspecified;
             default = [ ];
@@ -35,11 +39,16 @@
           nixpkgs = {
             system = mkDefault pkgs.system;
             pkgs = let
-              pkgsReval = import pkgs.path {
+              pkgsReval = import config.nixpkgs.path {
                 inherit (config.nixpkgs) config localSystem crossSystem crossOverlays;
                 inherit (meta.channels.config.nixpkgs) overlays;
               };
-            in mkDefault (if config.nixpkgs.config == pkgs.config && config.nixpkgs.localSystem.system == pkgs.buildPlatform.system && config.nixpkgs.crossSystem == null then pkgs else pkgsReval);
+              untouched =
+                config.nixpkgs.config == pkgs.config
+                && config.nixpkgs.localSystem.system == pkgs.buildPlatform.system
+                && config.nixpkgs.crossSystem == null
+                && config.nixpkgs.path == pkgs.path;
+            in mkDefault (if untouched then pkgs else pkgsReval);
             inherit (meta.channels.config.nixpkgs) config; # TODO: mkDefault?
           };
           nix = {
