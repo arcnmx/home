@@ -1,23 +1,35 @@
-{ base16, config, pkgs, lib, ... } @ args: with lib; {
+{ base16, nixosConfig, config, pkgs, lib, ... } @ args: with lib; {
   config = {
     home.shell.functions = {
-      bluenet = ''
-        ${config.systemd.package}/bin/systemctl start bluetooth
-        ${pkgs.connman}/bin/connmanctl enable bluetooth
-        ${pkgs.connman}/bin/connmanctl disable wifi
-        ${config.systemd.package}/bin/systemctl restart connman
-      '';
-      iosnet = ''
-        ${config.systemd.package}/bin/systemctl restart usbmuxd
-        ${pkgs.connman}/bin/connmanctl disable wifi
-        ${pkgs.connman}/bin/connmanctl disable bluetooth
+      bluenet = mkIf nixosConfig.hardware.bluetooth.enable (''
+        systemctl start bluetooth
+      '' + (if nixosConfig.services.connman.enable then ''
+        connmanctl enable bluetooth
+        connmanctl disable wifi
+        systemctl restart connman
+      '' else ''
+        rfkill unblock bluetooth
+        rfkill block wlan
+      ''));
+      iosnet = mkIf nixosConfig.services.usbmuxd.enable (''
+        systemctl restart usbmuxd
+      '' + (if nixosConfig.services.connman.enable then ''
+        connmanctl disable wifi
+        connmanctl disable bluetooth
+      '' else ''
+        rfkill block wlan
+        rfkill block bluetooth
+      '') + ''
         sleep 2.5
-        ${pkgs.connman}/bin/connmanctl connect ethernet_629316761e6d_cable
-      '';
-      winet = ''
-        ${pkgs.connman}/bin/connmanctl disable bluetooth
-        ${pkgs.connman}/bin/connmanctl enable wifi
-        ${pkgs.connman}/bin/connmanctl scan wifi
+        connmanctl connect ethernet_629316761e6d_cable
+      '');
+      winet = if nixosConfig.services.connman.enable then ''
+        connmanctl disable bluetooth
+        connmanctl enable wifi
+        connmanctl scan wifi
+      '' else ''
+        rfkill block bluetooth
+        rfkill unblock wlan
       '';
     };
 

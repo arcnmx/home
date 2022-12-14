@@ -231,12 +231,16 @@ in {
         KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", ATTR{index}=="0", ATTRS{idVendor}=="1d6c", ATTRS{idProduct}=="1278", ATTRS{manufacturer}=="YGTek", ATTRS{product}=="Webcam", ATTRS{serial}=="YG_U600D.4653_4K.2103121705", SYMLINK+="video-yg4k", TAG+="systemd"
         KERNEL=="video[0-9]*", SUBSYSTEM=="video4linux", ATTR{name}=="OBS Virtual Camera", SYMLINK+="video-obs", TAG+="systemd"
       '';
+      rfkill = ''
+        KERNEL=="rfkill", SUBSYSTEM=="misc", GROUP="input"
+      '';
     in ''
       ${devBoards}
       ${i2c}
       ${inputs}
       ${uinput}
       ${uvc}
+      ${rfkill}
     '';
     services.udev.packages = [
       pkgs.android-udev-rules

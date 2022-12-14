@@ -1,7 +1,10 @@
 { config, pkgs, lib, ... }: with lib; {
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
-    hardware.bluetooth.enable = true;
+    hardware.bluetooth = {
+      enable = true;
+      powerOnBoot = mkDefault false;
+    };
     hardware.display.dpms.standbyMinutes = mkDefault 5;
 
     # TODO: fill in wireless.networks or iwd.networks instead of using connman?
@@ -69,6 +72,31 @@
           ExecStop = mkIf config.services.connman.enable [
             "${pkgs.connman}/bin/connmanctl enable wifi"
             "${pkgs.connman}/bin/connmanctl scan wifi"
+          ];
+        };
+      };
+      bt-shutdown = rec {
+        enable = config.hardware.bluetooth.enable;
+        description = "block bluetooth on shutdown";
+        wantedBy = mkMerge [
+          [ "network.target" ]
+          (mkIf config.services.connman.enable [ "connman.service" ])
+        ];
+        bindsTo = wantedBy;
+        after = wantedBy;
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = [
+            "${pkgs.coreutils}/bin/true"
+          ];
+          ExecStop = mkMerge [
+            (mkIf config.services.connman.enable [
+              "${pkgs.connman}/bin/connmanctl disable bluetooth"
+            ])
+            (mkDefault [
+              "${pkgs.util-linux}/bin/rfkill block bluetooth"
+            ])
           ];
         };
       };
