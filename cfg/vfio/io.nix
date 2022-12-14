@@ -571,7 +571,7 @@
             RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
             OOMScoreAdjust = -150;
           } (mkIf (config.qmp.enable || qgaShutdown) {
-            ExecStop = pkgs.writeShellScript "vm-${config.name}-stop" ExecStop;
+            ExecStop = singleton (pkgs.writeShellScript "vm-${config.name}-stop" ExecStop);
             KillSignal = "SIGCONT"; # only signal if timeout occurs
             FinalKillSignal = "SIGTERM";
             TimeoutStopSec = "2m";
@@ -589,6 +589,7 @@
           unit = {
             wantedBy = mkIf (config.scream.mode == "ivshmem") [ config.systemd.id ];
             conflicts = mapAttrsToList (_: machine: machine.scream.systemd.id) (filterAttrs (_: machine: machine.scream.systemd.enable) sameMachines);
+            after = mkIf (config.scream.mode == "ivshmem") [ config.systemd.id ];
             unitConfig = {
               ConditionPathExists = mkIf (
                 config.scream.playback.backend == "pulse"
@@ -607,7 +608,14 @@
                   "PULSE_COOKIE=${nixosConfig.users.users.${config.scream.playback.user}.home}/.config/pulse/cookie"
                 ])
               ];
-              ExecStart = config.scream.playback.cli.command;
+              ExecStart = singleton config.scream.playback.cli.command;
+              ExecStartPre = mkIf (config.scream.mode == "ivshmem") [
+                (pkgs.writeShellScript "${config.scream.systemd.name}-pre" ''
+                  while [[ ! -e ${config.scream.ivshmem.path} ]]; do
+                    sleep 1
+                  done
+                '')
+              ];
             };
           };
         };
