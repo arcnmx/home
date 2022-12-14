@@ -1,4 +1,4 @@
-{ config, lib, ... }: with lib; let
+{ config, lib, inputs, ... }: with lib; let
   homeModule = { ... }: {
     config = {
       home = {
@@ -27,6 +27,7 @@ in {
   config.home = {
     extraModules = [ homeModule ];
     specialArgs = {
+      inherit inputs;
       nixos = config;
     };
   };
