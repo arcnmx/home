@@ -4,6 +4,7 @@
   openglPackages = pkgs: with pkgs; mkMerge [
     (mkIf opengl.opencl.enable [ rocm-opencl-icd rocm-opencl-runtime ])
     (mkIf (cfg.vulkan.driver == "amdvlk") [ amdvlk ])
+    (mkIf (cfg.driver == "amdgpu-pro" && (cfg.vaapi.enable || cfg.vdpau.enable) && pkgs ? amf-amdgpu-pro) [ amf-amdgpu-pro ])
   ];
 in {
   options = with types; {
