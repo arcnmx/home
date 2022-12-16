@@ -58,7 +58,6 @@ in {
       {
         grep = "grep --color=auto";
 
-        make = "make -j$(cpucount)";
         clear = "clear && printf '\\e[3J'";
         bell = "tput bel";
       }
@@ -67,11 +66,6 @@ in {
       # helper for use with `nix -I $(nixpkgs unstable)`
       nixpkgs = ''
         echo "nixpkgs=https://nixos.org/channels/$1/nixexprs.tar.xz"
-      '';
-      cpucount = if pkgs.hostPlatform.isDarwin then ''
-        sysctl -n hw.logicalcpu_max
-      '' else ''
-        ${pkgs.coreutils}/bin/nproc 2> /dev/null || ${pkgs.coreutils}/bin/grep -c '^processor' /proc/cpuinfo
       '';
       prargs = ''
         printf '"%b"\n' "$0" "$@" | ${pkgs.coreutils}/bin/nl -v0 -s": "
