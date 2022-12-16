@@ -27,6 +27,8 @@ set cmdheight=2 updatetime=300 shortmess+=c
 
 set hidden " allow buffer switching without saving
 
+set mouse=v
+
 syntax on
 let g:EditorConfig_exclude_patterns = ['fugitive://.\*']
 
