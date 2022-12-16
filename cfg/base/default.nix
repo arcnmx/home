@@ -61,6 +61,7 @@ in {
         coreutils
         iproute2
       ] ++ lib.optionals (!config.home.minimalSystem) [
+        iotop iftop nix-top
         bind.dnsutils
         config.home.profileSettings.base.duc
       ];
