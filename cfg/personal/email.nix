@@ -74,6 +74,8 @@ in {
         password.entry = "arcnmx/google";
         notmuch.tag = "arcnmx";
         lieer.remoteTranslations = {
+          "Notifications/Tasks" = "tasks";
+          "Notifications/Social" = "social";
           "Notifications/Twitch" = "twitch";
           "Notifications/CI" = "ci";
           "Twitter" = "twitter";
@@ -98,7 +100,7 @@ in {
     in {
       enable = mkDefault true;
       new.tags = [ "new" ];
-      search.excludeTags = [ "deleted" "trash" "spam" "junk" "draft" "twitter" ];
+      search.excludeTags = [ "deleted" "trash" "spam" "junk" "draft" ];
       hooks.new = {
         notify = mkDefault (config.services.dunst.enable || config.services.kdeconnect.enable);
       };

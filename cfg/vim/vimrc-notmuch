@@ -82,12 +82,12 @@ augroup notmuch_arc
   autocmd FileType notmuch-search,notmuch-show nmap <silent> <buffer> t
   \ :call g:NotmuchTag('')<CR>
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> a
-  \ :call g:NotmuchTag('-flagged -unread -later')<CR>
+  \ :call g:NotmuchTag('-flagged -unread -later -notif -social')<CR>
   autocmd FileType notmuch-folders,notmuch-search,notmuch-show nmap <buffer> I
   \ :call g:NotmuchTag('-unread')<CR>
   " TODO: bind `A` to untag too?
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> O
-  \ :call g:NotmuchTag('+later -unread +flagged')<CR>
+  \ :call g:NotmuchTag('+later -unread +flagged -notif -social')<CR>
   autocmd FileType notmuch-search,notmuch-show nmap <buffer> d
   \ :call g:NotmuchTag('+deleted +trash -flagged -unread')<CR>
 
