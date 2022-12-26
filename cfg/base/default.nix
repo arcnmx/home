@@ -48,7 +48,7 @@ in {
 
     fonts.fontconfig.enable = lib.mkDefault false;
 
-    time.timeZone = "America/Vancouver";
+    time.timeZone = mkDefault "America/Vancouver";
 
     programs.zsh = {
       promptInit = lib.mkForce "";
