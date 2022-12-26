@@ -267,13 +267,16 @@ in {
       matrix-synapse.enable = true;
       matrix-appservices = {
         mautrix-googlechat.enable = true;
+        mautrix-telegram.enable = false;
         mx-puppet-discord.enable = true;
         mautrix-whatsapp.enable = true;
         #matrix-appservice-irc.enable = true;
       };
     };
     systemd.services.mx-puppet-discord.serviceConfig.Restart = "on-failure";
-    system.mutableState.services.mautrix-googlechat.restore.enable = false; # XXX: re-enable on a redeploy
     home.profileSettings.gensokyo.frontpage = true;
+    # XXX: re-enable on a redeploy
+    system.mutableState.services.mautrix-googlechat.restore.enable = false;
+    system.mutableState.services.mautrix-telegram.restore.enable = false;
   };
 }

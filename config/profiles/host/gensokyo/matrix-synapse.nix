@@ -125,6 +125,22 @@ in {
             };
           };
         };
+        mautrix-telegram = {
+          binding = bindings.mautrix-telegram;
+          registration.pushEphemeral = true;
+          logging.root.handlers = [ "console" ];
+          bridge = {
+            displayname_template = "{displayname}";
+            permissions = {
+              "@arc:${config.services.matrix-synapse.settings.server_name}" = "admin";
+            };
+            relaybot.whitelist = [ "arcnmx" ];
+            backfill = {
+              double_puppet_backfill = true;
+              unread_hours_threshold = -1;
+            };
+          };
+        };
         mx-puppet-discord = {
           package = pkgs.mx-puppet-discord-develop;
           binding = bindings.mx-puppet-discord;
@@ -236,6 +252,9 @@ in {
         };
         mautrix-googlechat = {
           port = 32064;
+        };
+        mautrix-telegram = {
+          port = 32066;
         };
         mx-puppet-discord = {
           port = 32065;
