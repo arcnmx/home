@@ -4,6 +4,7 @@ let
   inherit (config.deploy.tf.import) common;
 in {
   imports = [
+    ./opengl.nix
     ./base16.nix
     ./personal.nix
     ./systemd2mqtt.nix

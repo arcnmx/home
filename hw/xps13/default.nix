@@ -8,8 +8,6 @@ in {
   ];
 
   config = {
-    home.profileSettings.intel.graphics.enable = true;
-
     home-manager.users.arc = { ... }: {
       imports = [ ./home.nix ];
     };
@@ -23,27 +21,30 @@ in {
       ];
     };
 
-    # boot.kernelParams = ["i915.enable_execlists=0"]; # try if getting freezes
-    # boot.kernelParams = ["i915.enable_psr=1"]; # try for powersaving
-    # boot.kernelParams = ["intel_idle.max_cstate=1"]; # try to fix baytrail freeze?
-
-    hardware.display = {
-      enable = true;
-      monitors = {
-        internal = {
-          output = "eDP1";
-          xserver.sectionName = "Monitor[0]";
-          primary = true;
-          width = 1920;
-          height = 1080;
-          size = {
-            diagonal = 13.3;
-            width = 292;
-            height = 165;
-          };
+    hardware = {
+      cpu = {
+        info = {
+          modelName = "Intel(R) Core(TM) i5-5200U CPU @ 2.20GHz";
         };
       };
-      dpi = config.hardware.display.monitors.internal.dpi.out.dpi;
+      display = {
+        enable = true;
+        monitors = {
+          internal = {
+            output = "eDP1";
+            xserver.sectionName = "Monitor[0]";
+            primary = true;
+            width = 1920;
+            height = 1080;
+            size = {
+              diagonal = 13.3;
+              width = 292;
+              height = 165;
+            };
+          };
+        };
+        dpi = config.hardware.display.monitors.internal.dpi.out.dpi;
+      };
     };
 
     services.xserver = {
@@ -54,13 +55,6 @@ in {
           DisplaySize ${toString (292 * config.hardware.display.dpiScale)} ${toString (165 * config.hardware.display.dpiScale)} # millimeters
         '';
       }];
-      videoDrivers = ["intel"];
-      deviceSection = ''
-        Option "TearFree" "true"
-        #Option "AccelMethod" "uxa"
-      '';
-      #videoDrivers = ["modesetting"]; # TODO: modern suggestion is to use this instead?
-      #useGlamor = true; # TODO: good idea or no? alternative 2d accel to uxa/sna/etc
 
       synaptics = {
         enable = true;

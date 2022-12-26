@@ -37,7 +37,7 @@
       };
       arc = {
         isNormalUser = true;
-        extraGroups = [ "wheel" "builders" "kvm" "video" "audio" ] ++ lib.optional config.virtualisation.docker.enable "docker";
+        extraGroups = [ "wheel" "builders" "kvm" "video" "render" "audio" ] ++ lib.optional config.virtualisation.docker.enable "docker";
         shell = pkgs.zsh;
         uid = 1000;
       };

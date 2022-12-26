@@ -3,7 +3,7 @@
   windowsGames = [ "windows-games-adata" "windows-games-sn770" ];
 in {
   config = {
-    home.profileSettings.nvidia.dynamicBinding = true;
+    hardware.nvidia.dynamicBinding = true;
     hardware.vfio = {
       devices = {
         rtx3080 = {
