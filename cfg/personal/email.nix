@@ -100,7 +100,7 @@ in {
       new.tags = [ "new" ];
       search.excludeTags = [ "deleted" "trash" "spam" "junk" "draft" "twitter" ];
       hooks.new = {
-        notify = mkDefault true;
+        notify = mkDefault (config.services.dunst.enable || config.services.kdeconnect.enable);
       };
       hooks.postNew = mkMerge [
         (mkBefore ''

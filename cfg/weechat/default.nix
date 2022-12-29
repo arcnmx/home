@@ -35,9 +35,11 @@
       weechat-matrix
       vimode-develop
       weechat-go buffer_autoset unread_buffer
-      highmon weechat-notify-send
+      highmon
       auto_away colorize_nicks urlgrab
       emoji
+    ] ++ optionals (config.services.dunst.enable || config.services.kdeconnect.enable) [
+      weechat-notify-send
     ];
     init = mkMerge [
       # make a new split window for highmon
