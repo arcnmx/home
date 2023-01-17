@@ -1,4 +1,4 @@
-{ tf, pkgs, options, config, lib, ... }: with lib; let
+{ tf, inputs, pkgs, options, config, lib, ... }: with lib; let
   c1 = ''\e[22;34m'';
   c2 = ''\e[1;35m'';
   nixos = [
@@ -283,9 +283,10 @@ in {
       logLevel = mkDefault 3;
       policy.roles.enable = mkDefault true;
       service.moduleDir = let
+        wireplumber-scripts-arc = pkgs.callPackage (inputs.wireplumber-scripts.outPath + "/derivation.nix") { };
         modules = pkgs.symlinkJoin {
           name = "wireplumber-modules";
-          paths = [ pkgs.wireplumber pkgs.wireplumber-scripts-arc ];
+          paths = [ pkgs.wireplumber wireplumber-scripts-arc ];
         };
       in "${modules}/lib/wireplumber-${versions.majorMinor pkgs.wireplumber.version}";
     };

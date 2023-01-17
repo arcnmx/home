@@ -152,7 +152,8 @@
         "rust": "rust",
         "std": "std",
         "systemd2mqtt": "systemd2mqtt",
-        "tf": "tf"
+        "tf": "tf",
+        "wireplumber-scripts": "wireplumber-scripts"
       }
     },
     "rust": {
@@ -247,6 +248,32 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "wireplumber-scripts": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust": [
+          "rust"
+        ]
+      },
+      "locked": {
+        "lastModified": 1673979448,
+        "narHash": "sha256-B+f/Op8Hxf1lSH8O/k3nVtbkIFuXLPoJn9zVauut8wo=",
+        "owner": "arcnmx",
+        "repo": "wireplumber-scripts",
+        "rev": "2bfc8d05ea61047abac5bf50234afde794635909",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "repo": "wireplumber-scripts",
         "type": "github"
       }
     }

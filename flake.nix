@@ -28,6 +28,14 @@
       url = "github:arcnmx/qemucomm";
       flake = false;
     };
+    wireplumber-scripts = {
+      url = "github:arcnmx/wireplumber-scripts";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        rust.follows = "rust";
+        flakelib.follows = "flakelib";
+      };
+    };
     systemd2mqtt = {
       url = "github:arcnmx/systemd2mqtt";
       inputs = {
