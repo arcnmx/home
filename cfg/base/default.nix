@@ -176,7 +176,6 @@ in {
         username = mkDefault "systemd";
       };
     };
-    services.wireplumber.enable = lib.mkDefault false;
     services.mosh.ports = lib.mkIf (free.base != null) {
       from = lib.mkDefault (free.base + 600);
       to = lib.mkDefault (free.base + 700);

@@ -319,7 +319,10 @@ in
         };
       };
     };
-    services.wireplumber.alsa.migrateMediaSession = mkDefault true;
+    services.wireplumber = {
+      enable = mkDefault config.services.pipewire.enable;
+      alsa.migrateMediaSession = mkDefault true;
+    };
     hardware.pulseaudio = {
       enable = false;
       daemon.config = {
