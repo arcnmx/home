@@ -255,10 +255,12 @@ in {
 
     services.usbmuxd.enable = true;
     services.openssh = {
-      passwordAuthentication = true;
       startWhenNeeded = true;
       forwardX11 = true;
-      permitRootLogin = "yes"; # "prohibit-password"
+      settings = {
+        PasswordAuthentication = true;
+        PermitRootLogin = "yes"; # "prohibit-password"
+      };
     };
     services.tailscale = {
       trust = mkDefault true;

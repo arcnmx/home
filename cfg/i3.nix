@@ -133,7 +133,8 @@
         ];
       };
       focus = {
-        forceWrapping = true;
+        wrapping = "workspace"; # slightly annoying, but I'll get used to it...
+        #wrapping = "yes";
       };
       window = {
         hideEdgeBorders = "smart";

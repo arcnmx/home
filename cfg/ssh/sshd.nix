@@ -13,17 +13,16 @@ in {
     startWhenNeeded = mkDefault false;
     allowSFTP = true;
     gatewayPorts = "yes";
-    kbdInteractiveAuthentication = false;
-    passwordAuthentication = mkDefault false;
-    useDns = false;
-    extraConfig = ''
-      MaxSessions 100
-      AllowAgentForwarding yes
-      AllowTcpForwarding yes
-      PrintMotd no
-      PermitUserEnvironment yes
-      Compression yes
-      PermitTunnel yes
-    '';
+    settings = {
+      KbdInteractiveAuthentication = false;
+      PasswordAuthentication = mkDefault false;
+      UseDns = false;
+      MaxSessions = 100;
+      AllowAgentForwarding = true;
+      AllowTcpForwarding = true;
+      PermitUserEnvironment = true;
+      Compression = true;
+      PermitTunnel = true;
+    };
   };
 }
