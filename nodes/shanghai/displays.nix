@@ -30,6 +30,7 @@
     } // _4k;
     lg = { config, ... }: {
       imports = [ defaults.common ];
+      enable = false;
       output = mkDefault "DP-2";
       edid = mapAttrs (_: mkDefault) {
         manufacturer = "GSM";
@@ -98,5 +99,5 @@
   };
 in {
   monitors = layouts;
-  default = layouts.stacked;
+  default = layouts.gaming;
 }
