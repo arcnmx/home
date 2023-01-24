@@ -55,6 +55,23 @@ in {
             before = [ "display-manager.service" "nvidia-x11.service" ];
           };
         };
+        hostusb-root = {
+          vendor = "1022";
+          product = "1485";
+          host = "0000:11:00.0";
+          vfio.unit = rec {
+            wantedBy = [ cfg.devices.hostusb.vfio.id ];
+            bindsTo = wantedBy;
+          };
+        };
+        hostusb = {
+          enable = true;
+          vendor = "1022";
+          product = "149c";
+          subvendor = "1458";
+          subproduct = "5007";
+          host = "0000:11:00.3";
+        };
       };
       usb.devices = {
         svse5 = {

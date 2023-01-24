@@ -91,6 +91,11 @@ in {
       enable = config.vfio.gpu == "rtx3080";
       sizeMB = if config.lookingGlass.vertical then 256 else 128;
     };
+    vfio.devices = {
+      hostusb = {
+        enable = false;
+      };
+    };
     netdevs = {
       hostnet0.settings = {
         type = "bridge";

@@ -14,6 +14,7 @@
     vserial0 = "0xc";
     natnet0 = "0xd";
     bridge = "0xe";
+    hostusb = "0xf";
   };
   iothreads = { config, ... }: {
     config.objects = listToAttrs (genList (i: nameValuePair "io${toString i}" {
