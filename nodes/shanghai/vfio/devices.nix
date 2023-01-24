@@ -66,6 +66,7 @@ in {
           };
         };
         hostusb = {
+          # CPU USB Controller
           enable = true;
           vendor = "1022";
           product = "149c";
@@ -110,6 +111,26 @@ in {
         naga2014 = {
           vendor = "1532";
           product = "0040";
+        };
+        oculus-sensor = {
+          vendor = "2833";
+          product = "0211";
+        };
+        oculus-audio = {
+          vendor = "2833";
+          product = "0330";
+        };
+        oculus-hub3 = {
+          vendor = "2833";
+          product = "3031";
+        };
+        oculus-hub2 = {
+          vendor = "2833";
+          product = "2031";
+        };
+        oculus-headset = {
+          vendor = "2833";
+          product = "0031";
         };
         arctis7p-plus = {
           vendor = "1038";

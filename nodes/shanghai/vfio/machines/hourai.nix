@@ -84,6 +84,11 @@ in {
       xpad.enable = true;
       nagatrinity.enable = false;
       shift.enable = false;
+      oculus-sensor.enable = true;
+      oculus-audio.enable = true;
+      oculus-hub2.enable = false;
+      oculus-hub3.enable = false;
+      oculus-headset.enable = true;
     };
     spice.usb.enable = true;
     lookingGlass = {
@@ -92,7 +97,7 @@ in {
     };
     vfio.devices = {
       hostusb = {
-        enable = false;
+        inherit (nixosConfig.hardware.vfio.devices.hostusb) enable;
       };
     };
     netdevs = {
