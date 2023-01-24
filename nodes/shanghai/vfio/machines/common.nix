@@ -27,7 +27,7 @@
         usb3.settings = {
           driver = "qemu-xhci";
           p3 = 8;
-          p2 = 8;
+          p2 = 16;
         };
       };
     };

@@ -259,6 +259,14 @@
       product = mkOption {
         type = types.strMatching "[0-9a-f]{4}";
       };
+      subvendor = mkOption {
+        type = types.nullOr (types.strMatching "[0-9a-f]{4}");
+        default = null;
+      };
+      subproduct = mkOption {
+        type = types.nullOr (types.strMatching "[0-9a-f]{4}");
+        default = null;
+      };
       unbindVts = mkEnableOption "unbind-vts";
       host = mkOption {
         type = with types; nullOr str;
@@ -427,7 +435,8 @@
         type = types.strMatching "[0-9a-f]{4}";
       };
       product = mkOption {
-        type = types.strMatching "[0-9a-f]{4}";
+        type = types.nullOr (types.strMatching "[0-9a-f]{4}");
+        default = null;
       };
       permission = mkOption {
         type = permissionType;
@@ -448,7 +457,7 @@
         (mkBefore ''SUBSYSTEM=="usb"'')
         (mkBefore ''ACTION=="add"'')
         ''ATTR{idVendor}=="${config.vendor}"''
-        ''ATTR{idProduct}=="${config.product}"''
+        (mkIf (config.product != null) ''ATTR{idProduct}=="${config.product}"'')
       ] ++ (map mkAfter (udevPermission config.permission)));
     };
   };
@@ -648,6 +657,10 @@ in {
       vfio-pci = let
         vfio-pci-ids = mapAttrsToList (_: dev:
           "${dev.vendor}:${dev.product}"
+          + optionalString (dev.subvendor != null) (
+            ":${dev.subvendor}"
+            + optionalString (dev.subproduct != null) ":${dev.subproduct}"
+          )
         ) (filterAttrs (_: dev: (dev.enable && !dev.reserve)) cfg.devices);
       in mkIf (vfio-pci-ids != [ ]) {
         options.ids = concatStringsSep "," vfio-pci-ids;

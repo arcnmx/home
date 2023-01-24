@@ -20,7 +20,7 @@
         default = hostDevices.${config.name}.vendor;
       };
       product = mkOption {
-        type = types.strMatching "[0-9a-f]{4}";
+        type = types.nullOr (types.strMatching "[0-9a-f]{4}");
         default = hostDevices.${config.name}.product;
       };
       device = mkOption {
@@ -34,7 +34,8 @@
         settings = mapAttrs (_: mkDefault) {
           driver = "usb-host";
           vendorid = "0x${config.vendor}";
-          productid = "0x${config.product}";
+        } // {
+          productid = mkIf (config.product != null) (mkDefault "0x${config.product}");
         };
       };
     };
