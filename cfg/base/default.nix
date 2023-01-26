@@ -83,7 +83,7 @@ in {
       ];
       kernel = {
         customBuild = lib.mkMerge [
-          (lib.mkDefault config.boot.kernel.bleedingEdge)
+          (lib.mkDefault (config.boot.kernel.bleedingEdge || config.deploy.personal.enable))
           # actions provides way too little disk space for compiling a kernel
           (lib.mkIf (builtins.getEnv "CI_PLATFORM" == "gh-actions") (lib.mkForce false))
         ];
