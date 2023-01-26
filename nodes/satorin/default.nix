@@ -19,8 +19,6 @@
     systemd.watchdog.enable = false;
     hardware.cpu.info.cores = 2;
 
-    boot.kernel.bleedingEdge = true;
-
     hardware.display = {
       monitors.internal.dpi.target = 96 * 2;
       fontScale = 0.95;

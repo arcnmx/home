@@ -6,7 +6,6 @@
     boot = {
       kernel = {
         arch = mkDefault "znver2";
-        bleedingEdge = mkDefault true;
       };
       modprobe.modules = {
         acpi_cpufreq.blacklist = true;
