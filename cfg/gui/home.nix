@@ -50,7 +50,6 @@ in {
         executable = true;
         text = ''
           #!${pkgs.bash}/bin/bash
-          ${pkgs.xorg.xrdb}/bin/xrdb -merge ~/.Xresources
           . ~/.xsession
         '';
       };
