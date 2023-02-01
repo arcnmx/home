@@ -289,8 +289,10 @@ in {
         wireplumber-scripts-arc = pkgs.callPackage (inputs.wireplumber-scripts.outPath + "/derivation.nix") { };
         modules = pkgs.symlinkJoin {
           name = "wireplumber-modules";
-          paths = [ pkgs.wireplumber wireplumber-scripts-arc ];
+          paths = singleton pkgs.wireplumber
+          ++ optional needsScripts wireplumber-scripts-arc;
         };
+        needsScripts = any (c: hasPrefix "libwpscripts_" c.name) config.services.wireplumber.components;
       in "${modules}/lib/wireplumber-${versions.majorMinor pkgs.wireplumber.version}";
     };
     services.physlock.enable = true;
