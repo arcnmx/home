@@ -31,7 +31,7 @@ in {
         private_key_pem = resources.secureboot_key.refAttr "private_key_pem";
 
         subject = {
-          common_name = "secureboot.${networking.hostName}.${networking.domain}";
+          common_name = "secureboot.${networking.fqdn}";
           organization = "arcnmx";
           organizational_unit = "secureboot";
         };

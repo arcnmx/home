@@ -16,7 +16,7 @@
         private_key_pem = resources.taskserver_client_key.refAttr "private_key_pem";
 
         subject = {
-          common_name = "${networking.hostName}.${networking.domain}";
+          common_name = networking.fqdn;
           organization = "arcnmx";
           organizational_unit = "taskserver";
         };

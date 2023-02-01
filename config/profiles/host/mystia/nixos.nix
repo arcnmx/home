@@ -62,7 +62,7 @@
           type = "droplet";
           inputs = {
             image = tf.resources.image.refAttr "image";
-            name = "${config.networking.hostName}.${config.networking.domain}";
+            name = config.networking.fqdn;
             region = "tor1";
             #region = "sfo2";
             size = "s-1vcpu-2gb";

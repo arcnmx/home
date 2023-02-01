@@ -18,7 +18,7 @@ in {
   config = {
     deploy.tf = let
       inherit (config.home.profileSettings.gensokyo) zone;
-      domain = removeSuffix zone "${config.networking.hostName}.${config.networking.domain}";
+      domain = removeSuffix zone config.networking.fqdn;
     in {
       dns.records = mkIf (zone != null) {
         local_a = mkIf config.deploy.network.local.hasIpv4 {

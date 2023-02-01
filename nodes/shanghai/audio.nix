@@ -176,7 +176,7 @@ in {
       user = "arc";
       targetDevice = "Bedroom Speakers";
       url = let
-        host = networking.hostName + optionalString (networking.domain != null) ".${networking.domain}";
+        host = networking.fqdnOrHostName;
         port = networking.firewall.free.base + 101;
       in "http://${host}:${toString port}";
     };
