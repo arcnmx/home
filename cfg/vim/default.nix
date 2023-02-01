@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @ args: with lib; let
+{ nixosConfig, config, pkgs, lib, ... } @ args: with lib; let
   vimPlugins = with pkgs.vimPlugins; [
     vim-cool
     vim-ledger
@@ -67,6 +67,7 @@ in {
       } else pkgs.vim_configurable-pynvim;
   };
   programs.neovim = {
+    enable = mkDefault (nixosConfig.deploy.personal.enable || config.home.minimalSystem);
     vimAlias = !config.programs.vim.enable;
     vimdiffAlias = true;
     plugins = vimPlugins;
