@@ -150,9 +150,9 @@ in {
     home.shell.aliases = {
       konawall = mkIf config.services.konawall.enable "systemctl --user restart konawall.service";
       chrome = mkIf (!config.programs.google-chrome.enable && !config.programs.chromium.enable)
-        "nix shell --impure nixpkgs-big#google-chrome -c google-chrome-stable";
+        "nix shell --impure --builders '' nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
-      parsec = "nix run --impure nixpkgs#parsec-bin";
+      parsec = "nix run --impure --builders '' nixpkgs#parsec-bin";
       pavucontrol = "nix run nixpkgs#pavucontrol";
     };
     home.shell.functions = {
