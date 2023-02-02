@@ -18,7 +18,9 @@
       SystemMaxUse=3G
     '';
 
-    fileSystems = {
+    fileSystems = let
+      wdauto = [ "x-systemd.automount" "x-systemd.mount-timeout=2m" "x-systemd.idle-timeout=30m" "noauto" ];
+    in {
       "/nix" = {
         device = "/dev/disk/by-uuid/a82e1a40-e0e5-4461-a29d-42caf5a502b6";
         fsType = "xfs";
@@ -71,22 +73,22 @@
       "/mnt/wdarchive" = {
         device = "/dev/disk/by-uuid/da37f8cd-9934-4d08-b0cf-a4d5ead43454";
         fsType = "ext4";
-        options = [ "x-systemd.automount" "noauto" ];
+        options = wdauto;
       };
       "/mnt/wdworking" = {
         device = "/dev/disk/by-uuid/64629b8d-8eae-4a00-87b2-d3fe2763cf34";
         fsType = "ext4";
-        options = [ "x-systemd.automount" "noauto" ];
+        options = wdauto;
       };
       "/mnt/wdmisc" = {
         device = "/dev/disk/by-uuid/d2c686b4-b7e1-4866-a8e9-efaa7964cbe5";
         fsType = "ext4";
-        options = [ "x-systemd.automount" "noauto" ];
+        options = wdauto;
       };
       "/mnt/wdtemp" = {
         device = "/dev/disk/by-uuid/56ea5e87-7344-4eeb-bf1a-166f174c9904";
         fsType = "ext4";
-        options = [ "x-systemd.automount" "noauto" ];
+        options = wdauto;
       };
     };
     swapDevices = [
