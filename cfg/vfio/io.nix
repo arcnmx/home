@@ -120,6 +120,7 @@
           User = mkIf (config.user != null) (mkDefault config.user);
           Type = mkDefault config.type;
           RemainAfterExit = mkIf (config.type == "oneshot") (mkDefault true);
+          TimeoutSec = mkIf (config.type == "oneshot") (mkDefault 180);
         };
       };
     };

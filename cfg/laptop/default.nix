@@ -73,6 +73,7 @@
             "${pkgs.connman}/bin/connmanctl enable wifi"
             "${pkgs.connman}/bin/connmanctl scan wifi"
           ];
+          TimeoutSec = 30;
         };
       };
       bt-shutdown = rec {
@@ -98,6 +99,7 @@
               "${pkgs.util-linux}/bin/rfkill block bluetooth"
             ])
           ];
+          TimeoutSec = 10;
         };
       };
     };

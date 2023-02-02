@@ -193,6 +193,7 @@ in {
           "${pkgs.coreutils}/bin/rm -f /dev/disk/${windows-games}-arc"
           "${pkgs.coreutils}/bin/chown root ${cfg.disks.mapped.${windows-games}.path}"
         ];
+        TimeoutSec = 5;
       };
     });
     security.polkit.users = {

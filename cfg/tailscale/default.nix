@@ -68,6 +68,7 @@ in {
           RemainAfterExit = true;
           ExecStart = ''${cfg.package}/bin/tailscale up --auth-key file:${config.secrets.files.tailnet-activation.path}'';
           ExecStartPost = ''${pkgs.coreutils}/bin/touch ${loginState}'';
+          TimeoutSec = 60;
         };
       };
       secrets.files.tailnet-activation = {

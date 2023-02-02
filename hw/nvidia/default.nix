@@ -89,6 +89,7 @@ in {
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
+          TimeoutSec = 15;
         };
       };
       display-manager = mkIf config.services.xserver.enable rec {
