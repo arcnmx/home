@@ -23,9 +23,9 @@
     #lock = "${pkgs.physlock}/bin/physlock -dms";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
     sleep = "${pkgs.coreutils}/bin/sleep";
-    dpms-off = if nixosConfig.services.dpms-standby.enable
-      then "${nixosConfig.services.dpms-standby.control} start"
-      else "${getExe pkgs.xorg.xset}/bin/xset dpms force off";
+    dpms-off = if config.services.dpms-standby.enable
+      then "${config.services.dpms-standby.control} start"
+      else "${getExe pkgs.xorg.xset} dpms force off";
     pactl = "${config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio}/bin/pactl";
     playerctl = "${config.services.playerctld.package}/bin/playerctl";
     pkill = "${pkgs.procps}/bin/pkill";

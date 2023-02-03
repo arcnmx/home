@@ -1,5 +1,5 @@
-{ pkgs, config, lib, ... }: with lib; let
-  inherit (config.services) xserver;
+{ pkgs, nixosConfig, options, config, lib, ... }@args: with lib; let
+  inherit (nixosConfig.services) xserver;
   cfg = config.services.dpms-standby;
   checkIdle = if cfg.checkIdle then ''
     if [[ $(${getExe pkgs.xprintidle}) -lt $DPMS_INTERVAL_MS ]]; then
@@ -14,7 +14,7 @@
       ${checkIdle}
     done
   '';
-  service = pkgs.writeShellScript "dpms-start.sh" ''
+  start = pkgs.writeShellScript "dpms-start.sh" ''
     set -eu
 
     POINTER_IDS=$(${getExe pkgs.xorg.xinput} --list --short |
@@ -39,7 +39,7 @@
   stop = pkgs.writeShellScript "dpms-stop.sh" ''
     set -eu
 
-    POINTER_IDS=$(cat $RUNTIME_DIRECTORY/pointers)
+    POINTER_IDS=$(${pkgs.coreutils}/bin/cat $RUNTIME_DIRECTORY/pointers)
 
     ${getExe pkgs.xorg.xset} dpms force on
 
@@ -48,20 +48,56 @@
         echo "WARN: failed to enable xinput id=$pointer" >&2
     done
   '';
+  control = pkgs.writeShellScript "dpms-standby-control" ''
+    set -eu
+    ${nixosConfig.systemd.package}/bin/systemctl ${optionalString isHome "--user"} "$1" dpms-standby.service
+  '';
+  isHome = options ? home.homeDirectory;
+  nixosConfig = if isHome then args.nixosConfig else config;
+  homeSkel = isHome && nixosConfig.services.dpms-standby.enable;
+  Environment = [
+    "DPMS_INTERVAL=${toString cfg.pollInterval}"
+    "DPMS_INTERVAL_MS=${toString (floor (cfg.pollInterval * 1000))}"
+  ];
+  service = rec {
+    requisite = mkIf (xserver.enable && !xserver.displayManager.startx.enable) [ "display-manager.service" ];
+    bindsTo = requisite;
+    after = requisite;
+    serviceConfig = {
+      Type = "forking";
+      RuntimeDirectory = "dpms-standby";
+      ExecStart = [ "${start}" ];
+      ExecStop = [ "${stop}" ];
+      User = mkIf (cfg.user != null) cfg.user;
+      Environment = mkMerge [
+        Environment
+        (mkIf xserver.enable (
+          optional (xserver.staticDisplay != null) "DISPLAY=:${toString xserver.staticDisplay}"
+          ++ optional (xserver.authority != null) "XAUTHORITY=${xserver.authority}"
+        ))
+      ];
+    };
+  };
+  homeService = {
+    Unit = rec {
+      Requisite = [ "graphical-session.target" ];
+      BindsTo = Requisite;
+    };
+    Service = {
+      inherit Environment;
+      inherit (service.serviceConfig)
+        Type RuntimeDirectory
+        ExecStart ExecStop
+      ;
+    };
+  };
 in {
   options.services.dpms-standby = with types; {
-    enable = mkEnableOption "DPMS standby";
-    display = mkOption {
-      type = nullOr int;
-      default = 0;
-    };
-    user = mkOption {
-      type = nullOr str;
-      default = null;
-    };
-    xauthority = mkOption {
-      type = nullOr path;
-      default = null;
+    enable = mkEnableOption "DPMS standby" // {
+      default = if homeSkel then true else (nixosConfig.hardware.display.dpms.enable && (if isHome
+        then config.xsession.enable
+        else xserver.enable && !xserver.displayManager.startx.enable
+      ));
     };
     pollInterval = mkOption {
       type = float;
@@ -73,35 +109,27 @@ in {
     };
     control = mkOption {
       type = package;
-      default = pkgs.writeShellScript "dpms-standby-control" ''
-        set -eu
-        ${config.systemd.package}/bin/systemctl "$1" dpms-standby.service
-      '';
+      default = if homeSkel
+        then nixosConfig.services.dpms-standby.control
+        else control;
+    };
+  } // optionalAttrs (!isHome) {
+    user = mkOption {
+      type = nullOr str;
+      default = null;
     };
   };
 
-  config.services.dpms-standby = {
-    xauthority = mkMerge [
-      (mkIf xserver.displayManager.lightdm.enable (mkDefault
-        "/var/run/lightdm/root/:${toString cfg.display}"
-      ))
-    ];
-    display = mkIf (xserver.display != null) xserver.display;
-  };
-  config.systemd.services.dpms-standby = mkIf cfg.enable rec {
-    requisite = mkIf (!xserver.displayManager.startx.enable) [ "display-manager.service" ];
-    bindsTo = requisite;
-    serviceConfig = {
-      Type = "forking";
-      RuntimeDirectory = "dpms-standby";
-      ExecStart = "${service}";
-      ExecStop = "${stop}";
-      User = mkIf (cfg.user != null) cfg.user;
-      Environment = [
-        "DPMS_INTERVAL=${toString cfg.pollInterval}"
-        "DPMS_INTERVAL_MS=${toString (floor (cfg.pollInterval * 1000))}"
-      ] ++ optional (cfg.display != null) "DISPLAY=:${toString cfg.display}"
-      ++ optional (cfg.xauthority != null) "XAUTHORITY=${cfg.xauthority}";
+  config = mkMerge [ {
+    services.idle.xss-lock.command = mkIf cfg.enable (mkAfter [
+      "${cfg.control}" "start"
+    ]);
+  } (mkIf (cfg.enable && !homeSkel) {
+    systemd = if isHome then {
+      user.services.dpms-standby = homeService;
+    } else {
+      services.dpms-standby = service;
     };
-  };
+    services.idle.enable = mkDefault true;
+  }) ];
 }

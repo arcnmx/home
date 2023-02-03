@@ -53,9 +53,6 @@
         };
       };
     };
-    services.systemd2mqtt.units = {
-      "dpms-standby.service".settings.invert = true;
-    };
 
     users = {
       chroot.users = [ "kat" ];

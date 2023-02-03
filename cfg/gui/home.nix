@@ -17,6 +17,7 @@
 in {
   imports = [
     ./xresources.nix
+    ./dpms-standby.nix
     ./idle.nix
     ../i3.nix
     ../imv.nix
@@ -172,7 +173,7 @@ in {
     ];
 
     xsession = {
-      enable = true;
+      enable = mkDefault nixosConfig.services.xserver.enable;
       profileExtra = ''
         export XDG_CURRENT_DESKTOP=i3
         ${pkgs.xorg.setxkbmap}/bin/setxkbmap -option numpad:microsoft
@@ -183,7 +184,11 @@ in {
 
         export LESS=''${LESS//F}
       '';
-        #${pkgs.xorg.xrandr}/bin/xrandr > /dev/null 2>&1
+      initExtra = let
+        inherit (nixosConfig.hardware.display) dpms;
+      in mkIf (dpms.enable && dpms.screensaverCycleSeconds != 600) ''
+        ${getExe pkgs.xorg.xset} s ${toString dpms.screensaverSeconds} ${toString dpms.screensaverCycleSeconds}
+      '';
     };
     gtk = {
       enable = true;

@@ -203,14 +203,6 @@ in {
       strace
     ] ++ optional config.services.ofono.enable bluephone;
 
-    services.${if options ? services.dpms-standby then "dpms-standby" else null} = {
-      enable = mkIf config.services.xserver.enable (mkDefault true);
-      user = mkIf config.services.xserver.displayManager.startx.enable (mkDefault "arc");
-    };
-    security.polkit.users."" = mkIf config.services.dpms-standby.enable or false {
-      systemd.units = singleton "dpms-standby.service";
-    };
-
     services.systemd2mqtt = mkIf tf.state.enable {
       mqtt.secretPassword = mkIf config.services.systemd2mqtt.enable tf.variables.SYSTEMD2MQTT_PASSWORD.ref;
     };

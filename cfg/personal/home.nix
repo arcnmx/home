@@ -125,8 +125,6 @@ in {
       ];
       #defaultCacheTtl = 31536000; maxCacheTtl = 31536000; defaultCacheTtlSsh = 31536000; maxCacheTtlSsh = 31536000; # doing a bad remove me later thanks
     };
-    services.${if options ? services.idle then "idle" else null}.enable =
-      mkIf config.xsession.enable (mkDefault true);
     programs.zsh = {
       dirHashes = {
         gen = "${config.xdg.userDirs.documents}/gensokyo";

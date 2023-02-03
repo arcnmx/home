@@ -5,10 +5,12 @@
     exec $HOME/.xinitrc
   '';
   inherit (pkgs.arc.packages.personal) openrazer-dpi;
+  inherit (config.services) xserver;
 in
 {
   imports = [
     ./dpms-standby.nix
+    ./idle.nix
   ];
 
   options = {
@@ -29,15 +31,41 @@ in
         type = types.float;
         default = 1.0;
       };
+      dpms = {
+        screensaverSeconds = mkOption {
+          type = types.int;
+          default = config.hardware.display.dpms.screensaverMinutes * 60;
+        };
+        screensaverCycleSeconds = mkOption {
+          type = types.int;
+          default = 600;
+        };
+      };
+    };
+    services.xserver = {
+      staticDisplay = mkOption {
+        type = types.nullOr types.int;
+        default = xserver.display;
+      };
+      authority = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+      };
     };
   };
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     home.profileSettings.base.duc = pkgs.duc;
     users.users.arc.systemd.translate.units = [ "graphical-session.target" ];
+    security.polkit.users."" = mkIf config.services.dpms-standby.enable {
+      systemd.units = singleton "dpms-standby.service";
+    };
     services.systemd2mqtt.units = {
       ${toString config.users.users.arc.systemd.translate.units."graphical-session.target".systemTarget.name} = {
         settings.readonly = true;
+      };
+      "dpms-standby.service" = mkIf config.services.dpms-standby.enable {
+        settings.invert = true;
       };
     };
 
@@ -72,6 +100,10 @@ in
       enable = true;
       exportConfiguration = true;
       displayManager.startx.enable = true;
+      staticDisplay = mkIf xserver.displayManager.lightdm.enable (mkDefault 0);
+      authority = mkIf (xserver.staticDisplay != null && xserver.displayManager.lightdm.enable) (mkDefault
+        "/var/run/lightdm/root/:${toString xserver.staticDisplay}"
+      );
 
       inputClassSections = [
         ''
@@ -111,6 +143,13 @@ in
       ];
       libinput.touchpad.naturalScrolling = true;
     };
+    hardware.display.dpms = mkIf config.services.idle.enable {
+      screensaverMinutes = mkDefault (
+        config.hardware.display.dpms.standbyMinutes + 1
+      );
+      screensaverCycleSeconds = mkDefault 0;
+    };
+
     systemd.services.display-manager = {
       bindsTo = [ "graphical.target" ];
       serviceConfig.OOMScoreAdjust = -500;
