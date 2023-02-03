@@ -134,6 +134,22 @@
       path = mkOption {
         type = types.path;
       };
+      uuid = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+      };
+      minor = mkOption {
+        type = types.nullOr types.int;
+        default = null;
+      };
+      flags = mkOption {
+        type = types.enum [ null "ro" "rw" ];
+        default = null;
+      };
+      concise = mkOption {
+        type = types.str;
+        default = "${config.name},${toString config.uuid},${toString config.minor},${toString config.flags}";
+      };
       source = mkOption {
         type = types.path;
       };
@@ -163,7 +179,7 @@
         mqtt.enable = mkDefault false;
         polkit.user = config.permission.owner;
         script = ''
-          ${nixosConfig.lib.arc-vfio.map-disk}/bin/map-disk ${config.source} ${config.name} ${config.mbr.id} ${toString config.mbr.partType}
+          ${nixosConfig.lib.arc-vfio.map-disk}/bin/map-disk ${config.source} ${escapeShellArg config.concise} ${config.mbr.id} ${toString config.mbr.partType}
           ${applyPermission {
             inherit (config) permission path;
           }}

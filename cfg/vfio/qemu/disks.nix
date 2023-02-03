@@ -1,4 +1,5 @@
-{ config, lib, ... }: with lib; let
+{ nixosConfig, config, lib, ... }: with lib; let
+  hostDisks = nixosConfig.hardware.vfio.disks;
   diskScsi = { config, ... }: {
     options = {
       driver = mkOption {
@@ -84,8 +85,21 @@
         type = unmerged.type;
         default = { };
       };
+      from = {
+        mapped = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+        cow = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+      };
     };
-    config = {
+    config = let
+      mapped = hostDisks.mapped.${config.from.mapped};
+      cow = hostDisks.cow.${config.from.cow};
+    in mkMerge [ {
       drive = mkMerge [
         {
           settings = {
@@ -140,7 +154,14 @@
           };
         })
       ];
-    };
+    } (mkIf (config.from.mapped != null) {
+      enable = mkIf (!mapped.systemd.enable) false;
+      path = mkDefault mapped.path;
+      readonly = mkDefault (mapped.flags == "ro");
+    }) (mkIf (config.from.cow != null) {
+      enable = mkIf (!cow.systemd.enable) false;
+      path = mkDefault cow.path;
+    }) ];
   };
 in {
   options = {
@@ -152,6 +173,13 @@ in {
   config = let
     disks = filterAttrs (_: disk: disk.enable) config.disks;
   in {
+    systemd.depends = concatMap (disk: let
+      mapped = hostDisks.mapped.${disk.from.mapped};
+      cow = hostDisks.cow.${disk.from.cow};
+    in
+      optional (disk.from.mapped != null && mapped.systemd.enable) mapped.systemd.id
+      ++ optional (disk.from.cow != null && cow.systemd.enable) cow.systemd.id
+    ) (attrValues disks);
     drives = mapAttrs (name: disk: unmerged.merge disk.drive) disks;
     devices = mapAttrs (name: disk: unmerged.merge disk.device) (filterAttrs (_: disk: !disk.virtio.enable) disks);
     pci.devices = mapAttrs (name: disk: {

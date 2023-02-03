@@ -7,10 +7,6 @@ in {
     ./vfio.nix
   ] ++ trusted.import.nixos "vfio/machines/goliath";
   config = {
-    systemd.wants = [
-      (mkIf config.disks.games-adata.enable disks.cow.windows-games-adata-kat.systemd.id)
-      (mkIf config.disks.games-sn770.enable disks.cow.windows-games-sn770-kat.systemd.id)
-    ];
     enable = mkDefault true;
     name = "goliath";
     state.owner = "kat";
@@ -30,24 +26,20 @@ in {
       };
       games-adata = {
         scsi.lun = 1;
-        inherit (disks.cow.windows-games-adata-kat) path;
+        from.cow = "windows-games-adata-kat";
       };
       games-sn770 = {
         scsi.lun = 2;
-        inherit (disks.cow.windows-games-sn770-kat) path;
+        from.cow = "windows-games-sn770-kat";
       };
     };
     usb.host.devices = {
-      nighthawk-x8 = { };
-      naga2014 = { };
       arctis7p-plus.hotplug = true;
       hori.enable = false;
-      xpad.hotplug = true;
+      xpad.enable = false;
       nagatrinity.enable = false;
       gmmk.enable = false;
       shift.enable = false;
-      yubikey5-kat = { };
-      yubikey5c-kat.enable = false;
     };
     scream = {
       mode = "ip";

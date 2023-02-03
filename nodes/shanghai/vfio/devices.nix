@@ -1,5 +1,6 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
+  inherit (cfg.qemu) machines;
   windowsGames = [ "windows-games-adata" "windows-games-sn770" ];
 in {
   config = {
@@ -114,12 +115,12 @@ in {
           vendor = "1038";
           product = "2212";
         };
-        yubikey5-kat = {
+        yubikey5 = {
           vendor = "1050";
           product = "0407";
           udev.rule = ''ATTR{bcdDevice}=="0526"'';
         };
-        yubikey5c-kat = {
+        yubikey5c = {
           vendor = "1050";
           product = "0407";
           udev.rule = ''ATTR{bcdDevice}=="0543"'';
@@ -127,7 +128,7 @@ in {
       };
       disks = {
         mapped = {
-          windows-games = {
+          windows-games-plextor = {
             source = "/dev/disk/by-partlabel/windows-games";
             mbr.id = "f4901f82";
             permission.owner = "arc";
@@ -138,7 +139,7 @@ in {
             permission.owner = "arc";
           };
           windows-games-sn850x = {
-            source = "/dev/disk/by-partlabel/windows-games-sn850x";
+            source = "/mnt/data/tmp/windows-games-sn850x.ntfs.raw"; flags = "ro";
             mbr.id = "26ca4c08";
             permission.owner = "arc";
           };
@@ -147,8 +148,13 @@ in {
             mbr.id = "58ec08ca";
           };
           windows-games-sn770 = {
-            source = "/dev/disk/by-partlabel/windows-games-sn770";
+            source = "/mnt/data/tmp/windows-games-sn770.ntfs.raw"; flags = "ro";
             mbr.id = "dd8f10de";
+          };
+          game-storage = {
+            systemd.enable = false;
+            source = "/mnt/bigdata/vfio/disks/game-storage";
+            mbr.id = "90a4fd21";
           };
         };
         cow = mkMerge (flip map windowsGames (windows-games: {
@@ -164,9 +170,12 @@ in {
           };
           "${windows-games}-kat" = {
             source = cfg.disks.mapped.${windows-games}.path;
-            systemd.depends = [
-              cfg.disks.mapped.${windows-games}.systemd.id
-            ];
+            systemd = {
+              inherit (machines.goliath1650) enable;
+              depends = [
+                cfg.disks.mapped.${windows-games}.systemd.id
+              ];
+            };
             permission.owner = "kat";
           };
         }));

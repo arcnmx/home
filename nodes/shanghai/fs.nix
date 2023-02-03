@@ -93,18 +93,13 @@
     };
     swapDevices = [
       {
-        # 16G adata
+        # 64G adata
         device = "/dev/disk/by-partuuid/0ecca923-20db-c34b-807b-2be849bf2017";
         randomEncryption.enable = true;
       }
       {
         # 32G Plextor
         device = "/dev/disk/by-partuuid/38b62f92-2fa2-4ee3-9e20-77a77a8e2b31";
-        randomEncryption.enable = true;
-      }
-      {
-        # 32G SN770
-        device = "/dev/disk/by-partuuid/0002fc58-b222-4fd3-80a4-a442137352ee";
         randomEncryption.enable = true;
       }
     ];

@@ -23,13 +23,8 @@ in {
       };
     };
     systemd.depends = [
-      (mkIf config.disks.games-adata.enable disks.cow.windows-games-adata-arc.systemd.id)
       (mkIf config.disks.games-adata-arc.enable "windows-games-adata-arc.service")
-      (mkIf config.disks.games-sn770.enable disks.cow.windows-games-sn770-arc.systemd.id)
       (mkIf config.disks.games-sn770-arc.enable "windows-games-sn770-arc.service")
-      disks.mapped.windows-games-sabrent.systemd.id
-      disks.mapped.windows-games-sn850x.systemd.id
-      disks.mapped.windows-games.systemd.id
     ];
     disks = {
       windows = {
@@ -38,7 +33,7 @@ in {
       };
       games-plextor = {
         scsi.lun = 1;
-        inherit (disks.mapped.windows-games) path;
+        from.mapped = "windows-games-plextor";
       };
       intel = {
         scsi = {
@@ -47,13 +42,17 @@ in {
         };
         path = "/dev/disk/by-id/ata-INTEL_SSDSC2BP480G4_BTJR442300QQ480BGN";
       };
+      game-storage = {
+        scsi.lun = 3;
+        from.mapped = "game-storage";
+      };
       games-sabrent = {
         scsi.lun = 4;
-        inherit (disks.mapped.windows-games-sabrent) path;
+        from.mapped = "windows-games-sabrent";
       };
       games-adata = {
         scsi.lun = 5;
-        inherit (disks.cow.windows-games-adata-arc) path;
+        from.cow = "windows-games-adata-arc";
       };
       games-adata-arc = {
         enable = !config.disks.games-adata.enable;
@@ -62,7 +61,7 @@ in {
       };
       games-sn770 = {
         scsi.lun = 6;
-        inherit (disks.cow.windows-games-sn770-arc) path;
+        from.cow = "windows-games-sn770-arc";
       };
       games-sn770-arc = {
         enable = !config.disks.games-sn770.enable;
@@ -71,7 +70,7 @@ in {
       };
       games-sn850x = {
         scsi.lun = 7;
-        inherit (disks.mapped.windows-games-sn850x) path;
+        from.mapped = "windows-games-sn850x";
         device.settings = {
           logical_block_size = 4096;
           physical_block_size = 4096;
@@ -79,10 +78,10 @@ in {
       };
     };
     usb.host.devices = {
-      svse5 = { };
+      svse5.enable = true;
       gmmk.enable = false;
-      hori.enable = false;
-      xpad.enable = false;
+      hori.enable = true;
+      xpad.enable = true;
       nagatrinity.enable = false;
       shift.enable = false;
     };
