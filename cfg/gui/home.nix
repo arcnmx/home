@@ -158,6 +158,14 @@ in {
     home.shell.functions = {
       soffice = ''nix shell nixpkgs-big#libreoffice-fresh -c soffice "$@"'';
     };
+    home.scratch.linkDirs = [
+      ".config/Microsoft"
+      ".config/discord/Code Cache"
+      ".parsec"
+      ".cache/sponsorblock_shared"
+      ".cache/google-chrome/Default/Code Cache"
+      ".local/share/Google" # Android Studio
+    ];
 
     xsession = {
       enable = true;

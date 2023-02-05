@@ -32,6 +32,7 @@ in {
         sudo watch -ctn1 'ryzen_monitor -u0'
       '';
     };
+    home.scratch.enable = true;
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';

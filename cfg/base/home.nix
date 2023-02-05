@@ -8,6 +8,7 @@ in {
     ./base16.nix
     ./bitw.nix
     ./email.nix
+    ./scratch.nix
     ../weechat/autosort.nix
     ../starship
     ../shell
@@ -40,7 +41,7 @@ in {
         target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
       };
       ".markdownlintrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/markdownlint/markdownlintrc";
-    } // lib.genAttrs [ "cargo/registry" "cargo/git" "cargo/bin" ] (path: {
+    } // lib.genAttrs [ "cargo/registry" "cargo/git" "cargo/bin" ] (path: mkIf (!config.home.scratch.enable) {
       # ensure empty cache directories are created
       text = "";
       target = "${config.xdg.cacheHome}/${path}/.keep";

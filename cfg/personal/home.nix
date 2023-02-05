@@ -98,6 +98,18 @@ in {
         '';
       };
     };
+    home.scratch.linkDirs = [
+      ".wine"
+      ".platformio"
+      ".cache/cargo"
+      ".local/share/gem"
+      ".local/share/NuGet"
+      ".android/cache"
+      ".bundle"
+      ".npm"
+      "gradle"
+      "go"
+    ];
     #services.lorri.enable = true;
     services.gpg-agent = {
       enable = true;
