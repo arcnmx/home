@@ -14,6 +14,18 @@ in {
         };
         local_aaaa = mkIf (config.networking.enableIPv6 && config.deploy.network.local.hasIpv6) {
           inherit zone domain;
+          aaaa.address = if config.deploy.network.ipv6.isGlobal.wan
+            then config.deploy.network.wan.ipv6
+            else config.deploy.network.local.ipv6;
+        };
+        lan_a = mkIf config.deploy.network.local.hasIpv4 {
+          inherit zone;
+          domain = "${config.networking.hostName}.local";
+          a.address = config.deploy.network.local.ipv4;
+        };
+        lan_aaaa = mkIf (config.networking.enableIPv6 && config.deploy.network.local.hasIpv6) {
+          inherit zone;
+          domain = "${config.networking.hostName}.local";
           aaaa.address = config.deploy.network.local.ipv6;
         };
         wan_a = {

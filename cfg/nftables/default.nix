@@ -10,6 +10,7 @@
   nfallow = { type, port }: let
     ports = if isInt port then toString port else "${toString port.from}-${toString port.to}";
   in ''${type} dport ${ports} accept'';
+  nfsource = { type, address }: ''${type} saddr ${address} accept'';
   allowed = mapInterface firewall;
   nftables-trusted = pkgs.writeText "nftables-trusted.conf" ''
     table inet filter {
@@ -25,8 +26,21 @@
       }
     }
   '';
+  nftables-sources = pkgs.writeText "nftables-sources.conf" ''
+    table inet filter {
+      chain input_ports {
+        ${concatMapStringsSep "\n" nfsource (attrValues firewall.trustedSourceAddresses)}
+      }
+    }
+  '';
 in {
-  networking = {
+  options.networking.firewall = with types; {
+    trustedSourceAddresses = mkOption {
+      type = attrsOf attrs;
+      default = { };
+    };
+  };
+  config.networking = {
     firewall.enable = mkDefault false;
     nftables = {
       enable = true;
@@ -43,6 +57,9 @@ in {
         ''
         (mkIf (firewall.trustedInterfaces != [ ]) ''
           include "${nftables-trusted}"
+        '')
+        (mkIf (firewall.trustedSourceAddresses != { }) ''
+          include "${nftables-sources}"
         '')
         (mkIf config.services.yggdrasil.enable (mkAfter ''
           table inet filter {

@@ -57,6 +57,10 @@ in {
             default = null;
           };
         };
+        isGlobal.wan = mkOption {
+          type = types.bool;
+          default = true;
+        };
       };
       local = mkOption {
         type = networkType "local";

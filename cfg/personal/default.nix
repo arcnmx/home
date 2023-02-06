@@ -123,7 +123,7 @@ in {
     };
 
     networking = {
-      firewall = mkMerge [ {
+      firewall = {
         free.enable = mkDefault true;
         allowedTCPPorts = [
           5201 # iperf
@@ -138,14 +138,36 @@ in {
         allowedUDPPortRanges = [
           { from = 32768; to = 61000; } # mkchromecast
         ];
-      } (mkIf (free.enable && free.base != null) {
-        allowedTCPPortRanges = [
-          rec { from = free.base + free.offset; to = from + free.size; }
-        ];
-        allowedUDPPortRanges = [
-          rec { from = free.base + free.offset; to = from + free.size; }
-        ];
-      }) ];
+        trustedSourceAddresses = let
+          inherit (config.deploy) network;
+        in {
+          link6 = { type = "ip6"; address = "fe80::/64"; };
+          lan4 = mkIf (network.local.ipv4 != null) {
+            type = "ip";
+            address = "${network.local.ipv4}/24";
+          };
+          lan6 = mkMerge [
+            (mkIf (network.local.ipv6 != null) (mkDefault {
+              type = "ip6";
+              address = "${network.local.ipv6}/64";
+            }))
+            (mkIf (network.ipv6.prefix.local != null) {
+              type = "ip6";
+              address = "${network.ipv6.prefix.local}:0:0:0:0/64";
+            })
+          ];
+          wan6 = mkMerge [
+            (mkIf (network.wan.ipv6 != null) (mkDefault {
+              type = "ip6";
+              address = "${network.wan.ipv6}/64";
+            }))
+            (mkIf (network.ipv6.prefix.wan != null) {
+              type = "ip6";
+              address = "${network.ipv6.prefix.wan}:0:0:0:0/64";
+            })
+          ];
+        };
+      };
       interfaces.ethb2b = {
         useDHCP = true;
       };
