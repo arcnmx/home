@@ -157,6 +157,10 @@ in {
     };
     home.shell.functions = {
       soffice = ''nix shell nixpkgs-big#libreoffice-fresh -c soffice "$@"'';
+      scrot = ''
+        cd ${config.xdg.userDirs.pictures}
+        command scrot "$@"
+      '';
     };
     home.scratch.linkDirs = [
       ".config/Microsoft"
