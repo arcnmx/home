@@ -2,7 +2,9 @@
   inherit (config.lib.file) mkOutOfStoreSymlink;
   firefoxFiles = let
     pathConds = {
-      "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}" = config.programs.firefox.extensions != [];
+      "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}" = any (profile:
+        profile.extensions != []
+      ) (attrValues config.programs.firefox.profiles);
       "profiles.ini" = config.programs.firefox.profiles != {};
     } // foldAttrList (mapAttrsToList (_: profile: {
       "${profile.path}/.keep" = true;
