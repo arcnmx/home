@@ -12,7 +12,7 @@ in {
     ];
     config = {
       input-default-bindings = false;
-      screenshot-directory = replaceStrings [ "$HOME" ] [ config.home.homeDirectory ] config.xdg.userDirs.pictures;
+      screenshot-directory = config.xdg.userDirs.absolute.pictures;
 
       hwdec = mkDefault "auto";
 

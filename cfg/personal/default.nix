@@ -335,9 +335,28 @@ in {
         };
         wantedBy = ["sysinit.target"];
       };
+      share = username: rec {
+        type = "none";
+        what = config.home-manager.users.${username}.xdg.userDirs.absolute.publicShare;
+        where = "/home/share/${username}";
+        options = mkMerge [ "bind" ];
+        unitConfig.RequiresMountsFor = [
+          "/home/share"
+          what
+        ];
+      };
     in [
       (hugepages { where = "/dev/hugepages"; options = "mode=0775"; })
       (hugepages { where = "/dev/hugepages1G"; options = "pagesize=1GB,mode=0775"; })
+      (share "arc")
+    ];
+    systemd.automounts = let
+      share = username: {
+        wantedBy = [ "multi-user.target" ];
+        where = "/home/share/${username}";
+      };
+    in [
+      (share "arc")
     ];
   };
 }

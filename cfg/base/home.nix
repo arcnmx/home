@@ -118,6 +118,7 @@ in {
     xdg.userDirs = {
       enable = true;
       createDirectories = true;
+    } // mapAttrs (_: mkDefault) {
       desktop = "$HOME";
       download = "$HOME/downloads";
       music = "$HOME/media/music";
