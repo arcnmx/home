@@ -27,6 +27,10 @@
     services.systemd2mqtt.enable = true;
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     hardware.openrazer.enable = true;
+    services.mediatomb = {
+      enable = true;
+      openFirewall = false;
+    };
 
     hardware.display = {
       enable = true;

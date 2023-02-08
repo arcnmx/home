@@ -314,6 +314,12 @@ in {
       in "${modules}/lib/wireplumber-${versions.majorMinor pkgs.wireplumber.version}";
     };
     services.physlock.enable = true;
+    services.mediatomb = {
+      serverName = config.networking.hostName;
+      mediaDirectories = [
+        { path = "/home/share"; recursive = true; hidden-files = false; }
+      ];
+    };
     security.sudo.wheelNeedsPassword = false;
     systemd.services = {
       nix-daemon.serviceConfig.OOMScoreAdjust = -100;
