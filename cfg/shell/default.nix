@@ -51,7 +51,9 @@ in {
       (mkIf pkgs.hostPlatform.isLinux {
         cp = "cp --reflink=auto --sparse=auto";
         sys = "systemctl";
+        sysu = "systemctl --user";
         log = "journalctl";
+        logu = "journalctl --user";
         dmesg = "dmesg -HP";
         open = "xdg-open";
       })
