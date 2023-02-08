@@ -12,7 +12,6 @@ in {
     ports = [ cfg.port ];
     startWhenNeeded = mkDefault false;
     allowSFTP = true;
-    gatewayPorts = "yes";
     settings = {
       KbdInteractiveAuthentication = false;
       PasswordAuthentication = mkDefault false;
@@ -20,6 +19,7 @@ in {
       MaxSessions = 100;
       AllowAgentForwarding = true;
       AllowTcpForwarding = true;
+      GatewayPorts = "yes";
       PermitUserEnvironment = true;
       Compression = true;
       PermitTunnel = true;

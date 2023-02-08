@@ -275,10 +275,10 @@ in {
     services.usbmuxd.enable = true;
     services.openssh = {
       startWhenNeeded = true;
-      forwardX11 = true;
       settings = {
         PasswordAuthentication = true;
         PermitRootLogin = "yes"; # "prohibit-password"
+        X11Forwarding = true;
       };
     };
     services.tailscale = {
