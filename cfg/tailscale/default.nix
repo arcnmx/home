@@ -42,6 +42,10 @@ in {
       };
     }
     (mkIf cfg.enable {
+      systemd.services.tailscaled.serviceConfig = {
+        # filter out noisy connection status logs
+        LogLevelMax = "notice";
+      };
       systemd.network.wait-online.ignoredInterfaces = [ cfg.interfaceName ];
       networking.firewall = {
         allowedUDPPorts = [

@@ -84,6 +84,9 @@ in {
     systemd.services.ddclient = mkIf cfg.enable {
       serviceConfig = {
         TimeoutStartSec = 90;
+        LogFilterPatterns = [
+          "~WARNING"
+        ];
       };
     };
   };
