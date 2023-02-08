@@ -323,6 +323,17 @@ in {
     security.sudo.wheelNeedsPassword = false;
     systemd.services = {
       nix-daemon.serviceConfig.OOMScoreAdjust = -100;
+      mediatomb = let
+        inherit (config.services) mediatomb;
+      in mkIf mediatomb.enable {
+        confinement = {
+          enable = true;
+        };
+        serviceConfig = {
+          BindReadOnlyPaths = map (dir: dir.path) mediatomb.mediaDirectories;
+          StateDirectory = mediatomb.package.pname;
+        };
+      };
     };
     systemd.mounts = let
       hugepages = { where, options }: {
