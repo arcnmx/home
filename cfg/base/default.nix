@@ -124,6 +124,7 @@ in {
         builders-use-substitutes = true;
         substituters = [ "https://arc.cachix.org" ];
         trusted-public-keys = [ "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=" ];
+        use-xdg-base-directories = mkIf (versionAtLeast pkgs.nix.version "2.13.3") true;
       };
       package = lib.mkMerge [
         (lib.mkDefault pkgs.nix)
