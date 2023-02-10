@@ -4,6 +4,9 @@
     # TODO: opencl_nvidia?
   ];
   isNvidiaDriver = cfg.driver == "nvidia" || cfg.driver == "nvidia-open";
+  inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
+  nvpackage = if versionAtLeast beta.version stable.version then beta else stable;
+  patched = cfg.patch.package.override { nvidia_x11 = nvpackage; };
 in {
   key = "NVIDIA GPU";
 
@@ -16,7 +19,9 @@ in {
       enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
       patch = {
         enable = mkEnableOption "nvidia-patch" // {
-          default = true;
+          default = if !patched.meta.broken
+            then true
+            else warn "nvidia-patch out of date" false;
         };
         package = mkOption {
           type = package;
@@ -36,13 +41,9 @@ in {
       nvidia = {
         open = cfg.driver == "nvidia-open";
         modesetting.enable = !cfg.dynamicBinding;
-        package = let
-          inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
-          package = if versionAtLeast beta.version stable.version then beta else stable;
-          patched = cfg.patch.package.override { nvidia_x11 = package; };
-        in mkIf (cfg.driver == "nvidia") (if cfg.patch.enable
+        package = mkIf (cfg.driver == "nvidia") (if cfg.patch.enable
           then patched
-          else package);
+          else nvpackage);
       };
       display.nvidia.enable = mkIf isNvidiaDriver true;
       opengl = {
