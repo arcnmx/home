@@ -126,13 +126,23 @@
       }
     },
     "qemucomm": {
-      "flake": false,
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust": [
+          "rust"
+        ]
+      },
       "locked": {
-        "lastModified": 1662662287,
-        "narHash": "sha256-8vM12brt6VP8MTQdu4jnLDpakpRTiLHbztazI+7SPYk=",
+        "lastModified": 1676145886,
+        "narHash": "sha256-ct2bCTE5ESxRudCIIjAKjcSMhdtbxI/bpOkNU3aPFZo=",
         "owner": "arcnmx",
         "repo": "qemucomm",
-        "rev": "c922896daffc9079d05199aa943b12290d61c141",
+        "rev": "d5d9f74bdf7b794ac575a2f4897e3596efc1b9d2",
         "type": "github"
       },
       "original": {

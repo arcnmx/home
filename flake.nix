@@ -26,7 +26,11 @@
     };
     qemucomm = {
       url = "github:arcnmx/qemucomm";
-      flake = false;
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        rust.follows = "rust";
+        flakelib.follows = "flakelib";
+      };
     };
     wireplumber-scripts = {
       url = "github:arcnmx/wireplumber-scripts";

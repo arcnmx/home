@@ -8,9 +8,7 @@ in {
       };
       package = mkOption {
         type = types.package;
-        default = pkgs.qemucomm or (pkgs.callPackage (inputs.qemucomm.outPath + "/derivation.nix") {
-          _arg'qemucomm = inputs.qemucomm.outPath;
-        });
+        default = pkgs.callPackage (inputs.qemucomm.outPath + "/derivation.nix") { };
       };
     };
     exec = {
