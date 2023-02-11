@@ -1,6 +1,7 @@
 { config, lib, pkgs, inputs, ... }: with lib; let
   cfg = config.pci;
-  pciDeviceModule = { config, ... }: {
+  machineConfig = config;
+  pciDeviceModule = { config, name, ... }: {
     options = {
       settings = mkOption {
         type = with types; attrsOf unspecified;
@@ -15,7 +16,7 @@
         inherit (cfg) bus;
       };
       device = {
-        cli.dependsOn = [ config.settings.bus ];
+        cli.dependsOn = [ machineConfig.devices.${name}.settings.bus ];
         settings = mapAttrs (_: mkDefault) config.settings;
       };
     };

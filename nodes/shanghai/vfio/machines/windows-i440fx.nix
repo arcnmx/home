@@ -8,6 +8,11 @@ in {
         driver = "pci-bridge";
         chassis_nr = 1;
       };
+      pci2.settings = {
+        id = "pci.2";
+        driver = "pci-bridge";
+        chassis_nr = 2;
+      };
     };
     machine.settings = {
       type = "pc-i440fx-5.0";

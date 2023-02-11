@@ -8,6 +8,13 @@ in {
         driver = "pcie-pci-bridge";
         multifunction = true;
       };
+      pci2.settings = {
+        driver = "pcie-root-port";
+        port = "0x19";
+        chassis = 3;
+        addr = "${config.pci.devices.bridge.settings.addr}.0x3";
+        hotplug = false;
+      };
       pcieport17.settings = {
         driver = "pcie-root-port";
         port = "0x17";

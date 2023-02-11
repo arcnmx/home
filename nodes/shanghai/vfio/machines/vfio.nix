@@ -12,7 +12,6 @@ in {
       args.vga = mkIf (cfg.gpu == null) "qxl";
     }
     (mkIf (cfg.gpu != null) {
-      pci.devices.gpu.settings.multifunction = true;
       vfio.devices = {
         gpu = {
           name = cfg.gpu;
