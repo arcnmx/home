@@ -5,7 +5,6 @@
   ];
 
   config = {
-    deploy.tf.deploy.systems.satorin.connection.host = config.deploy.network.local.ipv4;
     deploy.network.local.ipv4 = "10.1.1.64";
     services.yggdrasil = mkIf tf.state.enable {
       privateKey = config.secrets.files.ygg-key.path;
