@@ -81,9 +81,9 @@ in {
           down = "#i3.next";
         };
         font = [
-          "monospace:size=${config.lib.gui.fontSizeStr 8}"
-          "Noto Mono:size=${config.lib.gui.fontSizeStr 8}"
-          "Symbola:size=${config.lib.gui.fontSizeStr 9}"
+          "monospace:size=${config.lib.gui.size 8 { }}"
+          "Noto Mono:size=${config.lib.gui.size 8 { }}"
+          "Symbola:size=${config.lib.gui.size 9 { }}"
         ];
         padding = {
           right = 1;

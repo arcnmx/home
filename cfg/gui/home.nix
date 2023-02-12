@@ -19,6 +19,7 @@ in {
     ./xresources.nix
     ./dpms-standby.nix
     ./idle.nix
+    ./dpi.nix
     ../i3.nix
     ../imv.nix
     ../polybar
@@ -26,23 +27,6 @@ in {
     ../dunst
     ../mpv
   ];
-
-  options = {
-    gtk.dpiScale = mkOption {
-      type = types.float;
-      default = config.home.gui.dpiScale;
-    };
-    home.gui = {
-      dpi = mkOption {
-        type = types.float;
-        default = nixosConfig.hardware.display.dpi;
-      };
-      dpiScale = mkOption {
-        type = types.float;
-        default = nixosConfig.hardware.display.fontScale;
-      };
-    };
-  };
 
   config = {
     home.profileSettings.base.clip = pkgs.clip.override { enableWayland = config.wayland.windowManager.sway.enable; };
@@ -76,14 +60,6 @@ in {
         '';
       };
     };
-    home.sessionVariables = mkMerge [
-      (mkIf (config.gtk.enable && config.gtk.dpiScale != 1.0) {
-        GDK_DPI_SCALE = toString config.gtk.dpiScale;
-      })
-      (mkIf (config.gtk.dpiScale != 1.0) {
-        QT_FONT_DPI = toString (config.home.gui.dpi * config.gtk.dpiScale);
-      })
-    ];
     xdg.open = "${xdg-open}/bin/xdg-open";
     programs.zsh.loginExtra = mkIf nixosConfig.services.xserver.displayManager.startx.enable ''
       if [[ -z "''${TMUX-}" && -z "''${DISPLAY-}" && "''${XDG_VTNR-}" = 1 && $(${pkgs.coreutils}/bin/id -u) != 0 && $- == *i* ]]; then
@@ -200,9 +176,6 @@ in {
     };
     gtk = {
       enable = true;
-      font = {
-        name = "sans-serif ${toString (config.lib.gui.fontSize 12 / config.gtk.dpiScale)}";
-      };
       iconTheme = {
         name = "Adwaita";
         package = pkgs.gnome.adwaita-icon-theme;
@@ -217,12 +190,6 @@ in {
           gtk-fallback-icon-theme = "gnome";
         };
       };
-    };
-
-    lib.gui = {
-      dpiSize = size: config.home.gui.dpiScale * config.home.gui.dpi / 96.0 * size;
-      fontSize = size: config.home.gui.dpiScale * size;
-      fontSizeStr = size: toString (config.lib.gui.fontSize size);
     };
   };
 }

@@ -23,7 +23,7 @@ in {
 
       volume-max = 200;
       osd-scale-by-window = false;
-      osd-font-size = config.lib.gui.fontSize 26; # pixels at 720 window height, then scaled to real size
+      osd-font-size = config.lib.gui.size 26 { int = true; }; # pixels at 720 window height, then scaled to real size
       osd-bar-h = 2.5; # 3.125 default
       osd-border-size = 2; # font border pixels, default 3
       osd-fractions = true;

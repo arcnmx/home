@@ -65,7 +65,7 @@
         workspaceNumbers = false;
         fonts = {
           names = [ "monospace" ];
-          size = config.lib.gui.fontSize 8;
+          size = config.lib.gui.size 8 { float = true; };
         };
         position = "top";
         colors = {
@@ -120,7 +120,7 @@
       };
       fonts = {
         names = [ "monospace" ];
-        size = config.lib.gui.fontSize 6;
+        size = config.lib.gui.size 6 { float = true; };
       };
       modifier = mod;
       floating = {

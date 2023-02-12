@@ -11,6 +11,7 @@ in
   imports = [
     ./dpms-standby.nix
     ./idle.nix
+    ./dpi.nix
   ];
 
   options = {
@@ -18,18 +19,6 @@ in
       oled = mkOption {
         type = types.listOf types.str;
         default = [ ];
-      };
-      dpi = mkOption {
-        type = types.float;
-        default = 96.0;
-      };
-      dpiScale = mkOption {
-        type = types.float;
-        default = 1.0;
-      };
-      fontScale = mkOption {
-        type = types.float;
-        default = 1.0;
       };
       dpms = {
         screensaverSeconds = mkOption {

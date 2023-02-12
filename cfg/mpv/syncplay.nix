@@ -19,7 +19,7 @@
       gui = {
         #autosavejoinstolist = false;
         showdurationnotification = false;
-        chatoutputrelativefontsize = config.lib.gui.fontSize 13.0;
+        chatoutputrelativefontsize = config.lib.gui.size 10 { float = true; };
       };
     };
   };

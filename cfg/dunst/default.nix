@@ -9,7 +9,7 @@
       global = {
         transparency = 10;
         follow = "mouse";
-        font = "monospace ${config.lib.gui.fontSizeStr 9}";
+        font = "monospace ${config.lib.gui.size 9 { }}";
         width = "(0, 720)"; # min, max
         idle_threshold = 60 * 3;
         show_age_threshold = -1; # 60 if this feature weren't so broken (causes endless refreshes once triggered, pegging the CPU when too many notifs are visible)

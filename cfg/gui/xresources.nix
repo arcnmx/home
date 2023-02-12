@@ -117,11 +117,12 @@ in {
         tamzenStyle = if style == normal || style == italic then normal else bold;
       in [(tamzen size tamzenStyle)] ++ (map (font: xft font ["pixelsize=${toString size}"]) fallbacks);
       fontsTtf = name: size: style:
-        [(xft name (["size=${toString size}"] ++ styles.${toString style}))] ++
-        (map (font: xft font ["size=${toString size}"]) fallbacks);
+        [(xft name (["size=${size}"] ++ styles.${toString style}))] ++
+        (map (font: xft font ["size=${size}"]) fallbacks);
 
       fontcommands = fonts: size: map (style: fontcommand style (fonts size style)) [normal bold italic ibold];
-      inherit (config.lib.gui) fontSize dpiSize;
+      dpiSize = flip config.lib.gui.size { float = true; norm = [ "dpi" "pt" ]; };
+      fontSize = flip config.lib.gui.size { round = true; };
     in {
       "URxvt.font" = fontsTtf monospace (fontSize 9) normal;
       "URxvt.boldFont" = fontsTtf monospace (fontSize 9) bold;
