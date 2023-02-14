@@ -9,7 +9,7 @@
     serverAliveInterval = 60;
     #PubkeyAcceptedKeyTypes=+ssh-dss # do I still need this?
     extraConfig = ''
-      SendEnv=TERM_THEME
+      SendEnv=TERM_THEME GDK_DPI_SCALE QT_FONT_DPI
     '';
     knownHosts = [
       "satorin ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFgcPU64V9VTwqGZ5GtaqXZd1o/T+58/VXsSfp+nUl6Q"
