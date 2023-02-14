@@ -206,17 +206,23 @@ in {
         };
       };
       "module/mpris" = mkIf config.services.playerctld.enable {
-        # TODO consider: https://github.com/polybar/polybar-scripts/tree/master/polybar-scripts/player-mpris-tail
         type = "custom/script";
         format = "<label>";
         interval = 10;
         click-left = "${pkgs.playerctl}/bin/playerctl play-pause";
-        exec = pkgs.writeShellScript "polybar-mpris" ''
-          ${pkgs.playerctl}/bin/playerctl \
-            metadata \
-            --format "{{ emoji(status) }} ~{{ duration(mpris:length) }} ♪ {{ artist }} - {{ title }}"
-        '';
-        tail = false;
+        exec = let
+          lazy = pkgs.writeShellScript "polybar-mpris" ''
+            ${pkgs.playerctl}/bin/playerctl \
+              metadata \
+              --format "{{ emoji(status) }} ~{{ duration(mpris:length) }} ♪ {{ artist }} - {{ title }}"
+          '';
+          mpris-tail = pkgs.fetchurl {
+            url = "https://github.com/polybar/polybar-scripts/raw/a588bfc/polybar-scripts/player-mpris-tail/player-mpris-tail.py";
+            sha256 = "sha256-FTbU8dzUUVVYHFHPWa9Pjgyb7Amvf0c8gNRpf87YuMM=";
+          };
+          python = pkgs.python3.withPackages (p: with p; [ dbus-python pygobject3 ]);
+        in "${getExe python} ${mpris-tail} -f '{icon} ~{fmt-length} ♪ {artist} - {title}'";
+        tail = true;
       };
       "module/net-ethb2b" = {
         type = "internal/network";
