@@ -2,7 +2,7 @@
   config.home.shell = {
     aliases = {
       nprp = if nixosConfig.nix.isNix24 && elem "repl-flake" nixosConfig.nix.experimentalFeatures
-        then "nix repl nixpkgs"
+        then "nix repl nixpkgs#legacyPackages.${pkgs.system}"
         else "nix repl -f '<nixpkgs>'";
       npath = "nix build --no-link --print-out-paths";
       necho = "nix eval --raw";
