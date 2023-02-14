@@ -84,7 +84,14 @@ in {
   };
   config = {
     deploy = {
-      system = mkOverride modules.defaultPriority config.system.build.toplevel;
+      system = mkOverride modules.defaultPriority (config.system.build.toplevel.overrideAttrs (old: {
+        meta = old.meta or { } // {
+          name = "network.nodes.${name}.deploy.system";
+        };
+        passthru = old.passthru or { } // {
+          ci.cache.wrap = true;
+        };
+      }));
       pkgs = mkOverride modules.defaultPriority pkgs;
       targetName = mkIf (meta.deploy.targets ? ${name}) (mkDefault name);
       tf.deploy = {

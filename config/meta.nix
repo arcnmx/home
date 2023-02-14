@@ -32,6 +32,11 @@
         file = ./default.nix;
         args = [ "--show-trace" ];
       };
+      run = {
+        generate.command = ''
+          ${getExe pkgs.nix_2_3} run -f https://github.com/arcnmx/ci/archive/master.tar.gz run.gh-actions-generate --arg config ${toString ../ci/config.nix}
+        '';
+      };
     };
   };
 }

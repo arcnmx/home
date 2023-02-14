@@ -2,26 +2,22 @@
   # https://github.com/arcnmx/ci
   name = "home";
   ci.gh-actions.enable = true;
-
-  ci.gh-actions.export = true;
-  gh-actions.jobs.ci.step = let
+  jobs = let
+    home = import ../. { };
     hostnames = [ "satorin" "shanghai" ];
-    profiles = [ /*"base" "personal" "desktop" "laptop"*/ ];
-  in mapAttrs' (k: nameValuePair "nixos-${k}") (genAttrs hostnames (host: {
-    name = "build nixos/${host}";
-    run = ''
-      nix build -Lf. network.nodes.${host}.deploy.system --show-trace
-    '';
-  })) // mapAttrs' (k: nameValuePair "home-${k}") (genAttrs profiles (profile: {
-    name = "build home/${profile}";
-    run = ''
-      nix build -Lf. home.profiles.${profile}.deploy.home --show-trace
-    '';
+  in mapAttrs' (k: nameValuePair "nixos-${k}") (genAttrs hostnames (host: let
+    inherit (home.network.nodes.${host}.deploy) system;
+  in {
+    ci.gh-actions.name = mkForce "build nixos/${host}";
+    tasks.nixos.inputs = [ system ];
   }));
   ci.gh-actions.checkoutOptions.submodules = false;
 
-  cache.cachix.arc = {
-    enable = true;
-    publicKey = "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=";
+  cache.cachix = {
+    ci.signingKey = "";
+    arc = {
+      enable = true;
+      publicKey = "arc.cachix.org-1:DZmhclLkB6UO0rc0rBzNpwFbbaeLfyn+fYccuAy7YVY=";
+    };
   };
 }
