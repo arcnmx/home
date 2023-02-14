@@ -82,6 +82,8 @@ in {
       passwordFile = mkIf hasSecret config.secrets.files.ddclient-secret.path;
     };
     systemd.services.ddclient = mkIf cfg.enable {
+      wants = [ "network-online.target" ];
+      wantedBy = mkForce [ ];
       serviceConfig = {
         TimeoutStartSec = 90;
         LogFilterPatterns = [
