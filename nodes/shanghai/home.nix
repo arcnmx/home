@@ -15,9 +15,12 @@ in {
       commonTags = [ "width:>=1600" ];
       tags = [ "score:>=200" "rating:safe" ];
     };
-    services.polybar.settings = {
-      "module/fs-root" = {
-        mount = mkAfter [ "/mnt/enc" "/nix" "/mnt/data" ];
+    services.polybar = {
+      nvidia.gpu = nixosConfig.hardware.vfio.devices.gtx1650.gpu.nvidia.uuid;
+      settings = {
+        "module/fs-root" = {
+          mount = mkAfter [ "/mnt/enc" "/nix" "/mnt/data" ];
+        };
       };
     };
     services.dunst.iconTheme.size = "64x64";
