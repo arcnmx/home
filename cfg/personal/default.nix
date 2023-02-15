@@ -321,6 +321,7 @@ in {
         { path = "/home/share"; recursive = true; hidden-files = false; }
       ];
     };
+    programs.fuse.userAllowOther = mkDefault true;
     security.sudo.wheelNeedsPassword = false;
     systemd.services = {
       nix-daemon.serviceConfig.OOMScoreAdjust = -100;

@@ -136,5 +136,17 @@
         };
       };
     };
+
+    services.mediatomb.mediaDirectories = map (path: {
+      path = "/mnt/shadow/media/${path}";
+      recursive = true;
+      hidden-files = false;
+    }) [
+      "anime" "movies" "tv" "unsorted"
+    ];
+    systemd.services.mediatomb.serviceConfig.BindReadOnlyPaths = mkForce [
+      "/home/share"
+      "/mnt/shadow"
+    ];
   };
 }

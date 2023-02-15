@@ -227,6 +227,15 @@ in {
           ];
         })
       ];
+      bindings = let
+        inherit (config.services) mediatomb;
+      in {
+        mediatomb = mkIf mediatomb.enable {
+          protocol = mkDefault "http";
+          port = mkDefault mediatomb.port;
+          address = mkDefault config.deploy.network.local.ipv4;
+        };
+      };
     };
 
     systemd = {
