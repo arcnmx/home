@@ -1,5 +1,6 @@
 { pkgs, nixosConfig, options, config, lib, ... }@args: with lib; let
   inherit (nixosConfig.services) xserver;
+  inherit (nixosConfig.systemd) translate;
   cfg = config.services.dpms-standby;
   checkIdle = if cfg.checkIdle then ''
     if [[ $(${getExe pkgs.xprintidle}) -lt $DPMS_INTERVAL_MS ]]; then
@@ -113,6 +114,12 @@ in {
         then nixosConfig.services.dpms-standby.control
         else control;
     };
+    unit = mkOption {
+      type = str;
+      default = if homeSkel
+        then toString translate.units."dpms-standby.service".userTarget.name
+        else "dpms-standby.service";
+    };
   } // optionalAttrs (!isHome) {
     user = mkOption {
       type = nullOr str;
@@ -129,7 +136,37 @@ in {
       user.services.dpms-standby = homeService;
     } else {
       services.dpms-standby = service;
+      translate.units = [ "dpms-standby.service" ];
     };
     services.idle.enable = mkDefault true;
+  }) (mkIf cfg.enable {
+    systemd = let
+      inherit (config.services) konawall;
+      sysu = "${config.systemd.package}/bin/systemctl --user";
+      konawall' = {
+        user.timers.konawall-rotation = {
+          Unit.Conflicts = mkIf cfg.enable [ cfg.unit ];
+        };
+        user.services.konawall-rotation-wake = rec {
+          Install.WantedBy = [ cfg.unit ];
+          Unit = {
+            After = Install.WantedBy;
+            StopWhenUnneeded = true;
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = mkDefault [ "${pkgs.coreutils}/bin/true" ];
+            ExecStop = singleton "${pkgs.writeShellScript "konawall-rotation-wake" ''
+              if ${sysu} is-active graphical-session.target > /dev/null; then
+                ${sysu} start konawall-rotation.timer
+              fi
+            ''}";
+          };
+        };
+      };
+    in mkMerge [
+      (optionalAttrs isHome (mkIf (konawall.enable && konawall.interval != null) konawall'))
+    ];
   }) ];
 }
