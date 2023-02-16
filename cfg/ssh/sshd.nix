@@ -1,5 +1,6 @@
 { config, lib, ... }: with lib; let
   cfg = config.services.openssh;
+  data = import ./data.nix;
 in {
   options.services.openssh = {
     port = mkOption {
@@ -20,7 +21,8 @@ in {
       AllowAgentForwarding = true;
       AllowTcpForwarding = true;
       GatewayPorts = "yes";
-      PermitUserEnvironment = true;
+      #PermitUserEnvironment = true;
+      AcceptEnv = toString data.SendEnv;
       Compression = true;
       PermitTunnel = true;
     };
