@@ -218,6 +218,7 @@ in {
             } // {
               "session.suspend-timeout-seconds" = 60;
               "api.alsa.period-size" = 512;
+              "latency.internal.rate" = 1110;
             };
           };
           onboard-optical = {
@@ -232,6 +233,7 @@ in {
             } // {
               "session.suspend-timeout-seconds" = 30;
               "api.alsa.period-size" = 512;
+              "latency.internal.rate" = 66;
               "audio.format" = "S32LE";
               "resample.quality" = 6;
             };
@@ -246,6 +248,7 @@ in {
               prio = 100;
             } // {
               "session.suspend-timeout-seconds" = 60;
+              "latency.internal.rate" = 66;
             };
           };
           onboard-mic-broken = {
@@ -275,6 +278,7 @@ in {
             } // {
               "session.suspend-timeout-seconds" = 60;
               #"api.alsa.period-size" = 512;
+              "latency.internal.rate" = 58;
             };
           };
         };

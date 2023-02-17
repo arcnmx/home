@@ -143,6 +143,10 @@ in {
 
           "dom.event.contextmenu.enabled" = true; # learn to shift+right-click instead
 
+          # https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Performance-tuning#firefox
+          "reader.parse-on-load.enabled" = false;
+          "media.webspeech.synth.enabled" = false;
+
           "privacy.trackingprotection.enabled" = true;
           "privacy.trackingprotection.fingerprinting.enabled" = true;
           "privacy.trackingprotection.cryptomining.enabled" = true;
