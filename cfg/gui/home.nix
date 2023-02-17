@@ -138,6 +138,7 @@ in {
         "nix shell --impure --builders '' nixpkgs-big#google-chrome -c google-chrome-stable";
       oryx = "chrome https://configure.ergodox-ez.com/train";
       parsec = "nix run --impure --builders '' nixpkgs#parsec-bin";
+      obsidian = "nix run --impure --builders '' nixpkgs#obsidian >/dev/null 2>/dev/null </dev/null";
       pavucontrol = "nix run nixpkgs#pavucontrol";
     };
     home.shell.functions = {
