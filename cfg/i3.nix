@@ -23,9 +23,10 @@
     #lock = "${pkgs.physlock}/bin/physlock -dms";
     lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
     sleep = "${pkgs.coreutils}/bin/sleep";
-    dpms-off = if config.services.dpms-standby.enable
+    dpms-off' = if config.services.dpms-standby.enable
       then "${config.services.dpms-standby.control} start"
       else "${getExe pkgs.xorg.xset} dpms force off";
+    dpms-off = "${sleep} 0.2 && ${dpms-off'}";
     pactl = "${config.home.nixosConfig.hardware.pulseaudio.package or pkgs.pulseaudio}/bin/pactl";
     playerctl = "${config.services.playerctld.package}/bin/playerctl";
     pkill = "${pkgs.procps}/bin/pkill";
@@ -36,6 +37,11 @@
     bar-refresh-mic = if config.services.polybar.enable
       then "&& ${config.services.polybar.package}/bin/polybar-msg hook mic 1"
       else bar-refresh;
+    lockscript = pkgs.writeShellScript "i3-exec-lock" ''
+      ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service
+      ${dpms-off}
+      ${lock}
+    '';
     bindWorkspace = key: workspace: {
       "${mod}+${key}" = "workspace number ${workspace}";
       "${mod}+shift+${key}" = "move container to workspace number ${workspace}";
@@ -187,9 +193,9 @@
         "XF86AudioPrev" = "exec --no-startup-id ${playerctl} previous ${bar-refresh}";
         "ctrl+XF86AudioPrev" = "exec --no-startup-id ${playerctl} seek 10- ${bar-refresh}";
 
-        "--release ${mod}+p" = "exec --no-startup-id ${sleep} 0.2 && ${dpms-off}";
+        "--release ${mod}+p" = "exec --no-startup-id ${dpms-off}";
 
-        "--release ${mod}+bracketleft" = "exec --no-startup-id ${config.systemd.package}/bin/systemctl --user stop gpg-agent.service; exec --no-startup-id ${sleep} 0.2 && ${dpms-off} && ${lock}";
+        "--release ${mod}+bracketleft" = "exec --no-startup-id ${lockscript}";
 
         "${mod}+shift+Escape" = "exit";
 
