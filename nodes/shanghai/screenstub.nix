@@ -128,7 +128,7 @@ in {
               toggle_grab.evdev = {
                 #new_device_name = "testing";
                 #evdev_ignore = singleton "button";
-                xcode_ignore = [ "button" "absolute" ];
+                xcore_ignore = [ "button" "absolute" ];
                 devices = singleton "/dev/input/by-id/usb-Razer_Razer_Naga_Trinity_00000000001A-event-mouse";
               };
             }
