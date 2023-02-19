@@ -53,8 +53,8 @@
       in if config.usb.useQemuXHCI then {
         usb3.settings = {
           driver = "qemu-xhci";
-          p3 = 8;
-          p2 = 16;
+          p3 = 16;
+          p2 = 32;
         };
       } else {
         usb-ehci1.settings = {
