@@ -71,6 +71,7 @@ sector-size: $PARENT_SECTOR_SIZE
 1 : start=$((2048*512/PARENT_SECTOR_SIZE)), size=$((BLOCK_SIZE_512S*512/PARENT_SECTOR_SIZE)), type=$DISK_TYPE
 EOF
 if [[ "$DM_NAME,,," != "$DM_CONCISE" ]]; then
+	sleep 0.3
 	dmsetup remove "$DM_NAME"
 	dmsetup create --concise "$DM_CONCISE,$DM_TABLE"
 fi
