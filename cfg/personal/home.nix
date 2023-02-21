@@ -138,6 +138,24 @@ in {
         nix = "${config.xdg.userDirs.documents}/nix";
       };
     };
+    programs.direnv = {
+      stdlib = ''
+        use_flake() {
+          DIRENV_FLAKE_DIR=.
+          if [[ "''${1-}" = *#* ]]; then
+            DIRENV_FLAKE_DIR=$(cut -d# -f1 <<<"$1")
+          fi
+          watch_file $DIRENV_FLAKE_DIR/flake.nix
+          watch_file $DIRENV_FLAKE_DIR/flake.lock
+          mkdir -p "$(direnv_layout_dir)"
+          ARGS=()
+          if [[ -v DIRENV_FLAKE_PROFILE ]]; then
+            ARGS+=(--profile "$(direnv_layout_dir)/flake-profile")
+          fi
+          eval "$(nix print-dev-env "''${ARGS[@]}" "$@")"
+        }
+      '';
+    };
     programs.git = {
       package = pkgs.git;
       extraConfig = {
