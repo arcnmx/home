@@ -77,11 +77,8 @@ in {
     };
 
     boot = {
-      kernelPackages = lib.mkMerge [
-        (lib.mkDefault pkgs.linuxPackages_latest)
-        (lib.mkIf (lib.elem "zfs" config.boot.supportedFilesystems) (lib.mkOverride 90 config.boot.zfs.package.latestCompatibleLinuxPackages))
-      ];
       kernel = {
+        select.enable = mkDefault true;
         customBuild = lib.mkMerge [
           (lib.mkDefault (config.boot.kernel.bleedingEdge || config.deploy.personal.enable))
           # actions provides way too little disk space for compiling a kernel
