@@ -50,6 +50,7 @@ au BufRead,BufNewFile *.kt setlocal filetype=kotlin
 au BufRead,BufNewFile *.as setlocal filetype=javascript
 
 au FileType gitcommit setlocal colorcolumn=50,72
+au FileType haskell setlocal expandtab
 
 xmap <M-C> y:call SendViaOSC52(getreg('"'))<cr>
 
