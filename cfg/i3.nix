@@ -21,7 +21,8 @@
     #term = "${pkgs.xterm}/bin/xterm";
     i3-easyfocus = "${pkgs.i3-easyfocus}/bin/i3-easyfocus";
     #lock = "${pkgs.physlock}/bin/physlock -dms";
-    lock = "${pkgs.i3lock}/bin/i3lock -e -u -c 111111";
+    lock = "${pkgs.i3lock}/bin/i3lock --show-failed-attempts -c 0c2c32"
+      + optionalString (!nixosConfig.services.fprintd.enable) " --ignore-empty-password";
     sleep = "${pkgs.coreutils}/bin/sleep";
     dpms-off' = if config.services.dpms-standby.enable
       then "${config.services.dpms-standby.control} start"
