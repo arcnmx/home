@@ -86,7 +86,7 @@ in {
       wantedBy = mkForce [ ];
       serviceConfig = {
         TimeoutStartSec = 90;
-        LogFilterPatterns = [
+        LogFilterPatterns = mkIf (versionAtLeast config.systemd.package.version "253") [
           "~WARNING"
         ];
       };

@@ -570,6 +570,11 @@
             StateDirectory = mkIf (hasPrefix "/var/lib/" config.state.path) (removePrefix "/var/lib/" config.state.path);
             RuntimeDirectory = mkIf (hasPrefix "/run/" config.state.runtimePath) (removePrefix "/run/" config.state.runtimePath);
             OOMScoreAdjust = -150;
+            LogFilterPatterns = mkIf (versionAtLeast nixosConfig.systemd.package.version "253") [
+              # reduce spam when pulse/pw needs a restart
+              "~pulseaudio: Reason: Connection terminated"
+              "~pa_threaded_mainloop_lock failed"
+            ];
           } (mkIf (config.qmp.enable || qgaShutdown) {
             ExecStop = singleton (pkgs.writeShellScript "vm-${config.name}-stop" ExecStop);
             KillSignal = "SIGCONT"; # only signal if timeout occurs
