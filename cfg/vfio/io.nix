@@ -305,6 +305,10 @@
       udev.rule = mkOption {
         type = types.separatedString ", ";
       };
+      softConflicts = mkOption {
+        type = types.bool;
+        default = config.gpu.enable && config.gpu.primary;
+      };
       gpu = {
         enable = mkEnableOption "GPU" // {
           default = elem config.driver [ "nvidia" "amdgpu" ];
@@ -336,9 +340,7 @@
         };
       };
     };
-    config = let
-      hardConflict = false;
-    in {
+    config = {
       vfio = {
         name = "pci-${name}-vfio";
         mqtt.enable = mkDefault false;
@@ -371,7 +373,7 @@
               "nvidia-x11.service"
             ])
           ];
-          conflicts = mkIf hardConflict [ config.vfio.id ];
+          conflicts = mkIf (!config.softConflicts) [ config.vfio.id ];
           script = mkMerge [ ''
             if [[ ! -L /sys/bus/pci/drivers/${config.driver}/${config.host} ]]; then
               echo > /sys/bus/pci/devices/${config.host}/driver_override
@@ -381,7 +383,7 @@
             ${smi} drain -p ${config.host} -m 0 || true
           '')) ];
           serviceConfig = {
-            ExecStartPre = mkIf (!hardConflict) [ "${getExe canRun} ${config.vfio.id}" ];
+            ExecStartPre = mkIf config.softConflicts [ "${getExe canRun} ${config.vfio.id}" ];
             ExecStop = [ "${getExe bindStop} ${config.driver} ${config.host}" ];
           };
         };
@@ -394,8 +396,9 @@
           unit = rec {
             wantedBy = mkIf (config.gpu.nvidia.enable && !config.gpu.primary && !config.reserve) [ "nvidia-x11.service" ];
             requisite = [ config.bind.id "nvidia-x11.service" ];
+            conflicts = [ config.vfio.id ];
             bindsTo = requisite;
-            after = requisite;
+            after = requisite ++ conflicts;
             serviceConfig = {
               ExecStart = [
                 "${smi} drain -p ${config.host} -m 1"
@@ -415,7 +418,7 @@
             requires = [ config.bind.id "nvidia-x11.service" ];
             conflicts = [ config.vfio.id config.gpu.nvidia.drain.id ];
             bindsTo = requires;
-            after = requires;
+            after = requires ++ conflicts;
             serviceConfig = {
               ExecStart = [
                 "${smi} -i ${config.gpu.nvidia.uuid} --persistence-mode=1"
@@ -588,7 +591,7 @@
           (mkDefault "unix:/run/user/${toString nixosConfig.users.users.${config.scream.playback.user}.uid}/pulse/native");
         systemd = {
           name = "vm-${name}-scream";
-          enable = config.scream.enable;
+          enable = config.enable && config.scream.enable;
           type = "exec";
           polkit.user = mkDefault config.systemd.polkit.user;
           unit = {
@@ -604,15 +607,13 @@
                 (removePrefix "unix:" config.scream.playback.pulse.server)
               ];
             };
+            environment = {
+              PULSE_SERVER = mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.pulse.server != null)
+                  config.scream.playback.pulse.server;
+              PULSE_COOKIE = mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.user != null)
+                "${nixosConfig.users.users.${config.scream.playback.user}.home}/.config/pulse/cookie";
+            };
             serviceConfig = {
-              Environment = mkMerge [
-                (mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.pulse.server != null) [
-                  "PULSE_SERVER=${config.scream.playback.pulse.server}"
-                ])
-                (mkIf (config.scream.playback.backend == "pulse" && config.scream.playback.user != null) [
-                  "PULSE_COOKIE=${nixosConfig.users.users.${config.scream.playback.user}.home}/.config/pulse/cookie"
-                ])
-              ];
               ExecStart = singleton config.scream.playback.cli.command;
               ExecStartPre = mkIf (config.scream.mode == "ivshmem") [
                 (pkgs.writeShellScript "${config.scream.systemd.name}-pre" ''
