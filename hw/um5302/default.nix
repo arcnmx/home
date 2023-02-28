@@ -53,14 +53,5 @@ in {
         enable = true;
       };
     };
-
-    # workaround for a bug where the backlight resets to a default level when waking from dpms
-    systemd.services.dpms-standby = mkIf config.services.dpms-standby.enable {
-      serviceConfig.ExecStop = [
-        (with pkgs; writeShellScript "restore-backlight" ''
-          ${getExe acpilight} -set $(${getExe acpilight} -get)
-        '')
-      ];
-    };
   };
 }

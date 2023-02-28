@@ -100,11 +100,9 @@
         };
       };
     };
-    xsession.windowManager.i3.config.keybindings = let
-      xbacklight = "${pkgs.acpilight}/bin/xbacklight"; # pkgs.xorg.xbacklight
-    in {
-      "XF86MonBrightnessUp" = "exec --no-startup-id ${xbacklight} -inc 10";
-      "XF86MonBrightnessDown" = "exec --no-startup-id ${xbacklight} -dec 10";
+    xsession.windowManager.i3.config.keybindings = {
+      "XF86MonBrightnessUp" = "exec --no-startup-id xbacklight -inc 10";
+      "XF86MonBrightnessDown" = "exec --no-startup-id xbacklight -dec 10";
     };
   };
 }

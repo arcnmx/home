@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }: with lib; {
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
+    hardware.acpilight.enable = mkDefault true;
     hardware.bluetooth = {
       enable = true;
       powerOnBoot = mkDefault false;
@@ -72,7 +73,6 @@
 
     environment.systemPackages = with pkgs; [
       acpi
-      acpilight
       wirelesstools
       bluez
     ];
