@@ -24,7 +24,7 @@ for bound in /sys/bus/pci/drivers/{nvidia,snd_hda_intel}/$PCI_DEVICE; do
 done
 
 if [[ ! -d /sys/bus/pci/drivers/vfio-pci ]]; then
-	modprobe -a vfio vfio_iommu_type1 vfio_pci vfio_virqfd || true
+	modprobe -a vfio vfio_iommu_type1 vfio_pci || true
 fi
 
 if [[ ! -e /sys/bus/pci/drivers/vfio-pci/$PCI_DEVICE ]]; then

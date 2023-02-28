@@ -15,7 +15,12 @@
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];
     boot = {
-      initrd.kernelModules = ["vfio" "vfio_iommu_type1" "vfio_pci" "vfio_virqfd"];
+      initrd.kernelModules = mkMerge [
+        ["vfio" "vfio_iommu_type1" "vfio_pci" ]
+        (mkIf (versionOlder config.boot.kernelPackages.kernel.version "6.2") [
+          "vfio_virqfd"
+        ])
+      ];
       modprobe.modules = {
         kvm.options = {
           ignore_msrs = mkDefault true;
