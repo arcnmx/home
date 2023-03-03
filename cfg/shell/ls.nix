@@ -1,8 +1,13 @@
 { pkgs, config, lib, ... }: with lib; {
-  programs.exa.enable = !config.home.minimalSystem;
+  programs.exa = {
+    enable = !config.home.minimalSystem;
+    enableAliases = mkDefault false;
+    extraOptions = [
+      "--time-style" "long-iso"
+    ];
+  };
   home.shell.aliases = mkMerge [
     (mkIf config.programs.exa.enable {
-      exa = "exa --time-style long-iso";
       ls = "exa -G";
       la = "exa -Ga";
       ll = "exa -l";
