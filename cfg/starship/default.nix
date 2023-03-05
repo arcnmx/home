@@ -112,11 +112,18 @@
       };
     } // mapListToAttrs (k: nameValuePair k { disabled = mkOptionDefault true; }) [
       # disable most builtin modules I'd never use...
-      "aws" "battery" "docker_context" "gcloud" "kubernetes" "openstack" "pulumi" "singularity" "terraform" "vagrant" "vcsh"
+      "battery" "vcsh"
+      "aws" "azure" "gcloud" "kubernetes"
+      "vagrant" "docker_context" "openstack" "singularity"
+      "terraform" "pulumi" "helm"
       # useless modules that just show version numbers...
-      "golang" "helm" "java" "julia" "cmake" "cobol" "conda" "crystal" "dart" "deno" "dotnet" "elixir" "elm" "erlang" "kotlin" "lua" "nim" "nodejs" "ocaml" "perl" "php" "purescript" "python" "rlang" "red" "ruby" "rust" "scala" "swift" "vlang" "zig"
+      "buf" "bun" "cmake" "cobol" "conda" "crystal" "dart" "deno" "dotnet" "elixir"
+      "elm" "erlang" "fennel" "golang" "gradle" "haskell" "haxe" "java" "julia"
+      "kotlin" "lua" "nim" "nodejs" "ocaml" "os" "perl" "php" "purescript"
+      "python" "raku" "rlang" "red" "ruby" "rust" "scala" "swift" "vlang" "zig"
       # sorry mercurial
       "hg_branch"
+      "fossil_branch"
     ];
   };
 }
