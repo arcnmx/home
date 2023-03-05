@@ -88,6 +88,10 @@ in {
           vendor = "045e";
           product = "0b12";
         };
+        switch-pro = {
+          vendor = "057e";
+          product = "2009";
+        };
         gmmk = {
           vendor = "0c45";
           product = "652f";

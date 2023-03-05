@@ -82,6 +82,7 @@ in {
       gmmk.enable = false;
       hori.enable = true;
       xpad.enable = true;
+      switch-pro.enable = true;
       nagatrinity.enable = false;
       shift.enable = false;
       oculus-sensor.enable = true;
