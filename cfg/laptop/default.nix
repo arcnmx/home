@@ -87,6 +87,9 @@
 
     systemd.network.wait-online.anyInterface = true;
     systemd.services = {
+      yggdrasil = mkIf config.services.yggdrasil.enable {
+        after = mkIf config.services.connman.enable [ "connman.service" ];
+      };
       net-suspend = rec {
         description = "stop wifi+bluetooth before sleep";
         wantedBy = [ "sleep.target" ];

@@ -42,9 +42,12 @@ in {
       };
     }
     (mkIf cfg.enable {
-      systemd.services.tailscaled.serviceConfig = {
-        # filter out noisy connection status logs
-        LogLevelMax = "notice";
+      systemd.services.tailscaled = {
+        after = mkIf config.services.connman.enable [ "connman.service" ];
+        serviceConfig = {
+          # filter out noisy connection status logs
+          LogLevelMax = "notice";
+        };
       };
       systemd.network.wait-online.ignoredInterfaces = [ cfg.interfaceName ];
       networking.firewall = {
