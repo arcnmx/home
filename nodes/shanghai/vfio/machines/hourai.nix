@@ -19,11 +19,11 @@ in {
     enable = mkDefault true;
     name = "hourai";
     virtio.enable = true;
-    memory.sizeMB = 8 * 1024;
+    memory.sizeMB = 12 * 1024;
     smp = {
       settings = {
         threads = 1;
-        cores = nixosConfig.hardware.cpu.info.cores / 2;
+        cores = nixosConfig.hardware.cpu.info.cores * 2 / 3;
       };
     };
     systemd.depends = mapAttrsToList (name: _:
