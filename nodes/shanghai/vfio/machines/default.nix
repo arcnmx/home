@@ -33,6 +33,7 @@ in {
         };
         hourai1650 = { ... }: {
           imports = [ ./hourai.nix toggleSharedDisks ];
+          enable = false;
           vfio.gpu = "gtx1650";
         };
         hourai-nocow = { ... }: {
