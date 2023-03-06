@@ -1,16 +1,15 @@
 { lib }: with lib; let
-  _4k = mapAttrs (_: mkDefault) {
-    width = 3840;
-    height = 2160;
-  };
   defaults = {
-    common = { config, ... }: {
-      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) "On";
+    _4k = mapAttrs (_: mkDefault) {
+      width = 3840;
+      height = 2160;
     };
-    spectrum = { config, ... }: {
-      imports = [ defaults.common ];
-      output = mkDefault "DP-0";
-      #source = mkDefault "DisplayPort-2"; # broken USB Type-C port
+    common = { config, ... }: {
+      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "DP-" config.output) (mkOptionDefault "On");
+    };
+    spectrum-4k144 = { config, ... }: {
+      imports = [ defaults.common defaults._4k ];
+      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "HDMI-" config.output && nixosConfig.hardware.vfio.rtx3080.gpu.primary) (mkDefault "On");
       edid = mapAttrs (_: mkDefault) {
         manufacturer = "EVE";
         model = "ES07D03";
@@ -18,18 +17,35 @@
       xserver.sectionName = mkDefault "Monitor[0]";
       refreshRate = mkDefault 144;
       primary = mkDefault true;
-    } // _4k;
+    };
+    spectrum-typec = { config, ... }: {
+      imports = [ defaults.spectrum-4k144 ];
+      output = mkDefault "DP-2";
+      source = mkDefault "DisplayPort-2"; # broken USB Type-C port
+    };
+    spectrum-hdmi = { config, ... }: {
+      imports = [ defaults.spectrum-4k144 ];
+      output = mkDefault "DP-0";
+      source = mkDefault "HDMI-2";
+      nvidia = {
+        options.AllowGSYNCCompatible = null;
+        flatPanelOptions = {
+          Dithering = "Disabled";
+        };
+      };
+    };
     dell = { config, ... }: {
-      imports = [ defaults.common ];
+      imports = [ defaults.common defaults._4k ];
       output = mkDefault "HDMI-0";
+      source = mkDefault "HDMI-1";
       edid = mapAttrs (_: mkDefault) {
         manufacturer = "DEL";
         model = "DELL S2721QS";
       };
       xserver.sectionName = mkDefault "Monitor[1]";
-    } // _4k;
+    };
     lg = { config, ... }: {
-      imports = [ defaults.common ];
+      imports = [ defaults.common defaults._4k ];
       enable = false;
       output = mkDefault "DP-2";
       edid = mapAttrs (_: mkDefault) {
@@ -38,7 +54,7 @@
       };
       xserver.sectionName = mkDefault "Monitor[2]";
       rotation = mkDefault "right";
-    } // _4k;
+    };
   };
   layouts = {
     stacked = monitors: with monitors; {
@@ -48,7 +64,7 @@
         y = spectrum.y - config.viewport.height;
       };
       spectrum = { config, ... }: {
-        imports = [ defaults.spectrum ];
+        imports = [ defaults.spectrum-typec ];
         x = 0;
         y = lg.y + lg.viewport.height - config.viewport.height;
       };
@@ -60,7 +76,7 @@
     };
     linear = monitors: with monitors; {
       spectrum = { config, ... }: {
-        imports = [ defaults.spectrum ];
+        imports = [ defaults.spectrum-typec ];
         x = 0;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
@@ -78,7 +94,7 @@
     gaming = monitors: with monitors; {
       # linear but with spectrum in the middle
       spectrum = { config, ... }: {
-        imports = [ defaults.spectrum ];
+        imports = [ defaults.spectrum-typec ];
         x = dell.x + dell.viewport.width;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
