@@ -68,16 +68,12 @@
       '';
       nrpf = ''
         ${collectArgs}
-        if [[ $# -eq 0 ]]; then
-          local FILE="''${1-.}"
-          if [[ $# -gt 0 ]]; then
-            shift
-          fi
-
-          nix repl ${args} --show-trace -f "$FILE" "$@"
-        else
-          nix repl ${args} --show-trace "$@"
+        local FILE="''${1-.}"
+        if [[ $# -gt 0 ]]; then
+          shift
         fi
+
+        nix repl ${args} --show-trace -f "$FILE" "$@"
       '';
     };
   };
