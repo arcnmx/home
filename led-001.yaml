@@ -1,0 +1,6 @@
+substitutions:
+  id: "001"
+
+packages:
+  led: !include led.yaml
+  ws2815: !include ws2815.yaml

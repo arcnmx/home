@@ -1,0 +1,10 @@
+substitutions:
+  platform: esp32
+  board: esp32dev # unknown
+
+esp32:
+  board: $board
+  variant: esp32
+
+packages:
+  platform-generic: !include esp32-generic.yaml

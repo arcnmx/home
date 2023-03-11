@@ -1,0 +1,45 @@
+e131:
+  method: multicast
+wled:
+
+light:
+- platform: neopixelbus
+  name: "${friendly_name} Strip"
+  variant: WS2813 # actually WS2815
+  pin: GPIO3
+  num_leds: 300
+  effects:
+  - e131:
+      universe: 1
+      channels: RGB
+  - wled:
+      #port: 21324
+  - random:
+  - pulse:
+  - strobe:
+  - flicker:
+  - addressable_rainbow:
+  - addressable_color_wipe:
+  - addressable_scan:
+  - addressable_twinkle:
+  - addressable_fireworks:
+  - addressable_lambda:
+      name: "My Custom Effect"
+      update_interval: 16ms
+      lambda: |-
+        // it.size() - Number of LEDs
+        // it[num] - Access the LED at index num.
+        // Set the LED at num to the given r, g, b values
+        // it[num] = Color(r, g, b);
+        // Get the color at index num (Color instance)
+        // it[num].get();
+
+        // Example: Simple color wipe
+        for (int i = it.size() - 1; i > 0; i--) {
+          it[i] = it[i - 1].get();
+        }
+        it[0] = Color::random_color();
+
+        // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+        it.range(0, 50) = Color::BLACK;
+        it.all().fade_to_black(10);

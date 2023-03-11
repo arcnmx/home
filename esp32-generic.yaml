@@ -1,0 +1,7 @@
+substitutions:
+  platform: esp32
+
+esp32:
+
+packages:
+  generic: !include generic.yaml
