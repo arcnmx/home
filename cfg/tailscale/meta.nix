@@ -24,6 +24,10 @@
       tags = mkOption {
         type = with types; listOf str;
       };
+      isPersonalDevice = mkOption {
+        type = types.bool;
+        default = elem config.user cfg.users || config.shortName == "tewi";
+      };
     };
   };
   mapRecord = addrIndex: dev: let
@@ -35,7 +39,7 @@
       inherit address;
     };
   };
-  ourDevices = filterAttrs (_: dev: elem dev.user cfg.users) cfg.devices;
+  ourDevices = filterAttrs (_: dev: dev.isPersonalDevice) cfg.devices;
   records = concatLists (mapAttrsToList (_: dev: imap0 (i: _: mapRecord i dev) dev.addresses) ourDevices);
 in {
   options = {

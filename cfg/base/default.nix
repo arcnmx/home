@@ -199,6 +199,7 @@ in {
 
     services.timesyncd.enable = true;
     services.fstrim.enable = true;
+    services.mediatomb.openFirewall = mkDefault false;
 
     networking = {
       nameservers = lib.mkIf config.home.profileSettings.base.defaultNameservers (

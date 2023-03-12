@@ -9,7 +9,7 @@
   ) meta.network.tailscale.devices);
   otherDevices = filterAttrs (_: dev:
     dev.shortName != config.networking.hostName
-    && elem dev.user meta.network.tailscale.users
+    && dev.isPersonalDevice
   ) meta.network.tailscale.devices;
 in {
   options = {
