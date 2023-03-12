@@ -215,7 +215,9 @@ in {
         SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ${assignLocalGroup}
         SUBSYSTEM=="usb", ATTR{idVendor}=="2047", ${assignLocalGroup}
         SUBSYSTEM=="usb", ATTR{idVendor}=="03eb", ${assignLocalGroup}
+        SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", ATTR{idProduct}=="ea60", ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="MSP Tools Driver", ${assignLocalGroup}
+        SUBSYSTEM=="tty", ATTRS{interface}=="CP2102 USB to UART Bridge Controller", ${assignLocalGroup}
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic GDB Server", ${assignLocalGroup}, SYMLINK+="ttyBMP"
         SUBSYSTEM=="tty", ATTRS{interface}=="Black Magic UART Port", ${assignLocalGroup}, SYMLINK+="ttyBMPuart"
       '';
