@@ -9,19 +9,24 @@
     };
     spectrum-4k144 = { config, ... }: {
       imports = [ defaults.common defaults._4k ];
-      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "HDMI-" config.output && nixosConfig.hardware.vfio.rtx3080.gpu.primary) (mkDefault "On");
+      nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "HDMI-" config.output && nixosConfig.hardware.vfio.rtx3080.gpu.primary) (mkOptionDefault "On");
       edid = mapAttrs (_: mkDefault) {
         manufacturer = "EVE";
         model = "ES07D03";
       };
       xserver.sectionName = mkDefault "Monitor[0]";
       refreshRate = mkDefault 144;
+    };
+    spectrum-dp = { config, ... }: {
+      imports = [ defaults.spectrum-4k144 ];
+      output = mkDefault "DP-2";
+      source = mkDefault "DisplayPort-1";
+      refreshRate = 144;
       primary = mkDefault true;
     };
     spectrum-typec = { config, ... }: {
-      imports = [ defaults.spectrum-4k144 ];
-      output = mkDefault "DP-2";
-      source = mkDefault "DisplayPort-2"; # broken USB Type-C port
+      imports = [ defaults.spectrum-dp ];
+      source = "DisplayPort-2"; # broken USB Type-C port
     };
     spectrum-hdmi = { config, ... }: {
       imports = [ defaults.spectrum-4k144 ];
@@ -34,7 +39,8 @@
         };
       };
     };
-    dell = { config, ... }: {
+    spectrum = defaults.spectrum-dp;
+    dell = { monitors, config, ... }: {
       imports = [ defaults.common defaults._4k ];
       output = mkDefault "HDMI-0";
       source = mkDefault "HDMI-1";
@@ -43,6 +49,7 @@
         model = "DELL S2721QS";
       };
       xserver.sectionName = mkDefault "Monitor[1]";
+      primary = mkDefault (!monitors.spectrum.primary);
     };
     lg = { config, ... }: {
       imports = [ defaults.common defaults._4k ];
@@ -57,63 +64,66 @@
     };
   };
   layouts = {
-    stacked = monitors: with monitors; {
-      dell = { config, ... }: {
+    stacked = {
+      dell = { monitors, config, ... }: with monitors; {
         imports = [ defaults.dell ];
         x = lg.x - config.viewport.width;
         y = spectrum.y - config.viewport.height;
       };
-      spectrum = { config, ... }: {
-        imports = [ defaults.spectrum-typec ];
+      spectrum = { monitors, config, ... }: with monitors; {
+        imports = [ defaults.spectrum ];
         x = 0;
         y = lg.y + lg.viewport.height - config.viewport.height;
       };
-      lg = { config, ... }: {
+      lg = { monitors, config, ... }: with monitors; {
         imports = [ defaults.lg ];
         x = spectrum.x + spectrum.viewport.width;
         y = max 0 ((spectrum.viewport.height + dell.viewport.height) - config.viewport.height);
       };
     };
-    linear = monitors: with monitors; {
-      spectrum = { config, ... }: {
-        imports = [ defaults.spectrum-typec ];
+    linear = {
+      spectrum = { monitors, config, ... }: with monitors; {
+        imports = [ defaults.spectrum ];
         x = 0;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
-      dell = { config, ... }: {
+      dell = { monitors, config, ... }: with monitors; {
         imports = [ defaults.dell ];
         x = spectrum.x + spectrum.viewport.width;
         y = lg.viewport.height - config.viewport.height;
       };
-      lg = { config, ... }: {
+      lg = { monitors, config, ... }: with monitors; {
         imports = [ defaults.lg ];
         x = dell.x + dell.viewport.width;
         y = 0;
       };
     };
-    gaming = monitors: with monitors; {
+    gaming = {
       # linear but with spectrum in the middle
-      spectrum = { config, ... }: {
-        imports = [ defaults.spectrum-typec ];
+      spectrum = { monitors, config, ... }: with monitors; {
+        imports = [ defaults.spectrum ];
         x = dell.x + dell.viewport.width;
         y = dell.y + dell.viewport.height - config.viewport.height;
       };
-      dell = { config, ... }: {
+      dell = { monitors, config, ... }: with monitors; {
         imports = [ defaults.dell ];
         x = 0;
         y = lg.viewport.height - config.viewport.height;
       };
-      lg = { config, ... }: {
+      lg = { monitors, config, ... }: with monitors; {
         imports = [ defaults.lg ];
         x = spectrum.x + spectrum.viewport.width;
         y = 0;
       };
     };
-    gaming-vertical = monitors: mkMerge [ (layouts.gaming monitors) {
-      spectrum.rotation = "right";
-    } ];
+    gaming-vertical = mkMerge [
+      layouts.gaming
+      {
+        spectrum.rotation = "right";
+      }
+    ];
   };
 in {
-  monitors = layouts;
+  inherit layouts;
   default = layouts.gaming;
 }

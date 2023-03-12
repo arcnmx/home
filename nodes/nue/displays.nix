@@ -27,30 +27,30 @@
     };
   };
   layouts = {
-    internal = monitors: with monitors; {
-      internal = { config, ... }: {
+    internal = {
+      internal = { monitors, config, ... }: with monitors; {
         imports = [ defaults.internal ];
       };
     };
-    stacked = monitors: with monitors; {
-      internal = { config, ... }: {
+    stacked = {
+      internal = { monitors, config, ... }: with monitors; {
         imports = [ defaults.internal ];
         x = spectrum.x + spectrum.viewport.width / 2 - config.viewport.width / 2;
         y = spectrum.y + spectrum.viewport.height;
       };
-      spectrum = { config, ... }: {
+      spectrum = { monitors, config, ... }: with monitors; {
         imports = [ defaults.spectrum ];
         x = 0;
         y = 0;
       };
     };
-    side = monitors: with monitors; {
-      internal = { config, ... }: {
+    side = {
+      internal = { monitors, config, ... }: with monitors; {
         imports = [ defaults.internal ];
         x = 0;
         y = spectrum.viewport.height - config.viewport.height;
       };
-      spectrum = { config, ... }: {
+      spectrum = { monitors, config, ... }: with monitors; {
         imports = [ defaults.spectrum ];
         x = internal.x + internal.viewport.width;
         y = internal.y + internal.viewport.height;
@@ -58,6 +58,6 @@
     };
   };
 in {
-  monitors = layouts;
+  inherit layouts;
   default = layouts.internal;
 }

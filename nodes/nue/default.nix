@@ -21,7 +21,7 @@
 
     hardware.display = {
       enable = true;
-      monitors = (import ./displays.nix { inherit lib; }).default config.hardware.display.monitors;
+      monitors = (import ./displays.nix { inherit lib; }).default;
       oled = singleton config.hardware.display.monitors.internal.output;
       dpi = config.hardware.display.monitors.internal.dpi.out.dpi;
       fontScale = 1.35;

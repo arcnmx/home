@@ -34,7 +34,7 @@
 
     hardware.display = {
       enable = true;
-      monitors = (import ./displays.nix { inherit lib; }).default config.hardware.display.monitors;
+      monitors = (import ./displays.nix { inherit lib; }).default;
     };
     services.xserver = {
       displayManager = {

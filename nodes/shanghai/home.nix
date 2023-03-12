@@ -60,10 +60,10 @@ in {
       set shada+=r/mnt/wdworking
       set shada+=r/mnt/wdmisc
     '';
-    hardware.display = mapAttrs (k: v: {
+    hardware.display = mapAttrs (k: monitors: {
       nvidia.enable = mkDefault nixosConfig.hardware.display.nvidia.enable;
-      monitors = v config.hardware.display.${k}.monitors;
-    }) (import ./displays.nix { inherit lib; }).monitors;
+      inherit monitors;
+    }) (import ./displays.nix { inherit lib; }).layouts;
     xsession.windowManager.i3 = with nixosConfig.hardware.display.monitors; {
       extraConfig = ''
         workspace 1:1 output ${dell.output}
