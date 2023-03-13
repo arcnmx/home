@@ -340,12 +340,10 @@
       };
     };
     "${resourceName}-backup" = {
-      provider = "null";
-      type = "resource";
-      inputs = {
-        triggers = {
-          expiry = tf.resources."${resourceName}-expiry".refAttr "id";
-        };
+      provider = "terraform";
+      type = "data";
+      inputs.triggers_replace = {
+        expiry = tf.resources."${resourceName}-expiry".refAttr "id";
       };
       provisioners = mkIf state.enable [ {
         local-exec = {

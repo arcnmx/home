@@ -233,11 +233,11 @@
     "tf": {
       "flake": false,
       "locked": {
-        "lastModified": 1677264084,
-        "narHash": "sha256-gNn1M+vqG82jt4hzJG64zDeo2bMJqS/RqUpjvRIkH/8=",
+        "lastModified": 1678722496,
+        "narHash": "sha256-akpjWk90RYLKGtoE48bjJz3TGBneymL7saOhM6SzaXk=",
         "owner": "arcnmx",
         "repo": "tf-nix",
-        "rev": "e71e677e3108bd080667e57ef0e5e60dc3885cfb",
+        "rev": "79e2387f3c4947277e1fdf5526135b7e7ca8125e",
         "type": "github"
       },
       "original": {
