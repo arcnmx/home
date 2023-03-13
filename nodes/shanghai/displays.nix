@@ -10,6 +10,7 @@
     spectrum-4k144 = { config, ... }: {
       imports = [ defaults.common defaults._4k ];
       nvidia.options.AllowGSYNCCompatible = mkIf (hasPrefix "HDMI-" config.output && nixosConfig.hardware.vfio.rtx3080.gpu.primary) (mkOptionDefault "On");
+      output = mkDefault "DP-0";
       edid = mapAttrs (_: mkDefault) {
         manufacturer = "EVE";
         model = "ES07D03";
@@ -19,9 +20,7 @@
     };
     spectrum-dp = { config, ... }: {
       imports = [ defaults.spectrum-4k144 ];
-      output = mkDefault "DP-2";
       source = mkDefault "DisplayPort-1";
-      refreshRate = 144;
       primary = mkDefault true;
     };
     spectrum-typec = { config, ... }: {
@@ -30,7 +29,6 @@
     };
     spectrum-hdmi = { config, ... }: {
       imports = [ defaults.spectrum-4k144 ];
-      output = mkDefault "DP-0";
       source = mkDefault "HDMI-2";
       nvidia = {
         options.AllowGSYNCCompatible = null;
