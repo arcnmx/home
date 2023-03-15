@@ -42,3 +42,4 @@ build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.y
 build/led-001/firmware.elf: $(DEPS_LED32) ws2815.yaml
 
 .PHONY: all clean
+.DELETE_ON_ERROR:
