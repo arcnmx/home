@@ -101,8 +101,8 @@
       };
     };
     xsession.windowManager.i3.config.keybindings = {
-      "XF86MonBrightnessUp" = "exec --no-startup-id xbacklight -inc 10";
-      "XF86MonBrightnessDown" = "exec --no-startup-id xbacklight -dec 10";
+      "XF86MonBrightnessUp" = "exec --no-startup-id xbacklight -inc 5";
+      "XF86MonBrightnessDown" = "exec --no-startup-id xbacklight -dec 5";
     };
   };
 }
