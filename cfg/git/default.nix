@@ -12,7 +12,7 @@
       ''}";
     };
     ignores = [
-      ".envrc"
+      ".envrc*"
       ".direnv/"
     ];
     extraConfig = {

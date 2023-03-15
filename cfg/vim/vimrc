@@ -48,6 +48,7 @@ let g:vim_markdown_folding_disabled=1
 
 au BufRead,BufNewFile *.kt setlocal filetype=kotlin
 au BufRead,BufNewFile *.as setlocal filetype=javascript
+au BufRead,BufNewFile .envrc setlocal filetype=bash
 
 au FileType gitcommit setlocal colorcolumn=50,72
 au FileType haskell setlocal expandtab
