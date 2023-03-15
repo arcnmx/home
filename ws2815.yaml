@@ -1,6 +1,17 @@
+substitutions:
+  log_level: INFO
+
 e131:
   method: multicast
 wled:
+adalight:
+uart:
+  baud_rate: 576000
+  rx_buffer_size: 4096
+  rx_pin: RX
+
+logger:
+  baud_rate: 0
 
 light:
 - platform: neopixelbus
@@ -14,6 +25,7 @@ light:
       channels: RGB
   - wled:
       #port: 21324
+  - adalight:
   - random:
   - pulse:
   - strobe:
