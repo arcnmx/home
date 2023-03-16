@@ -27,4 +27,12 @@ in {
       PermitTunnel = true;
     };
   };
+  config.systemd.services = {
+    "sshd@" = mkIf (cfg.enable && cfg.startWhenNeeded) {
+      restartIfChanged = false;
+    };
+    "sshd" = mkIf (cfg.enable && !cfg.startWhenNeeded) {
+      restartIfChanged = false;
+    };
+  };
 }
