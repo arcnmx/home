@@ -236,12 +236,13 @@ in {
         #inherit (pkgs.nodePackages) vscode-html-languageserver-bin vscode-css-languageserver-bin vscode-json-languageserver;
         src = ./files/kak-lsp.toml;
       };
-      "cargo/config" = mkIf tf.state.enable {
+      "cargo/config.toml" = mkIf tf.state.enable {
         source = mkOutOfStoreSymlink config.secrets.files.cargo-config.path;
       };
     };
     secrets.files = {
       cargo-config.text = ''
+        ${config.xdg.configFile."cargo/config.toml".text}
         [registry]
         token = "${tf.variables.CRATES_TOKEN_ARC.ref}"
       '';

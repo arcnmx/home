@@ -97,9 +97,12 @@ in {
         "default" = true;
         "line-length" = false;
       };
-      "cargo/config".text = ''
+      "cargo/config.toml".text = ''
         [net]
         git-fetch-with-cli = true
+
+        [registries.crates-io]
+        protocol = "sparse"
       '';
       "cargo/.crates.toml".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/cargo/.crates.toml";
       "cargo/bin".source = mkOutOfStoreSymlink "${config.xdg.cacheHome}/cargo/bin/";
