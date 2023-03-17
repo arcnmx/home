@@ -67,7 +67,7 @@ in {
       provider = "local";
       type = "file";
       dataSource = true;
-      inputs.filename = toString terraform.dataDir + "/secureboot.pem";
+      inputs.filename = toString meta.deploy.dataDir + "/${networking.hostName}-secureboot.pem";
 
       dependsOn = [
         resources.secureboot_cert.namedRef
