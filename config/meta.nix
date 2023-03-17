@@ -15,12 +15,12 @@
         repos.workingDir = config.deploy.dataDir + "/gitarchive/working";
         borg.repos = {
           ${config.deploy.idTag} = {
-            repoDir = config.deploy.dataDir + "/data";
+            repoDir = "$HOME_BORG_ARCHIVE_PATH";
             keyFile = config.deploy.dataDir + "/data.key";
             passphraseShellCommand = "bitw get tokens/borg-home -f passphrase";
           };
           repos = {
-            repoDir = config.deploy.dataDir + "/gitarchive/data";
+            repoDir = "$HOME_BORG_GIT_PATH";
             keyFile = config.deploy.dataDir + "/gitarchive.key";
             passphraseShellCommand = "bitw get tokens/borg-home-git -f passphrase";
           };

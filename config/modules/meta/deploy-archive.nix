@@ -385,10 +385,10 @@
   borgRepoSubmodule = { config, ... }: {
     options = {
       repoDir = mkOption {
-        type = types.path;
+        type = types.str;
       };
       keyFile = mkOption {
-        type = types.path;
+        type = types.str;
       };
       passphraseShellCommand = mkOption {
         type = types.nullOr types.str;
@@ -470,7 +470,7 @@ in {
         default = { };
       };
       workingDir = mkOption {
-        type = types.path;
+        type = types.str;
       };
     };
   };
