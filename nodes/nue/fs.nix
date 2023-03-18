@@ -26,7 +26,7 @@
       "/" = {
         device = "/dev/mapper/nuefs";
         fsType = "xfs";
-        options = [ "rw" "relatime" "nofail" ];
+        options = [ "rw" "relatime" ];
         encrypted = {
           enable = true;
           label = "nuefs";
