@@ -39,6 +39,10 @@ let
   '' + optionalString config.programs.zsh.enableAutosuggestions ''
     ZSH_AUTOSUGGEST_STRATEGY=(history completion)
     bindkey '^ ' autosuggest-accept
+  '' + optionalString config.programs.fzf.enable ''
+    bindkey "^_" fzf-history-widget # Ctrl+/
+    bindkey "^P" fzf-file-widget
+    bindkey "^Z" fzf-cd-widget
   '';
 in {
   imports = [

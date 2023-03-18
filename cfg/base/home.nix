@@ -188,7 +188,7 @@ in {
     };
     programs.fzf = {
       enable = !config.home.minimalSystem;
-      enableZshIntegration = true;
+      enableZshIntegration = mkDefault true;
       defaultCommand = "${pkgs.fd}/bin/fd --type f --type l";
       defaultOptions = [
         "--height 40%"
@@ -200,7 +200,7 @@ in {
       ];
       fileWidgetCommand = "${pkgs.fd}/bin/fd --type f";
       fileWidgetOptions = [
-        "--prefix 'head {}'"
+        "--preview 'head {}'"
       ];
       changeDirWidgetCommand = "${pkgs.fd}/bin/fd --type d";
       changeDirWidgetOptions = [

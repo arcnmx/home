@@ -17,6 +17,10 @@ autoload -Uz edit-command-line
 bindkey "^?" backward-delete-char
 bindkey -M vicmd 'V' edit-command-line
 
+bindkey -M vicmd "U" redo
+bindkey -M vicmd "^r" redo
+bindkey "^r" redo
+
 # tab completion menu
 bindkey -M menuselect "k" up-line-or-history
 bindkey -M menuselect "j" down-line-or-history
@@ -106,10 +110,6 @@ bindkey -M vicmd "b" backward-word-normal
 
 bindkey -M viopp "e" forward-end-viopp-word-normal
 bindkey -M viopp "E" forward-end-viopp-word-parameter
-
-bindkey "^_" fzf-history-widget # Ctrl+/
-bindkey "^P" fzf-file-widget
-bindkey "^Z" fzf-cd-widget
 
 zstyle ':zle:*-viopp-*' virangeflag 1
 zstyle ':zle:*-word-parameter' word-style shell
