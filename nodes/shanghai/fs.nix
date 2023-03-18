@@ -23,7 +23,7 @@
       wdauto = [ "x-systemd.automount" "x-systemd.mount-timeout=2m" "x-systemd.idle-timeout=30m" "noauto" ];
     in {
       "/nix" = {
-        device = "/dev/disk/by-uuid/a82e1a40-e0e5-4461-a29d-42caf5a502b6";
+        device = "/dev/disk/by-uuid/6f27e800-797a-4b1f-b0be-5c9cea8a29e9";
         fsType = "xfs";
         options = ["rw" "relatime"]; # discard
       };
@@ -33,18 +33,18 @@
         options = ["bind"];
       };
       "/" = {
-        device = "/dev/disk/by-uuid/76b9ccba-7d5f-4ceb-b0aa-476c63ebb60f";
+        device = "/dev/disk/by-uuid/8b5033f4-2ef4-4abb-b181-4ec45cd523fe";
         fsType = "btrfs";
-        options = [ "rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" ];
+        options = [ "rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "subvol=/" ];
       };
-      "/mnt/enc" = {
-        device = "/dev/mapper/enc";
+      "/mnt/enc" = { config, ... }: (config: { inherit config; }) {
+        device = "/dev/mapper/${config.encrypted.label}";
         fsType = "xfs";
         options = [ "x-systemd.automount" "noauto" ];
         encrypted = {
           enable = false;
-          label = "enc";
-          blkDev = "/dev/disk/by-uuid/cc8e597e-228d-49b6-af65-a47ced8dd57a"; # PARTLABEL=shanghai-enc
+          label = "enc-sn850x";
+          blkDev = "/dev/disk/by-uuid/2275bc45-55c9-46ff-ad64-8fe5331e89e1"; # PARTLABEL=shanghai-enc-sn850x
         };
         crypttab = {
           enable = true;
@@ -67,7 +67,7 @@
         options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" "nofail"];
       };
       "/mnt/efi" = {
-        device = "/dev/disk/by-uuid/1016-9B5D";
+        device = "/dev/disk/by-uuid/8584-BEFF"; # PARTLABEL=efi-sn850x
         fsType = "vfat";
         options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
       };
