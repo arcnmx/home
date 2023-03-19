@@ -1,10 +1,12 @@
 { pkgs, lib, config, ... }: with lib; let
   cfg = config.hardware.vfio;
   inherit (cfg.qemu) machines;
-  cowEnable = config.hardware.vfio.qemu.machines.hourai-nocow.enable;
   toggleSharedDisks = { ... }: {
-    disks.games-adata.enable = cowEnable;
-    disks.games-sn770.enable = true;
+    disks = let
+      inherit (config.hardware.vfio.qemu.machines.hourai-nocow) enable;
+    in mapAttrs' (name: nameValuePair "games-${name}" {
+      inherit enable;
+    }) cfg.windowsGames;
   };
 in {
   config = {
@@ -41,7 +43,6 @@ in {
           imports = [ hourai3080 ];
           scream.enable = false;
           hotplug.enable = false;
-          disks.games-adata.enable = mkForce false;
         };
         goliath1650 = { config, ... }: {
           imports = [ ./goliath.nix toggleSharedDisks ];

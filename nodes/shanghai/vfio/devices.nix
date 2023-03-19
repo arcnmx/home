@@ -1,9 +1,20 @@
 { lib, config, pkgs, ... }: with lib; let
   cfg = config.hardware.vfio;
   inherit (cfg.qemu) machines;
-  windowsGames = [ "windows-games-adata" "windows-games-sn770" ];
 in {
+  options.hardware.vfio = with types; {
+    windowsGames = mkOption {
+      type = attrsOf attrs;
+      default = { };
+      example = {
+        sn770.scsi.lun = 6;
+      };
+    };
+  };
   config = {
+    home-manager.users.arc.home.scratch.linkDirs = [
+      ".cache/vfio/cow"
+    ];
     hardware.nvidia.dynamicBinding = true;
     hardware.vfio = {
       devices = {
@@ -151,30 +162,39 @@ in {
           udev.rule = ''ATTR{bcdDevice}=="0543"'';
         };
       };
+      windowsGames = {
+      };
       disks = {
         mapped = {
+          windows-games-sabrent = {
+            source = "/dev/disk/by-partlabel/windows-games-sabrent";
+            mbr.id = "415708fa";
+            permission.owner = "arc";
+          };
           windows-games-plextor = {
             source = "/dev/disk/by-partlabel/windows-games";
             mbr.id = "f4901f82";
             permission.owner = "arc";
           };
-          windows-games-sabrent = {
-            source = "/dev/disk/by-partlabel/windows-games-sabrent";
+          windows-games-adata2 = {
+            source = "/dev/disk/by-partlabel/windows-games-adata2";
             mbr.id = "954e3dd3";
             permission.owner = "arc";
           };
           windows-games-sn850x = {
-            source = "/mnt/data/tmp/windows-games-sn850x.ntfs.raw"; flags = "ro";
+            source = "/dev/disk/by-partlabel/windows-games-sn850x";
             mbr.id = "26ca4c08";
             permission.owner = "arc";
           };
           windows-games-adata = {
             source = "/dev/disk/by-partlabel/windows-games-adata";
             mbr.id = "58ec08ca";
+            permission.owner = "arc";
           };
-          windows-games-sn770 = {
-            source = "/mnt/data/tmp/windows-games-sn770.ntfs.raw"; flags = "ro";
+          windows-games-adata3 = {
+            source = "/dev/disk/by-partlabel/windows-games-adata3";
             mbr.id = "dd8f10de";
+            permission.owner = "arc";
           };
           game-storage = {
             systemd.enable = false;
@@ -182,10 +202,13 @@ in {
             mbr.id = "90a4fd21";
           };
         };
-        cow = mkMerge (flip map windowsGames (windows-games: {
+        cow = mkMerge (flip mapAttrsToList cfg.windowsGames (name: _: let
+          windows-games = "windows-games-${name}";
+          inherit (config.home-manager.users) arc;
+        in {
           "${windows-games}-arc" = {
             source = cfg.disks.mapped.${windows-games}.path;
-            storage = "/mnt/data/hourai/${windows-games}-snapshot-overlay";
+            storage = "${arc.xdg.cacheHome}/vfio/cow/${windows-games}-snapshot-overlay";
             mode = "P";
             sizeMB = 1024 * 16;
             systemd.depends = [
@@ -206,7 +229,9 @@ in {
         }));
       };
     };
-    systemd.services = flip mapListToAttrs windowsGames (windows-games: nameValuePair "${windows-games}-arc" rec {
+    systemd.services = flip mapAttrs' cfg.windowsGames (name: _: let
+      windows-games = "windows-games-${name}";
+    in nameValuePair "vfio-mapdisk-${windows-games}-arc" rec {
       requires = [ cfg.disks.mapped.${windows-games}.systemd.id ];
       after = requires;
       conflicts = [
@@ -234,13 +259,40 @@ in {
       kat.systemd.units = [ "graphical.target" ];
     };
     services.systemd2mqtt.units = [ "graphical.target" ];
-    services.udev.extraRules = ''
-      # my VM disks
-      SUBSYSTEM=="block", ACTION=="add", ATTRS{model}=="INTEL SSDSC2BP48", ATTRS{wwid}=="naa.55cd2e404b6f84e5", OWNER="arc"
-      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="4", ATTR{size}=="125829120", ATTRS{wwid}=="eui.6479a741e0203d76", OWNER="arc"
-      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="6", ATTR{size}=="134217728", ATTRS{wwid}=="eui.002303563000ad1b", OWNER="arc"
-      SUBSYSTEM=="block", ACTION=="add", ATTR{partition}=="2", ATTR{size}=="838860800", ATTRS{wwid}=="eui.e8238fa6bf530001001b448b4bcd741f", OWNER="kat"
-      SUBSYSTEM=="usb", ATTR{idVendor}=="1038", ATTR{idProduct}=="2212", GROUP="plugdev"
-    '';
+    services.udev.extraRules = let
+      adata = rec {
+        attrs.wwid = "nvme.1cc1-324a34303230303035353234-414441544120535838323030504e50-00000001";
+        windows-vm = {
+          attr = {
+            partition = 2;
+            size = 125829120;
+          };
+          attrs = {
+            inherit (attrs) wwid;
+          };
+        };
+      };
+      bx = rec {
+        attrs = {
+          wwid = "naa.55cd2e404b6f84e5";
+          model = "INTEL SSDSC2BP48";
+        };
+      };
+      blockadd = {
+        attrs ? { }, attr ? { }
+      , owner ? "arc"
+      , actions ? [ ''OWNER="${owner}"'' ]
+      , subsystem ? "block", action ? "add"
+      , ...
+      }: concatStringsSep ", " (
+        [ ''SUBSYSTEM=="${subsystem}"'' ''ACTION=="${action}"'' ]
+        ++ mapAttrsToList (name: value: ''ATTR{${name}}=="${toString value}"'') attr
+        ++ mapAttrsToList (name: value: ''ATTRS{${name}}=="${toString value}"'') attrs
+        ++ actions
+      );
+    in mkMerge (
+      map blockadd [ bx adata.windows-vm ]
+      ++ singleton ''SUBSYSTEM=="usb", ATTR{idVendor}=="1038", ATTR{idProduct}=="2212", GROUP="plugdev"''
+    );
   };
 }

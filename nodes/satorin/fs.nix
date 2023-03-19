@@ -42,12 +42,11 @@
       "/boot" = {
         device = "/mnt/efi/EFI/nixos";
         fsType = "none";
-        options = ["bind"];
+        options = [ "bind" "nofail" ];
       };
       "/mnt/efi" = {
         device = "/dev/disk/by-uuid/17CA-FD91";
         fsType = "vfat";
-        options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
       };
     };
     swapDevices = [

@@ -20,27 +20,32 @@
     nix.build.enable = false;
 
     fileSystems = let
-      wdauto = [ "x-systemd.automount" "x-systemd.mount-timeout=2m" "x-systemd.idle-timeout=30m" "noauto" ];
+      wdauto = [
+        "x-systemd.automount" "x-systemd.mount-timeout=2m" "x-systemd.idle-timeout=30m"
+        "noauto"
+      ];
+      btrfsopts = [ "compress=zstd" "ssd" ];
     in {
       "/nix" = {
         device = "/dev/disk/by-uuid/6f27e800-797a-4b1f-b0be-5c9cea8a29e9";
         fsType = "xfs";
-        options = ["rw" "relatime"]; # discard
       };
       "/boot" = {
         device = "/mnt/efi/EFI/nixos";
         fsType = "none";
-        options = ["bind"];
+        options = [ "bind" "nofail" ];
       };
       "/" = {
         device = "/dev/disk/by-uuid/8b5033f4-2ef4-4abb-b181-4ec45cd523fe";
         fsType = "btrfs";
-        options = [ "rw" "relatime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "subvol=/" ];
+        options = btrfsopts ++ [ "subvol=/" ];
       };
       "/mnt/enc" = { config, ... }: (config: { inherit config; }) {
         device = "/dev/mapper/${config.encrypted.label}";
         fsType = "xfs";
-        options = [ "x-systemd.automount" "noauto" ];
+        options = [
+          "x-systemd.automount" "noauto"
+        ];
         encrypted = {
           enable = false;
           label = "enc-sn850x";
@@ -55,6 +60,14 @@
           ];
         };
       };
+      "/mnt/scratch" = { config, ... }: (config: { inherit config; }) {
+        device = "/dev/disk/by-uuid/c86d8291-b8df-450d-bbef-c199dec0da8b"; # PARTLABEL=scratch-adata
+        fsType = "btrfs";
+        options = btrfsopts ++ [
+          "subvol=/"
+          "nofail"
+        ];
+      };
       "/home/arc" = {
         device = "/mnt/enc/home/arc";
         fsType = "none";
@@ -64,12 +77,14 @@
       "/mnt/data" = {
         device = "/dev/disk/by-uuid/9407fd0a-683b-4839-908d-e65cb9b5fec5";
         fsType = "btrfs";
-        options = ["rw" "strictatime" "lazytime" "user_subvol_rm_allowed" "compress=zstd" "ssd" "space_cache" "subvol=/" "nofail"];
+        options = btrfsopts ++ [
+          "space_cache" "subvol=/"
+          "nofail"
+        ];
       };
       "/mnt/efi" = {
         device = "/dev/disk/by-uuid/8584-BEFF"; # PARTLABEL=efi-sn850x
         fsType = "vfat";
-        options = ["rw" "strictatime" "lazytime" "errors=remount-ro"];
       };
       "/mnt/wdarchive" = {
         device = "/dev/disk/by-uuid/da37f8cd-9934-4d08-b0cf-a4d5ead43454";
@@ -95,7 +110,7 @@
     swapDevices = [
       {
         # 64G adata
-        device = "/dev/disk/by-partuuid/0ecca923-20db-c34b-807b-2be849bf2017";
+        device = "/dev/disk/by-partuuid/3b3a71f5-3865-4c8c-9567-4d440a23feab";
         randomEncryption.enable = true;
       }
       {

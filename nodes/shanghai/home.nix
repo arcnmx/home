@@ -19,7 +19,7 @@ in {
       nvidia.gpu = nixosConfig.hardware.vfio.devices.gtx1650.gpu.nvidia.uuid;
       settings = {
         "module/fs-root" = {
-          mount = mkAfter [ "/mnt/enc" "/nix" "/mnt/data" ];
+          mount = mkAfter [ "/mnt/enc" "/nix" "/mnt/scratch" "/mnt/data" ];
         };
       };
     };
@@ -42,6 +42,12 @@ in {
         SUBCOMMAND=$1
         shift
         if [[ $SUBCOMMAND = index ]] && [[ "$(id -u)" != 0 ]]; then
+          if [[ $# -eq 0 ]]; then
+            set -- -xp / /mnt/efi /mnt/enc /mnt/scratch /mnt/data
+            if systemctl is-active 'mnt-wd*.mount' > /dev/null; then
+              set -- "$@" /mnt/wd{archive,working,misc,temp}
+            fi
+          fi
           sudo duc "$SUBCOMMAND" --database=/mnt/enc/duc.db "$@"
         elif [[ $SUBCOMMAND != help ]]; then
           command duc "$SUBCOMMAND" --database=/mnt/enc/duc.db "$@"
@@ -50,7 +56,10 @@ in {
         fi
       '';
     };
-    home.scratch.enable = true;
+    home.scratch = {
+      enable = true;
+      path = "/mnt/scratch/${config.home.username}";
+    };
     programs.zsh.initExtra = ''
       compdef _paswitch paswitch
     '';

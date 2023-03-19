@@ -1,5 +1,9 @@
 { nixosConfig, config, trusted, lib, ... }: with lib; let
-  inherit (nixosConfig.hardware.vfio) disks;
+  inherit (nixosConfig.hardware.vfio) disks windowsGames;
+  sector4k = {
+    logical_block_size = 4096;
+    physical_block_size = 4096;
+  };
 in {
   imports = [
     ./common.nix ./audio.nix ./scream.nix ./virtio.nix
@@ -22,14 +26,13 @@ in {
         cores = nixosConfig.hardware.cpu.info.cores / 2;
       };
     };
-    systemd.depends = [
-      (mkIf config.disks.games-adata-arc.enable "windows-games-adata-arc.service")
-      (mkIf config.disks.games-sn770-arc.enable "windows-games-sn770-arc.service")
-    ];
+    systemd.depends = mapAttrsToList (name: _:
+      mkIf config.disks."games-${name}-arc".enable "vfio-mapdisk-windows-games-${name}-arc.service"
+    ) windowsGames;
     disks = {
       windows = {
         scsi.lun = 0;
-        path = "/dev/disk/by-partlabel/windows-vm-sabrent";
+        path = "/dev/disk/by-partlabel/windows-vm-adata";
       };
       games-plextor = {
         scsi.lun = 1;
@@ -46,37 +49,40 @@ in {
         scsi.lun = 3;
         from.mapped = "game-storage";
       };
-      games-sabrent = {
+      games-adata2 = {
         scsi.lun = 4;
-        from.mapped = "windows-games-sabrent";
+        from.mapped = "windows-games-adata2";
       };
       games-adata = {
         scsi.lun = 5;
-        from.cow = "windows-games-adata-arc";
+        from.mapped = "windows-games-adata";
       };
-      games-adata-arc = {
-        enable = !config.disks.games-adata.enable;
-        scsi.lun = config.disks.games-adata.scsi.lun;
-        path = "/dev/disk/windows-games-adata-arc";
-      };
-      games-sn770 = {
+      games-adata3 = {
         scsi.lun = 6;
-        from.cow = "windows-games-sn770-arc";
-      };
-      games-sn770-arc = {
-        enable = !config.disks.games-sn770.enable;
-        scsi.lun = config.disks.games-sn770.scsi.lun;
-        path = "/dev/disk/windows-games-sn770-arc";
+        from.mapped = "windows-games-adata3";
       };
       games-sn850x = {
         scsi.lun = 7;
         from.mapped = "windows-games-sn850x";
-        device.settings = {
-          logical_block_size = 4096;
-          physical_block_size = 4096;
-        };
+        device.settings = sector4k;
       };
-    };
+      games-sabrent = {
+        scsi.lun = 8;
+        from.mapped = "windows-games-sabrent";
+        device.settings = sector4k;
+      };
+    } // listToAttrs (concatLists (mapAttrsToList (name: data: [
+      (nameValuePair "games-${name}" (data // {
+        from.cow = "windows-games-${name}";
+      }))
+      (nameValuePair "games-${name}-arc" {
+        enable = !config.disks."games-${name}".enable;
+        scsi = {
+          inherit (config.disks."games-${name}") lun;
+        };
+        path = "/dev/disk/windows-games-${name}-arc";
+      })
+    ]) windowsGames));
     usb.host.devices = {
       svse5.enable = true;
       gmmk.enable = false;

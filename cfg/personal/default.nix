@@ -29,6 +29,42 @@
     ${pkgs.python3.withPackages (p: with p; [ dbus-python /*pygobject3*/ ])}/bin/python ${./files/bluephone.py} "$@"
   '';
   inherit (config.networking.firewall) free;
+  fileSystemModule = { config, ... }: let
+    defaults = rec {
+      auto = {
+        lazytime = true;
+      };
+      vfat = auto // {
+        options = auto.options or [ ] ++ [
+          "errors=remount-ro" "nofail"
+        ];
+      };
+      ext3 = auto;
+      ext4 = ext3;
+      xfs = auto;
+      zfs = auto;
+      btrfs = auto // {
+        options = auto.options or [ ] ++ [
+          "user_subvol_rm_allowed"
+        ];
+      };
+    };
+  in {
+    options = {
+      lazytime = mkEnableOption "lazytime" // {
+        default = defaults.${config.fsType}.lazytime or false;
+      };
+    };
+    config = {
+      options = let
+        lazytime = [ "lazytime" "strictatime" ];
+        options' = defaults.${config.fsType}.options or [ ];
+      in mkMerge [
+        (mkIf config.lazytime (mkBefore lazytime))
+        (mkIf (options' != [ ]) (mkBefore options'))
+      ];
+    };
+  };
 in {
   imports = [
     ./remote-user.nix
@@ -41,6 +77,12 @@ in {
     ../mpd
     ../ssh/personal.nix
   ];
+
+  options = with types; {
+    fileSystems = mkOption {
+      type = attrsOf (submodule fileSystemModule);
+    };
+  };
 
   config = {
     home-manager.users.arc.imports = [ ./home.nix ];

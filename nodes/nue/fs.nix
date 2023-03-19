@@ -26,7 +26,6 @@
       "/" = {
         device = "/dev/mapper/nuefs";
         fsType = "xfs";
-        options = [ "rw" "relatime" ];
         encrypted = {
           enable = true;
           label = "nuefs";
@@ -41,7 +40,6 @@
       "/mnt/esp2" = {
         device = "/dev/disk/by-uuid/40D7-01ED";
         fsType = "vfat";
-        options = ["rw" "strictatime" "lazytime" "errors=remount-ro" "nofail"];
       };
     };
     swapDevices = [
