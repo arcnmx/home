@@ -13,6 +13,7 @@ in {
       default = [ ];
     };
   };
+  config.programs.zsh.dirHashes.scratch = mkIf cfg.enable cfg.path;
   config.home = mkIf cfg.enable {
     file = (genAttrs cfg.linkDirs (path: {
       source = mkOutOfStoreSymlink "${cfg.path}/${path}";
@@ -20,6 +21,7 @@ in {
     activation = {
       scratchDirMigration = config.lib.dag.entryBefore [ "checkLinkTargets" ] ''
         (
+          $DRY_RUN_CMD mkdir -p ${escapeShellArg cfg.path}/
           $DRY_RUN_CMD cd ${escapeShellArg cfg.path}
           for d in ${escapeShellArgs cfg.linkDirs}; do
             if [[ ! -L "$HOME/$d" ]]; then
@@ -28,7 +30,9 @@ in {
                 exit 1
               fi
               $DRY_RUN_CMD mkdir -p "$(dirname "$d")"
-              $DRY_RUN_CMD mv "$HOME/$d" "$d"
+              if [[ -e "$HOME/$d" ]]; then
+                $DRY_RUN_CMD mv "$HOME/$d" "$d"
+              fi
             fi
           done
         )
