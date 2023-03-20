@@ -33,5 +33,8 @@ in {
       extraPackages = openglPackages pkgs;
       extraPackages32 = openglPackages pkgs.driversi686Linux;
     };
+    environment.systemPackages = with pkgs; [
+      radeontop
+    ];
   };
 }
