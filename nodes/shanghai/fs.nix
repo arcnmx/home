@@ -17,6 +17,7 @@
     services.journald.extraConfig = ''
       SystemMaxUse=3G
     '';
+    nix.build.enable = false;
 
     fileSystems = let
       wdauto = [ "x-systemd.automount" "x-systemd.mount-timeout=2m" "x-systemd.idle-timeout=30m" "noauto" ];

@@ -20,7 +20,6 @@
       };
       supportedFilesystems = [ "xfs" ];
       cleanTmpDir = true;
-      tmpOnTmpfs = false;
     };
 
     fileSystems = {

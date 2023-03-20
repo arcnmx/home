@@ -8,6 +8,7 @@ in {
     ./base16.nix
     ./personal.nix
     ./systemd2mqtt.nix
+    ./nix-daemon.nix
     ../ssh/sshd.nix
     inputs.systemd2mqtt.nixosModules.default
   ];
