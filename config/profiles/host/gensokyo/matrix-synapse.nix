@@ -92,6 +92,12 @@ in {
               "@arc:${config.services.matrix-synapse.settings.server_name}" = "admin";
             };
           };
+          logging = {
+            writers.file.settings = {
+              max_backups = 0;
+              compress = false;
+            };
+          };
         };
         mautrix-hangouts = {
           binding = bindings.mautrix-hangouts;
