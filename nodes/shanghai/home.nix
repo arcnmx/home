@@ -26,7 +26,7 @@ in {
     services.dunst.iconTheme.size = "64x64";
     home.shell.functions = {
       _paswitch_sinks = ''
-        ${pactl} list short sinks | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
+        ${pactl} list short sinks 2> /dev/null | ${pkgs.coreutils}/bin/cut -d $'\t' -f 2
       '';
       _paswitch = ''
         _alternative 'preset:preset:(headphones speakers)' 'sink:sink:($(_paswitch_sinks))'
