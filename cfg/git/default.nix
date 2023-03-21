@@ -17,7 +17,13 @@
     ];
     extraConfig = {
       core = {
-        pager = ''sed 's/\t/  /g' | $PAGER''; # TODO: unsure how to get page/vim to handle tabs, so...
+        pager = let
+          pager = if config.programs.page.enable
+            then "$PAGER -t git"
+            else "$PAGER";
+          # TODO: unsure how to get page/vim to handle tabs, so...
+          filter = "sed 's/\t/  /g' |";
+        in filter + pager;
       };
       user = {
         useConfigOnly = true;
