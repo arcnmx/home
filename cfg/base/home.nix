@@ -178,6 +178,9 @@ in {
         ];
       });
     };
+    programs.bat.config = {
+      theme = "base16-256";
+    };
     programs.less = {
       enable = true;
       keys = ''

@@ -29,7 +29,9 @@
         useConfigOnly = true;
       };
       color = {
-        ui = "auto";
+        ui = if config.programs.bat.enable then "never" else "auto";
+        status = "auto";
+        diff = "auto";
       };
       push = {
         default = "simple";
