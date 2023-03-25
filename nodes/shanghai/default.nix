@@ -27,7 +27,10 @@
     services.systemd2mqtt.enable = true;
     systemd.services.ofono.wantedBy = [ "multi-user.target" ];
     hardware.openrazer.enable = true;
-    services.mediatomb.enable = true;
+    services.mediatomb = {
+      enable = true;
+      uuid = "ab297d64-0f40-539e-b505-a24ade505af7";
+    };
 
     hardware.display = {
       enable = true;
