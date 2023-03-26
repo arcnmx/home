@@ -326,18 +326,16 @@ in {
         }*/
       ];
     };
-    services.pipewire = {
-      config.pipewire = {
-        "context.objects" = map pwVirtual [
-          { desc = "Headset"; prio = 1500; }
-          { desc = "Speakers"; prio = 1000; }
-          { desc = "Amp"; prio = 100; }
-          { desc = "Mic"; sink = false; prio = 1000; monitorVolume = true; }
-          { name = "stream_live"; desc = "Stream Audio (Live)"; monitorVolume = true; prio = 0; }
-          { name = "stream_vod"; desc = "Stream Audio (VOD)"; monitorVolume = true; prio = 0; }
-          { name = "stream"; desc = "Stream Audio"; monitorVolume = true; prio = 0; }
-        ];
-      };
+    services.pipewire.confSettings.pipewire = {
+      "context.objects" = map pwVirtual [
+        { desc = "Headset"; prio = 1500; }
+        { desc = "Speakers"; prio = 1000; }
+        { desc = "Amp"; prio = 100; }
+        { desc = "Mic"; sink = false; prio = 1000; monitorVolume = true; }
+        { name = "stream_live"; desc = "Stream Audio (Live)"; monitorVolume = true; prio = 0; }
+        { name = "stream_vod"; desc = "Stream Audio (VOD)"; monitorVolume = true; prio = 0; }
+        { name = "stream"; desc = "Stream Audio"; monitorVolume = true; prio = 0; }
+      ];
     };
     hardware.alsa = {
       ucm = {

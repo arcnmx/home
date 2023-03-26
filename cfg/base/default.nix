@@ -168,9 +168,6 @@ in {
     ];
 
     services.pipewire = {
-      media-session = {
-        enable = lib.mkDefault (config.services.pipewire.enable && !config.services.wireplumber.enable);
-      };
       wireplumber.enable = lib.mkDefault false; # disable the built-in module
     };
     services.systemd2mqtt = {

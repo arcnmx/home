@@ -38,7 +38,7 @@ in {
     };
 
     programs.screenstub = {
-      enable = mkDefault true;
+      enable = mkDefault (!pkgs.screenstub.meta.broken);
       settings = {
         qemu = mkMerge [
           (mapAttrs (_: mkOptionDefault) {
