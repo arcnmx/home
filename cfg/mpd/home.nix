@@ -58,14 +58,22 @@ in {
       '') ];
       configPath = mkIf tf.state.enable config.secrets.files.mpd-config.path;
     };
-    mpdris2.enable = mkDefault config.services.mpd.enable;
+    mpdris2.enable = mkDefault (cfg.enable && config.services.playerctld.enable);
+    mpd-mpris = {
+      enable = mkDefault (cfg.enable && config.services.playerctld.enable && !config.services.mpdris2.enable);
+    };
   };
-  systemd.user.services.mpdris2 = mkIf config.services.mpdris2.enable {
-    Install = mkForce {
-      WantedBy = [ "mpd.service" ];
+  systemd.user.services = let
+    boundService = {
+      Install = mkForce {
+        WantedBy = [ "mpd.service" ];
+      };
+      Unit = {
+        PartOf = [ "mpd.service" ];
+      };
     };
-    Unit = {
-      PartOf = [ "mpd.service" ];
-    };
+  in {
+    mpdris2 = mkIf (cfg.enable && config.services.mpdris2.enable) boundService;
+    mpd-mpris = mkIf (cfg.enable && config.services.mpd-mpris.enable) boundService;
   };
 }
