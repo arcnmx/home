@@ -1,4 +1,4 @@
-{ nixosConfig, config, pkgs, lib, ... }: with lib; let
+{ nixosConfig, config, pkgs, lib, inputs, ... }: with lib; let
   cfg = config.programs.screenstub;
   windows = pkgs.writeShellScriptBin "windows" ''
     tmux new-session -d -s windows \
@@ -11,6 +11,9 @@
   vm = nixosConfig.hardware.vfio.qemu.machines.${cfg.vm.name};
   inherit (cfg) modifierKey;
 in {
+  imports = [
+    inputs.screenstub.homeModules.default
+  ];
   options = {
     programs.screenstub = {
       vm.name = mkOption {
@@ -38,7 +41,7 @@ in {
     };
 
     programs.screenstub = {
-      enable = mkDefault (!pkgs.screenstub.meta.broken);
+      enable = mkDefault true;
       settings = {
         qemu = mkMerge [
           (mapAttrs (_: mkOptionDefault) {

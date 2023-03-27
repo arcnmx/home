@@ -24,6 +24,14 @@
       url = "github:arcnmx/tf-nix";
       flake = false;
     };
+    screenstub = {
+      url = "github:arcnmx/screenstub/xinput";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        rust.follows = "rust";
+        flakelib.follows = "flakelib";
+      };
+    };
     qemucomm = {
       url = "github:arcnmx/qemucomm";
       inputs = {

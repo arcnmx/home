@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1679935237,
-        "narHash": "sha256-pCVTxBRyGxtz0ApyDQpGJpfRgzflFdNcuvGDRUXfZOI=",
+        "lastModified": 1680038114,
+        "narHash": "sha256-rq5jZ34t5Gi28pDV2gNvd4ppviCrPxRF6TXN7kt5xpY=",
         "owner": "arcnmx",
         "repo": "nixexprs",
-        "rev": "141fd3719437b039202c752ef5853704d94a79c6",
+        "rev": "759092fcd2a063c400bdea6a41bd12967ebf3549",
         "type": "github"
       },
       "original": {
@@ -160,6 +160,7 @@
         "nixpkgs-big": "nixpkgs-big",
         "qemucomm": "qemucomm",
         "rust": "rust",
+        "screenstub": "screenstub",
         "std": "std",
         "systemd2mqtt": "systemd2mqtt",
         "tf": "tf",
@@ -183,6 +184,33 @@
       "original": {
         "owner": "arcnmx",
         "repo": "nixexprs-rust",
+        "type": "github"
+      }
+    },
+    "screenstub": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust": [
+          "rust"
+        ]
+      },
+      "locked": {
+        "lastModified": 1680038753,
+        "narHash": "sha256-z9pOG9X0z+tt9n9UgXumFAoPePYaW6Vq+Q2CkgOV9WQ=",
+        "owner": "arcnmx",
+        "repo": "screenstub",
+        "rev": "c5df474a4669db8c704c092ec9b385b2f14e84c3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "ref": "xinput",
+        "repo": "screenstub",
         "type": "github"
       }
     },
