@@ -63,6 +63,9 @@
   home.packages = with pkgs; mkIf config.programs.git.enable [
     git-fixup
     git-continue
+    (mkIf (!config.home.minimalSystem) (zsh-plugins.git-completion.override {
+      git = config.programs.git.package;
+    }))
   ];
   home.shell.aliases = mkIf config.programs.git.enable {
     gcont = "git continue";
