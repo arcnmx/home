@@ -1,7 +1,3 @@
-substitutions:
-  node_name: swb1
-  friendly_name: SWB1
-
 packages:
   esp01_1m: !include esp8266-esp01_1m.yaml
 

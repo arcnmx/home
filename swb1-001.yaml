@@ -1,0 +1,6 @@
+substitutions:
+  node_name: swb1-001
+  friendly_name: SWB1
+
+packages:
+  swb1: !include swb1.yaml
