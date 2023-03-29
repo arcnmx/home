@@ -34,96 +34,97 @@ binary_sensor:
     device_class: problem
   - platform: gpio
     internal: true
-    id: in_d1
+    id: rotary_off
     pin:
       number: D7
       mode: INPUT_PULLUP
       inverted: True
     on_press:
       - fan.turn_off:
-          id: fan_internal
+          id: fan_entity
   - platform: gpio
     internal: true
-    id: in_d5
+    id: rotary_low
     pin:
       number: D6
       mode: INPUT_PULLUP
       inverted: True
     on_press:
       - fan.turn_on:
-          id: fan_internal
+          id: fan_entity
           speed: 1
   - platform: gpio
     internal: true
-    id: in_d6
+    id: rotary_med
     pin:
       number: D5
       mode: INPUT_PULLUP
       inverted: True
     on_press:
       - fan.turn_on:
-          id: fan_internal
+          id: fan_entity
           speed: 2
   - platform: gpio
     internal: true
-    id: in_d7
+    id: rotary_high
     pin:
       number: D1
       mode: INPUT_PULLUP
-      inverted: True
+      inverted: true
     on_press:
       - fan.turn_on:
-          id: fan_internal
+          id: fan_entity
           speed: 3
 
 output:
   - platform: gpio
     pin: D4
-    id: gpio_d2
+    id: out_high
     inverted: true
   - platform: gpio
     pin: D3
-    id: gpio_d3
+    id: out_med
     inverted: true
   - platform: gpio
     pin: D2
-    id: gpio_d4
+    id: out_low
     inverted: true
   - platform: template
-    id: fan_out_internal
+    id: fan_speed
     type: float
     write_action:
-      if:
+    - if:
         condition:
           lambda: 'return state < 0.1;'
         then:
-          - output.turn_off: gpio_d4
-          - output.turn_off: gpio_d3
-          - output.turn_off: gpio_d2
-        else:
-          - if:
-              condition:
-                lambda: 'return state < 0.4;'
-              then:
-                - output.turn_on:  gpio_d4
-                - output.turn_off: gpio_d3
-                - output.turn_off: gpio_d2
-              else:
-                - if:
-                    condition:
-                      lambda: 'return state < 0.7;'
-                    then:
-                      - output.turn_off: gpio_d4
-                      - output.turn_on:  gpio_d3
-                      - output.turn_off: gpio_d2
-                    else:
-                      - output.turn_off: gpio_d4
-                      - output.turn_off: gpio_d3
-                      - output.turn_on:  gpio_d2
+        - output.turn_off: out_low
+        - output.turn_off: out_med
+        - output.turn_off: out_high
+    - if:
+        condition:
+          lambda: 'return state > 0.1 && state < 0.4;'
+        then:
+        - output.turn_on:  out_low
+        - output.turn_off: out_med
+        - output.turn_off: out_high
+    - if:
+        condition:
+          lambda: 'return state > 0.4 && state < 0.7;'
+        then:
+        - output.turn_off: out_low
+        - output.turn_on:  out_med
+        - output.turn_off: out_high
+    - if:
+        condition:
+          lambda: 'return state > 0.7;'
+        then:
+        - output.turn_off: out_low
+        - output.turn_off: out_med
+        - output.turn_on:  out_high
 
 fan:
- - platform: speed
-   output: fan_out_internal
-   id: fan_internal
-   name: ${friendly_name} Fan
-   speed_count: 3
+- platform: speed
+  output: fan_speed
+  id: fan_entity
+  name: ${friendly_name} Fan
+  speed_count: 3
