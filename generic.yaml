@@ -1,22 +1,34 @@
 substitutions:
   log_level: DEBUG
+  bedroom_wifi_prio: "5"
+  kitchen_wifi_prio: "3"
 
 esphome:
   name: ${node_name}
   build_path: ./build/${node_name}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: !secret local_domain
-  fast_connect: true
+  fast_connect: false
+  networks:
+    - ssid: !secret bedroom_wifi_ssid
+      password: !secret bedroom_wifi_password
+      bssid: !secret bedroom_wifi_bssid
+      priority: ${bedroom_wifi_prio}
+    - ssid: !secret kitchen_wifi_ssid
+      password: !secret kitchen_wifi_password
+      bssid: !secret kitchen_wifi_bssid
+      priority: ${kitchen_wifi_prio}
+    - ssid: !secret bedroom_wifi_ssid
+      password: !secret bedroom_wifi_password
+      priority: 0
 
 ota:
   password: !secret ota_password
   safe_mode: true
 
 api:
-  password: !secret api_password
+  encryption:
+    key: !secret api_key
 
 time:
   - platform: homeassistant

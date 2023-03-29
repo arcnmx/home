@@ -3,5 +3,9 @@ substitutions:
 
 esp32:
 
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
 packages:
   generic: !include generic.yaml

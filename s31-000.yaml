@@ -1,5 +1,6 @@
 substitutions:
   id: "000"
+  kitchen_wifi_prio: "6"
 
 packages:
   s31: !include s31.yaml
