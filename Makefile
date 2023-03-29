@@ -1,4 +1,4 @@
-all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1 fornuftig-001 outdoor bedroom led-001
+all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1 fornuftig-001 outdoor bedroom
 
 clean:
 	rm -r ./build/
@@ -25,7 +25,6 @@ swb1: build/swb1/firmware.elf
 fornuftig-001: build/fornuftig-001/firmware.elf
 outdoor: build/outdoor/firmware.elf
 bedroom: build/bedroom/firmware.elf
-led-001: build/led-001/firmware.elf
 
 build/%/firmware.elf: %.yaml
 	esphome compile $<
@@ -39,7 +38,6 @@ build/swb1/firmware.elf: $(DEPS_ESP8266_1M)
 build/fornuftig-001/firmware.elf: $(DEPS_FORNUFTIG)
 build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml
 build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml
-build/led-001/firmware.elf: $(DEPS_LED32) ws2815.yaml
 
 .PHONY: all clean
 .DELETE_ON_ERROR:
