@@ -9,9 +9,6 @@ binary_sensor:
       inverted: True
     name: "${friendly_name} Button"
 
-  - platform: status
-    name: "${friendly_name} Status"
-
 switch:
   - platform: gpio
     name: "${friendly_name} Relay 1"
