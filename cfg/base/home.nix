@@ -143,6 +143,8 @@ in {
       LESS = "-KFRXMfnq";
       LESSHISTFILE = "${config.xdg.dataHome}/less/history";
 
+      MANOPT = "--nj --nh";
+
       #LC_COLLATE = "C";
 
       TERMINFO_DIRS = "\${TERMINFO_DIRS:-${config.home.profileDirectory}/share/terminfo:/usr/share/terminfo}";

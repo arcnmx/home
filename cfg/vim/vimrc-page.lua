@@ -9,8 +9,10 @@ else
 end
 mod.page = {}
 
-local manpager_name = os.getenv('MAN_PN')
+local man_page_name = os.getenv('MAN_PN')
+local is_man = man_page_name ~= nil or vim.bo.filetype == 'man'
 local is_page = os.getenv('PAGE_NVIM') ~= nil
+local is_file = false
 
 function mod.page.close(page_alternate_bufnr)
 	vim.cmd('bd!')
@@ -30,18 +32,13 @@ function mod.page.move_to_buf()
 end
 
 function mod.page.apply()
-	if manpager_name ~= nil then
-		mod.page.move_to_buf()
+	if is_man then
+		-- mod.page.move_to_buf()
 	elseif is_file then
 		vim.cmd('bd!')
 	end
 
-	if manpager_name ~= nil then
-		vim.bo.filetype = 'man'
-		vim.fn.cursor(3, 1)
-	else
-		vim.fn.cursor(1, 1)
-	end
+	vim.fn.cursor(1, 1)
 
 	vim.wo.number = true
 	vim.wo.scrolloff = 999
@@ -82,7 +79,7 @@ function mod.page.on_open()
 	end
 	pcall(unmap_page) -- don't fail if they don't exist
 
-	if manpager_name ~= nil then
+	if is_man then
 		vim.defer_fn(mod.page.apply, 128)
 	else
 		vim.defer_fn(mod.page.apply, 48)
@@ -90,7 +87,7 @@ function mod.page.on_open()
 end
 
 function mod.page.on_disconnect()
-	if manpager_name ~= nil then
+	if is_man then
 		-- suggested by readme but I'm not really sure why?
 		-- vim.cmd('sleep 100m')
 	end

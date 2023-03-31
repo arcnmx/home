@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1680042170,
-        "narHash": "sha256-gtNqqWxXKj91rJbzS+tSqL8w8EBatO0/49UOrmqoYmU=",
+        "lastModified": 1680285462,
+        "narHash": "sha256-iuDi6MUfLxGYQUgpy5x7HBDIGf8dnPGMkYs/9qujmyE=",
         "owner": "arcnmx",
         "repo": "nixexprs",
-        "rev": "6a2badc744f096fd2021355f31fb85b271830ff1",
+        "rev": "c425430b7c084e154a6ce56b496d4d04f6f60c68",
         "type": "github"
       },
       "original": {

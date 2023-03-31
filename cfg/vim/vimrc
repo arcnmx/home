@@ -51,6 +51,12 @@ au BufRead,BufNewFile *.as setlocal filetype=javascript
 
 au FileType gitcommit setlocal colorcolumn=50,72
 au FileType haskell setlocal expandtab
+au FileType vim setlocal tw=78
+
+let g:ft_man_folding_enable=1
+let g:no_man_maps=1
+au FileType man setlocal number relativenumber wrap
+au FileType man nnoremap <silent> <buffer> gO :call man#show_toc()<CR>
 
 xmap <M-C> y:call SendViaOSC52(getreg('"'))<cr>
 
