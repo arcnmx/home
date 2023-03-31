@@ -1,5 +1,7 @@
 sensor:
   - platform: scd4x
+    measurement_mode: single_shot
+    update_interval: 30s
     co2:
       name: "Bedroom CO2"
       id: scd41_co2
