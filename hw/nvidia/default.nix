@@ -1,14 +1,13 @@
-{ config, pkgs, lib, ... }: with lib; let
+{ inputs, config, pkgs, lib, ... }: with lib; let
   cfg = config.hardware.nvidia;
   openglPackages = pkgs: with pkgs; mkMerge [
     # TODO: opencl_nvidia?
   ];
   isNvidiaDriver = cfg.driver == "nvidia" || cfg.driver == "nvidia-open";
   inherit (config.boot.kernelPackages.nvidiaPackages) stable beta;
-  nvpackage = if versionAtLeast beta.version stable.version then beta else stable;
-  patched = cfg.patch.package.override { nvidia_x11 = nvpackage; };
 in {
   key = "NVIDIA GPU";
+  imports = [ inputs.nvidia-patch.nixosModules.default ];
 
   options = with types; {
     hardware.nvidia = {
@@ -17,17 +16,6 @@ in {
         default = "nvidia";
       };
       enableSoftwareI2c = mkEnableOption "DDC workaround for Pascal over HDMI";
-      patch = {
-        enable = mkEnableOption "nvidia-patch" // {
-          default = if !patched.meta.broken
-            then true
-            else warn "nvidia-patch out of date" false;
-        };
-        package = mkOption {
-          type = package;
-          default = pkgs.nvidia-patch;
-        };
-      };
       dynamicBinding = mkEnableOption "dynamic gpu unbinding";
     };
   };
@@ -36,14 +24,16 @@ in {
     home-manager.users.arc = { ... }: {
       imports = [ ./home.nix ];
     };
-
     hardware = {
       nvidia = {
+        patch = {
+          enable = mkIf (cfg.driver != "nvidia") (mkDefault false);
+          softEnable = mkDefault true;
+          nvidiaPackage = if versionAtLeast beta.version stable.version then beta else stable;
+        };
         open = cfg.driver == "nvidia-open";
         modesetting.enable = !cfg.dynamicBinding;
-        package = mkIf (cfg.driver == "nvidia") (if cfg.patch.enable
-          then patched
-          else nvpackage);
+        package = mkDefault cfg.patch.nvidiaPackage;
       };
       display.nvidia.enable = mkIf isNvidiaDriver true;
       opengl = {

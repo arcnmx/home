@@ -24,6 +24,13 @@
       url = "github:arcnmx/tf-nix";
       flake = false;
     };
+    nvidia-patch = {
+      url = "github:arcnmx/nvidia-patch.nix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flakelib.follows = "flakelib";
+      };
+    };
     screenstub = {
       url = "github:arcnmx/screenstub/xinput";
       inputs = {

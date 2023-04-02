@@ -124,6 +124,46 @@
         "type": "github"
       }
     },
+    "nvidia-patch": {
+      "inputs": {
+        "flakelib": [
+          "flakelib"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nvidia-patch-src": "nvidia-patch-src"
+      },
+      "locked": {
+        "lastModified": 1682006604,
+        "narHash": "sha256-eDgboXP0lHaED4pDdL1QemG8icZdtKLnetXQVjUhuNI=",
+        "owner": "arcnmx",
+        "repo": "nvidia-patch.nix",
+        "rev": "b6b4b43d58a4e82ac5d66acc7979aad3a2e0720c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arcnmx",
+        "repo": "nvidia-patch.nix",
+        "type": "github"
+      }
+    },
+    "nvidia-patch-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1681920503,
+        "narHash": "sha256-eKDUjIidTb6BFhKpgH0/908yZ9ZpE9bZu1UatRaGPbA=",
+        "owner": "keylase",
+        "repo": "nvidia-patch",
+        "rev": "176936b844a42ba5ea6fd340af34922b9aa6a0f5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "keylase",
+        "repo": "nvidia-patch",
+        "type": "github"
+      }
+    },
     "qemucomm": {
       "inputs": {
         "flakelib": [
@@ -157,6 +197,7 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-big": "nixpkgs-big",
+        "nvidia-patch": "nvidia-patch",
         "qemucomm": "qemucomm",
         "rust": "rust",
         "screenstub": "screenstub",
