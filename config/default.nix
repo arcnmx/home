@@ -9,7 +9,6 @@
     overlays = [
       channels.paths.arc
       channels.paths.rust
-      ../cfg
     ];
     nixPath = map (ch: "${ch}=${channels.imports.${ch}}") (builtins.attrNames channels.imports);
     nixpkgs = import channels.paths.nixpkgs {
@@ -18,7 +17,9 @@
     };
     config.nixpkgs = {
       config = import ./channels/nixpkgs.nix;
-      overlays = map (p: import (p + "/overlay.nix")) channels.overlays;
+      overlays = map (p: import (p + "/overlay.nix")) channels.overlays ++ [
+        (import ../cfg/overlay)
+      ];
     };
     pkgs = channels.nixpkgs;
   };
