@@ -498,7 +498,7 @@
           wantedBy = mkIf (machineConfig.systemd.enable && config.default) [ machineConfig.systemd.id ];
           after = requisite;
           conflicts = let
-            otherMachines = filterAttrs (name: _: name != machineName) cfg.qemu.machines;
+            otherMachines = filterAttrs (name: machine: machine.enable && machine.systemd.enable && name != machineName) cfg.qemu.machines;
             machineIds = mapAttrsToList (_: machine: let
               devices = attrValues machine.hotplug.devices;
               matching = filter (dev: dev.name == config.name) devices;
@@ -546,7 +546,7 @@
     };
     config = let
       otherMachines = filterAttrs (n: _: n != name) cfg.qemu.machines;
-      sameMachines = filterAttrs (_: machine: machine.systemd.enable && machine.name == config.name) otherMachines;
+      sameMachines = filterAttrs (_: machine: machine.enable && machine.systemd.enable && machine.name == config.name) otherMachines;
     in {
       systemd = {
         name = "vm-${name}";
