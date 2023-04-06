@@ -11,7 +11,7 @@
       };
       modulesPath = mkOption {
         type = types.path;
-        default = toString (config.channels.paths.nixpkgs + "/nixos/modules");
+        default = toString (inputs.nixpkgs + "/nixos/modules");
       };
     };
     yggdrasil = mkOption {
@@ -88,9 +88,9 @@
   config.network = {
     nixos = {
       extraModules = let
-        tf = import (config.channels.paths.tf + "/modules");
-        arc = import (config.channels.paths.arc + "/modules");
-        hm = config.channels.paths.home-manager + "/nixos";
+        tf = import (inputs.tf + "/modules");
+        arc = import (inputs.arc + "/modules");
+        hm = inputs.home-manager + "/nixos";
       in [
         (toString hm)
         arc.nixos

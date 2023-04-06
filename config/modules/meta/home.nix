@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }: with lib; {
+{ pkgs, lib, inputs, config, ... }: with lib; {
   options.home = {
     username = mkOption {
       type = types.str;
@@ -17,7 +17,7 @@
       default = { };
     };
     profiles = let
-      modulesPath = config.channels.paths.home-manager + "/modules";
+      modulesPath = inputs.home-manager + "/modules";
       hmlib = import (modulesPath + "/lib/stdlib-extended.nix") pkgs.lib;
       homeModules = import (modulesPath + "/modules.nix") {
         inherit pkgs;
@@ -44,8 +44,8 @@
     };
     extraModules = [
       ../home
-      "${toString config.channels.paths.arc}/modules/home"
-      "${toString config.channels.paths.tf}/modules/home"
+      "${toString inputs.arc}/modules/home"
+      "${toString inputs.tf}/modules/home"
       ({
         config = {
           home.username = mkDefault config.home.username;

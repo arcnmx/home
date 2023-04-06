@@ -1,4 +1,4 @@
-{ channels, config, pkgs, lib, ... }: with lib; let
+{ inputs, config, pkgs, lib, ... }: with lib; let
   cfg = config.deploy;
   meta = config;
   tfModule = { lib, ... }: with lib; {
@@ -38,13 +38,13 @@
   tfType = types.submoduleWith {
     modules = [
       tfModule
-      "${toString config.channels.paths.tf}/modules"
+      "${toString inputs.tf}/modules"
     ];
     shorthandOnlyDefinesConfig = true;
   };
 in {
   imports = [
-    (toString (channels.paths.tf + "/modules/run.nix"))
+    (toString (inputs.tf + "/modules/run.nix"))
   ];
   options = {
     deploy = {

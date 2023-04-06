@@ -1,17 +1,14 @@
 { inputs ? (import ../ci/bootstrap.nix).inputs }: let
   channels = {
-    paths = builtins.mapAttrs (_: i: i.outPath) {
-      inherit (inputs) nixpkgs home-manager tf arc rust;
-    };
     imports = {
-      inherit (channels.paths) nixpkgs arc rust;
+      inherit (inputs) nixpkgs arc rust;
     };
     overlays = [
-      channels.paths.arc
-      channels.paths.rust
+      inputs.arc
+      inputs.rust
     ];
     nixPath = map (ch: "${ch}=${channels.imports.${ch}}") (builtins.attrNames channels.imports);
-    nixpkgs = import channels.paths.nixpkgs {
+    nixpkgs = import inputs.nixpkgs {
       system = builtins.currentSystem or "x86_64-linux";
       inherit (channels.config.nixpkgs) config overlays;
     };

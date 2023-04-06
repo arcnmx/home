@@ -1,11 +1,11 @@
-{ lib, ... }: with lib; {
+{ lib, inputs, ... }: with lib; {
   config = {
     deploy.targets.cirno = {
       nodeNames = singleton "cirno";
     };
     network.nodes.cirno = { meta, ... }: {
       imports = let
-        tf = import (meta.channels.paths.tf + "/modules");
+        tf = import (inputs.tf + "/modules");
       in [
         ../../../nixos.nix
         ./nixos.nix
