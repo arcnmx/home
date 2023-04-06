@@ -22,7 +22,7 @@
     };
     tf = {
       url = "github:arcnmx/tf-nix";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nvidia-patch = {
       url = "github:arcnmx/nvidia-patch.nix";

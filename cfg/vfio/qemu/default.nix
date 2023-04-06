@@ -8,7 +8,7 @@
     machines = mkOption {
       type = types.attrsOf (types.submoduleWith {
         modules = [
-          (import (inputs.arc + "/modules/misc")).qemu
+          inputs.arc.modules.misc.qemu
           ./machine.nix
           ./install.nix
           ./memory.nix

@@ -4,13 +4,11 @@
       nodeNames = singleton "cirno";
     };
     network.nodes.cirno = { meta, ... }: {
-      imports = let
-        tf = import (inputs.tf + "/modules");
-      in [
+      imports = [
         ../../../nixos.nix
         ./nixos.nix
-        tf.nixos.oracle
-        tf.nixos.ubuntu-linux # lustrate host image
+        inputs.tf.nixosModules.oracle
+        inputs.tf.nixosModules.ubuntu-linux # lustrate host image
       ];
     };
   };

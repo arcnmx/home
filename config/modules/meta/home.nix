@@ -44,8 +44,8 @@
     };
     extraModules = [
       ../home
-      "${toString inputs.arc}/modules/home"
-      "${toString inputs.tf}/modules/home"
+      inputs.arc.homeModules.default
+      inputs.tf.homeModules.default
       ({
         config = {
           home.username = mkDefault config.home.username;

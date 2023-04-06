@@ -38,13 +38,13 @@
   tfType = types.submoduleWith {
     modules = [
       tfModule
-      "${toString inputs.tf}/modules"
+      inputs.tf.metaModules.default
     ];
     shorthandOnlyDefinesConfig = true;
   };
 in {
   imports = [
-    (toString (inputs.tf + "/modules/run.nix"))
+    inputs.tf.metaModules.run
   ];
   options = {
     deploy = {

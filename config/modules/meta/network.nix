@@ -87,14 +87,10 @@
   };
   config.network = {
     nixos = {
-      extraModules = let
-        tf = import (inputs.tf + "/modules");
-        arc = import (inputs.arc + "/modules");
-        hm = inputs.home-manager + "/nixos";
-      in [
-        (toString hm)
-        arc.nixos
-        tf.nixos tf.run
+      extraModules = [
+        inputs.home-manager.nixosModules.default
+        inputs.arc.nixosModules.default
+        inputs.tf.nixosModules.default inputs.tf.metaModules.run
       ];
       specialArgs = {
         inherit (config.network) nodes;
