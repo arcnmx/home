@@ -57,6 +57,9 @@
         };
       };
     };
+    environment.systemPackages = with pkgs; [
+      cryptsetup
+    ];
 
     users = {
       chroot.users = [ "kat" ];

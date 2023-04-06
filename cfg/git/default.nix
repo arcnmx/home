@@ -57,6 +57,9 @@
         smudge = "${pkgs.coreutils}/bin/unexpand --first-only --tabs=4";
         clean = "${pkgs.coreutils}/bin/expand -i --tabs=4";
       };
+      diff = {
+        sopsdiffer.textconv = "sops --config /dev/null -d";
+      };
       advice = {
         skippedCherryPicks = false;
       };

@@ -102,10 +102,11 @@ in {
     };
     deprecationAliases = mkMerge [ {
       yes = "no";
-    } (mkIf (!config.home.minimalSystem) {
+    } (mkIf config.programs.page.enable {
+      less = "page";
+    }) (mkIf (!config.home.minimalSystem) {
       sed = "sd";
       find = "fd";
-      grep = "rg";
     }) ];
   };
   home.packages = let

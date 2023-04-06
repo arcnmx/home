@@ -143,6 +143,7 @@ in {
     };
     home.shell.functions = {
       soffice = ''nix shell nixpkgs-big#libreoffice-fresh -c soffice "$@"'';
+      pdf = ''evince "$@" 2>/dev/null &'';
       scrot = ''
         cd ${config.xdg.userDirs.pictures}
         command scrot "$@"
