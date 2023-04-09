@@ -34,7 +34,6 @@ in {
     };
     home.packages = with pkgs; [
       git-remote-gcrypt git-revise git-annex git-annex-remote-b2
-      gnupg
       pass-arc
       bitwarden-cli
       playerctl
@@ -117,6 +116,9 @@ in {
       "go"
     ];
     #services.lorri.enable = true;
+    programs.gpg = {
+      enable = mkDefault true;
+    };
     services.gpg-agent = {
       enable = mkDefault true;
       enableExtraSocket = mkDefault true;

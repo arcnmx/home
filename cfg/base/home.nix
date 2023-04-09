@@ -33,13 +33,6 @@ in {
   config = {
     home.stateVersion = mkDefault "22.11";
     home.file = {
-      ".gnupg".source = mkOutOfStoreSymlink "${config.xdg.dataHome}/gnupg";
-      ".gnupg/gpg.conf" = lib.mkIf config.programs.gpg.enable {
-        target = "${config.xdg.configHome}/gnupg/gpg.conf";
-      };
-      "${config.programs.gpg.homedir}/gpg-agent.conf" = lib.mkIf config.services.gpg-agent.enable {
-        target = "${config.xdg.configHome}/gnupg/gpg-agent.conf";
-      };
       ".markdownlintrc".source = mkOutOfStoreSymlink "${config.xdg.configHome}/markdownlint/markdownlintrc";
     } // lib.genAttrs [ "cargo/registry" "cargo/git" "cargo/bin" ] (path: mkIf (!config.home.scratch.enable) {
       # ensure empty cache directories are created
@@ -111,13 +104,7 @@ in {
     };
     xdg.dataDirs = [
       "less"
-      "gnupg" # TODO: directory needs restricted permissions
     ];
-    xdg.dataFile = {
-      "gnupg/gpg-agent.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg-agent.conf";
-      "gnupg/gpg.conf".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/gpg.conf";
-      "gnupg/sshcontrol".source = mkOutOfStoreSymlink "${config.xdg.configHome}/gnupg/sshcontrol";
-    };
     xdg.userDirs = {
       enable = true;
       createDirectories = true;
@@ -177,6 +164,9 @@ in {
           })
         ];
       });
+    };
+    programs.gpg = {
+      homedir = "${config.xdg.dataHome}/gnupg";
     };
     programs.bat.config = {
       theme = "base16-256";
