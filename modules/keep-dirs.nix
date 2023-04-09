@@ -1,12 +1,4 @@
-{ config, lib, ... }: with lib; let
-  shellFunAlias = command: replacement: ''
-    if [[ ! -t 0 ]]; then
-      command ${command} $@
-    else
-      echo 'use ${replacement}!'
-    fi
-  '';
-in {
+{ config, lib, ... }: with lib; {
   options.xdg.dataDirs = mkOption {
     type = types.listOf types.str;
     default = [ ];
