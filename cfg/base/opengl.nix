@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }: with lib; let
   cfg = config.hardware.opengl;
-  openglPackages = pkgs: glpkgs: with pkgs; mkMerge [
-    (mkIf cfg.mesa.enable [ glpkgs.mesaPackage.drivers ])
+  openglPackages = pkgs: with pkgs; mkMerge [
     (mkIf (cfg.vaapi.enable && cfg.vdpau.enable) [ vaapiVdpau libvdpau-va-gl ])
   ];
 in {
@@ -21,12 +20,8 @@ in {
   };
   config = {
     hardware.opengl = {
-      extraPackages = openglPackages pkgs {
-        inherit (cfg) mesaPackage;
-      };
-      extraPackages32 = openglPackages pkgs.driversi686Linux {
-        mesaPackage = cfg.mesaPackage32;
-      };
+      extraPackages = openglPackages pkgs;
+      extraPackages32 = openglPackages pkgs.driversi686Linux;
     };
     services.xserver.videoDrivers = mkAfter [
       "modesetting"
