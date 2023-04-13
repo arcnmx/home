@@ -12,7 +12,7 @@
         };
       };
       supportedFilesystems = ["btrfs" "xfs"];
-      tmpOnTmpfsSize = "64G";
+      tmp.tmpfsSize = "64G";
     };
     services.journald.extraConfig = ''
       SystemMaxUse=3G

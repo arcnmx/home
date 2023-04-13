@@ -19,7 +19,7 @@
         };
       };
       supportedFilesystems = [ "xfs" ];
-      cleanTmpDir = true;
+      tmp.cleanOnBoot = true;
     };
 
     fileSystems = {

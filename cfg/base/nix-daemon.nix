@@ -3,7 +3,7 @@
 in {
   options.nix.build = with types; {
     enable = mkEnableOption "nix build directory" // {
-      default = config.boot.tmpOnTmpfs;
+      default = config.boot.tmp.useTmpfs;
     };
     path = mkOption {
       type = types.path;
