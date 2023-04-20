@@ -17,7 +17,7 @@
       command_timeout = 200;
       add_newline = false;
       format =
-        "[$username$hostname$directory$all$shlvl$jobs$status$cmd_duration$fill$line_break](${bg} fg:${foreground_status})"
+        "[\${env_var.STARSHIP_TAG}$username$hostname$directory$all$shlvl$jobs$status$cmd_duration$fill$line_break](${bg} fg:${foreground_status})"
         + "$shell$character";
       right_format = "$package$battery$time";
       character = {
@@ -46,7 +46,12 @@
         truncation_symbol = "…/";
         style = "${bg} bold fg:${function}";
       };
-      env_var = { }; # TODO
+      env_var = {
+        STARSHIP_TAG = {
+          format = "[\\[$env_value\\]]($style) ";
+          style = "${bg} bold fg:${foreground_status}";
+        };
+      };
       git_branch = {
         format = "[$symbol$branch]($style) ";
         style = "${bg} fg:${class}";
