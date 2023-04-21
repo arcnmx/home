@@ -54,4 +54,5 @@ in config // lib.optionalAttrs (hostname != null) {
   inherit host inputs;
 } // {
   switch = lib.optionalAttrs (hostname != null) host.run.switch // lib.mapAttrs (_: host: host.run.deploy) config.network.nodes;
+  meta = config;
 } // channels
