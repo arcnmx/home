@@ -1,0 +1,10 @@
+substitutions:
+  node_name: kitchen
+  friendly_name: Kitchen
+
+packages:
+  d1_mini: !include esp8266-d1-mini.yaml
+  scd41: !include scd41.yaml
+  sen55: !include sen55.yaml
+  i2c: !include esp8266-i2c.yaml
+  uart: !include esp8266-uart.yaml

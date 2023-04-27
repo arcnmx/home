@@ -1,0 +1,42 @@
+sensor:
+- platform: sen5x
+  id: sen55
+  pm_1_0:
+    name: "${friendly_name} PM <1µm Weight concentration"
+    id: pm_1_0
+    accuracy_decimals: 1
+  pm_2_5:
+    name: "${friendly_name} PM <2.5µm Weight concentration"
+    id: pm_2_5
+    accuracy_decimals: 1
+  pm_4_0:
+    name: "${friendly_name} PM <4µm Weight concentration"
+    id: pm_4_0
+    accuracy_decimals: 1
+  pm_10_0:
+    name: "${friendly_name} PM <10µm Weight concentration"
+    id: pm_10_0
+    accuracy_decimals: 1
+  temperature:
+    name: ${friendly_name} Temperature SEN55
+    accuracy_decimals: 1
+  humidity:
+    name: ${friendly_name} Temperature SEN55
+    accuracy_decimals: 0
+  voc:
+    name: "${friendly_name} VOC"
+    algorithm_tuning:
+      index_offset: 100
+      learning_time_offset_hours: 12
+      learning_time_gain_hours: 12
+      gating_max_duration_minutes: 180
+      std_initial: 50
+      gain_factor: 230
+  temperature_compensation:
+    offset: 0
+    normalized_offset_slope: 0
+    time_constant: 0
+  acceleration_mode: low
+  store_baseline: true
+  address: 0x69
+  update_interval: 10s

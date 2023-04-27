@@ -1,0 +1,4 @@
+i2c:
+  sda: SDA
+  scl: SCL
+  frequency: 100kHz

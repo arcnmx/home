@@ -1,0 +1,8 @@
+substitutions:
+  node_name: dirty
+  friendly_name: Dirty
+
+packages:
+  esp32_wroom32c4: !include esp32-wroom32-devkitc-v4.yaml
+  sen55: !include sen55.yaml
+  esp32-i2c: !include esp32-i2c.yaml
