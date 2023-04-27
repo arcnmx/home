@@ -18,7 +18,7 @@
       ];
     };
     devShells = {
-      default = { mkShell, writeShellScriptBin, gnumake, esphome, esphome-fonts }: let
+      default = { mkShell, writeShellScriptBin, sops, gnumake, esphome, esphome-fonts }: let
         esphome-wrapper = writeShellScriptBin "esphome" ''
           exec ${nixlib.getExe esphome} -s fonts_root ${esphome-fonts} "$@"
         '';
@@ -26,6 +26,7 @@
         nativeBuildInputs = [
           esphome-wrapper
           gnumake
+          sops
         ];
       };
     };

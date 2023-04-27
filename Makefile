@@ -1,5 +1,8 @@
 all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1-001 fornuftig-001 outdoor bedroom kitchen dirty
 
+secrets.yaml: secrets.sops.yaml
+	sops -d $< > $@
+
 clean:
 	rm -r ./build/
 

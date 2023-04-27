@@ -1,0 +1,10 @@
+keys:
+- &kat CD8CE78CB0B3BDD4 # https://inskip.me/pubkey.asc
+- &mew 65BD3044771CB6FB
+creation_rules:
+- path_regex: .*\.sops\..*$
+  shamir_threshold: 1
+  key_groups:
+  - pgp:
+    - *kat
+    - *mew
