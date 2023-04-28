@@ -1,6 +1,7 @@
 substitutions:
   node_name: bedroom
   friendly_name: Bedroom
+  scd41_suffix: " 2"
 
 packages:
   d1_mini: !include esp8266-d1-mini.yaml

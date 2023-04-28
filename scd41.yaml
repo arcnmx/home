@@ -1,3 +1,6 @@
+substitutions:
+  scd41_suffix: ""
+
 sensor:
   - platform: scd4x
     measurement_mode: single_shot
@@ -6,7 +9,7 @@ sensor:
       name: ${friendly_name} CO2
       id: scd41_co2
     temperature:
-      name: ${friendly_name} Temperature 2
+      name: ${friendly_name} Temperature${scd41_suffix}
       id: scd41_temp
     humidity:
-      name: ${friendly_name} Humidity 2
+      name: ${friendly_name} Humidity${scd41_suffix}

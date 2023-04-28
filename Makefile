@@ -18,8 +18,8 @@ DEPS_ESP32_I2C := esp32-i2c.yaml
 DEPS_SWB1 := swb1.yaml $(DEPS_ESP8266_1M)
 DEPS_S31 := s31.yaml $(DEPS_ESP8266_1M)
 DEPS_FORNUFTIG := fornuftig.yaml $(DEPS_ESP8266_D1)
-DEPS_SENSORFRIEND := sensorfriend.yaml $(DEPS_ESP8266_D1) $(DEPS_ESP8266_I2C) $(DEPS_ESP8266_UART)
-DEPS_SENSORFRIEND32 := $(DEPS_ESP32_WROOM32)
+DEPS_SENSORFRIEND := $(DEPS_ESP8266_D1) $(DEPS_ESP8266_I2C) $(DEPS_ESP8266_UART)
+DEPS_SENSORFRIEND32 := $(DEPS_ESP32_WROOM32) $(DEPS_ESP32_I2C)
 DEPS_LED32 := led.yaml $(DEPS_ESP32_WROOM32) $(DEPS_ESP32_I2C)
 DEPS_KITTYLAMP := kittylamp.yaml $(DEPS_ESP8266_D1)
 
@@ -47,8 +47,8 @@ build/s31-003/firmware.elf: $(DEPS_S31)
 build/swb1-001/firmware.elf: $(DEPS_SWB1)
 build/fornuftig-001/firmware.elf: $(DEPS_FORNUFTIG)
 build/kittylamp-001/firmware.elf: $(DEPS_KITTYLAMP)
-build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml
-build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml
+build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml sensorfriend.yaml
+build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml sensorfriend.yaml
 build/kitchen/firmware.elf: $(DEPS_SENSORFRIEND) sen55.yaml scd41.yaml
 build/dirty/firmware.elf: $(DEPS_SENSORFRIEND32) sen55.yaml
 

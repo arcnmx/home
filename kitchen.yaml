@@ -1,6 +1,8 @@
 substitutions:
   node_name: kitchen
   friendly_name: Kitchen
+  kitchen_wifi_prio: "5"
+  bedroom_wifi_prio: "3"
 
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
