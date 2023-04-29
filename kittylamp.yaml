@@ -1,6 +1,7 @@
 substitutions:
   node_name: "kittylamp-${id}"
   friendly_name: "kittylamp-${id}"
+  kittylamp_name: $friendly_name
 
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
@@ -11,4 +12,4 @@ light:
     variant: WS2812X
     pin: GPIO4
     num_leds: 7
-    name: "Kittylamp"
+    name: $kittylamp_name

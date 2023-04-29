@@ -1,5 +1,6 @@
 substitutions:
   id: "001"
+  kittylamp_name: Kittylamp
 
 packages:
   kittylamp: !include kittylamp.yaml
