@@ -1,0 +1,5 @@
+substitutions:
+  id: "001"
+
+packages:
+  kittylamp: !include kittylamp.yaml
