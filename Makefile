@@ -1,4 +1,4 @@
-all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1-001 fornuftig-001 outdoor bedroom kitchen dirty
+all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1-001 fornuftig-001 outdoor bedroom kitchen dirty kittylamp-001
 
 secrets.yaml: secrets.sops.yaml
 	sops -d $< > $@
@@ -21,6 +21,7 @@ DEPS_FORNUFTIG := fornuftig.yaml $(DEPS_ESP8266_D1)
 DEPS_SENSORFRIEND := sensorfriend.yaml $(DEPS_ESP8266_D1) $(DEPS_ESP8266_I2C) $(DEPS_ESP8266_UART)
 DEPS_SENSORFRIEND32 := $(DEPS_ESP32_WROOM32)
 DEPS_LED32 := led.yaml $(DEPS_ESP32_WROOM32) $(DEPS_ESP32_I2C)
+DEPS_KITTYLAMP := kittylamp.yaml $(DEPS_ESP8266_D1)
 
 s31-000: build/s31-000/firmware.elf
 s31-001: build/s31-001/firmware.elf
@@ -29,6 +30,7 @@ s31-003: build/s31-003/firmware.elf
 s31-004: build/s31-004/firmware.elf
 swb1-001: build/swb1-001/firmware.elf
 fornuftig-001: build/fornuftig-001/firmware.elf
+kittylamp-001: build/kittylamp-001/firmware.elf
 outdoor: build/outdoor/firmware.elf
 bedroom: build/bedroom/firmware.elf
 kitchen: build/kitchen/firmware.elf
@@ -44,6 +46,7 @@ build/s31-002/firmware.elf: $(DEPS_S31)
 build/s31-003/firmware.elf: $(DEPS_S31)
 build/swb1-001/firmware.elf: $(DEPS_SWB1)
 build/fornuftig-001/firmware.elf: $(DEPS_FORNUFTIG)
+build/kittylamp-001/firmware.elf: $(DEPS_KITTYLAMP)
 build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml
 build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml
 build/kitchen/firmware.elf: $(DEPS_SENSORFRIEND) sen55.yaml scd41.yaml

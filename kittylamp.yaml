@@ -1,0 +1,14 @@
+substitutions:
+  node_name: "kittylamp-${id}"
+  friendly_name: "kittylamp-${id}"
+
+packages:
+  d1_mini: !include esp8266-d1-mini.yaml
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812X
+    pin: GPIO4
+    num_leds: 7
+    name: "Kittylamp"
