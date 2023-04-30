@@ -6,6 +6,10 @@ substitutions:
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
 
+e131:
+  method: multicast
+wled:
+
 light:
   - platform: neopixelbus
     type: GRB
@@ -13,3 +17,12 @@ light:
     pin: GPIO4
     num_leds: 7
     name: $kittylamp_name
+    effects:
+    - e131:
+        universe: 1
+        channels: RGB
+    - wled:
+        #port: 21324
+    - random:
+    - pulse:
+    - flicker:
