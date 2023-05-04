@@ -1,5 +1,13 @@
 substitutions:
   id: "001"
+  # incorrectly wired
+  gpio_rotary_off: D7
+  gpio_rotary_low: D6
+  gpio_rotary_med: D5
+  gpio_rotary_high: D1
+  gpio_out_high: D4
+  gpio_out_med: D3
+  gpio_out_low: D2
 
 packages:
   fornuftig: !include fornuftig.yaml

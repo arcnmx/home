@@ -1,4 +1,4 @@
-all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1-001 fornuftig-001 outdoor bedroom kitchen dirty kittylamp-001
+all: s31-000 s31-001 s31-002 s31-003 s31-004 swb1-001 fornuftig-001 fornuftig-002 outdoor bedroom kitchen dirty kittylamp-001
 
 secrets.yaml: secrets.sops.yaml
 	sops -d $< > $@
@@ -30,6 +30,7 @@ s31-003: build/s31-003/firmware.elf
 s31-004: build/s31-004/firmware.elf
 swb1-001: build/swb1-001/firmware.elf
 fornuftig-001: build/fornuftig-001/firmware.elf
+fornuftig-002: build/fornuftig-002/firmware.elf
 kittylamp-001: build/kittylamp-001/firmware.elf
 outdoor: build/outdoor/firmware.elf
 bedroom: build/bedroom/firmware.elf
@@ -46,6 +47,7 @@ build/s31-002/firmware.elf: $(DEPS_S31)
 build/s31-003/firmware.elf: $(DEPS_S31)
 build/swb1-001/firmware.elf: $(DEPS_SWB1)
 build/fornuftig-001/firmware.elf: $(DEPS_FORNUFTIG)
+build/fornuftig-002/firmware.elf: $(DEPS_FORNUFTIG)
 build/kittylamp-001/firmware.elf: $(DEPS_KITTYLAMP)
 build/outdoor/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml ccs811.yaml sensorfriend.yaml
 build/bedroom/firmware.elf: $(DEPS_SENSORFRIEND) dht22.yaml scd41.yaml pms5003.yaml sensorfriend.yaml

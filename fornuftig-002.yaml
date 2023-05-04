@@ -1,0 +1,6 @@
+substitutions:
+  id: "002"
+  friendly_name: Bedroom Air Purifier
+
+packages:
+  fornuftig: !include fornuftig.yaml

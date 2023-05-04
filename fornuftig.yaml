@@ -1,6 +1,13 @@
 substitutions:
   node_name: fornuftig-${id}
   friendly_name: FORNÜFTIG
+  gpio_rotary_off: D1
+  gpio_rotary_low: D5
+  gpio_rotary_med: D6
+  gpio_rotary_high: D7
+  gpio_out_high: D2
+  gpio_out_med: D3
+  gpio_out_low: D4
 
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
@@ -36,7 +43,7 @@ binary_sensor:
     internal: true
     id: rotary_off
     pin:
-      number: D7
+      number: $gpio_rotary_off
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -46,7 +53,7 @@ binary_sensor:
     internal: true
     id: rotary_low
     pin:
-      number: D6
+      number: $gpio_rotary_low
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -57,7 +64,7 @@ binary_sensor:
     internal: true
     id: rotary_med
     pin:
-      number: D5
+      number: $gpio_rotary_med
       mode: INPUT_PULLUP
       inverted: True
     on_press:
@@ -68,7 +75,7 @@ binary_sensor:
     internal: true
     id: rotary_high
     pin:
-      number: D1
+      number: $gpio_rotary_high
       mode: INPUT_PULLUP
       inverted: true
     on_press:
@@ -78,15 +85,15 @@ binary_sensor:
 
 output:
   - platform: gpio
-    pin: D4
+    pin: $gpio_out_high
     id: out_high
     inverted: true
   - platform: gpio
-    pin: D3
+    pin: $gpio_out_med
     id: out_med
     inverted: true
   - platform: gpio
-    pin: D2
+    pin: $gpio_out_low
     id: out_low
     inverted: true
   - platform: template

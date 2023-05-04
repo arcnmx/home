@@ -3,6 +3,7 @@ substitutions:
   friendly_name: "kittylamp-${id}"
   kittylamp_name: $friendly_name
 
+# https://www.wemos.cc/en/latest/d1_mini_shield/rgb_led.html
 packages:
   d1_mini: !include esp8266-d1-mini.yaml
 
