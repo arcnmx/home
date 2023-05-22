@@ -1,3 +1,5 @@
+# https://community.home-assistant.io/t/ikea-fornuftig-in-home-assistant/318341
+
 substitutions:
   node_name: fornuftig-${id}
   friendly_name: FORNÜFTIG

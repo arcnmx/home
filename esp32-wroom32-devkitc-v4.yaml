@@ -1,5 +1,11 @@
+# Pinout:
+# https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/esp32-devkitC-v4-pinout.png
+
+# NOTE: Bootloader configuration (important!)
+# https://docs.espressif.com/projects/esptool/en/latest/esp32/advanced-topics/boot-mode-selection.html
+# Otherwise the ESP32 will be locked out of entering the serial bootloader.
+
 substitutions:
-  platform: esp32
   board: esp32dev # unknown
 
 esp32:

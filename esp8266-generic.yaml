@@ -1,3 +1,11 @@
+# NOTE: Bootloader configuration (important!)
+# https://docs.espressif.com/projects/esptool/en/latest/esp8266/advanced-topics/boot-mode-selection.html
+# Otherwise the ESP8266 will be locked out of entering the serial bootloader.
+# * GPIO15 (MIDO): must be low or floating/NC at boot
+# * GPIO2: must be high or floating/NC at boot
+# ** will be driven as output (UART TX) during serial bootloader execution
+# * GPIO0: must be floating/NC at boot
+
 substitutions:
   platform: esp8266
 

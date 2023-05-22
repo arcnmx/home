@@ -1,3 +1,28 @@
+# Pinout:
+# https://www.wemos.cc/en/latest/d1/d1_mini.html
+# * 3.3V
+# * GPIO15(D8): MIDO (must be low or floating/NC at boot!)
+# * GPIO13(D7): MOSI
+# * GPIO12(D6): MISO
+# * GPIO14(D5): SCK
+# * GPIO16(D0): IO16
+# * A0: TOUT/ADC
+# * RST
+#
+# * 5V
+# * GND
+# * GPIO2(D4): LED (must be high or floating/NC at boot!)
+# ** will be driven as output (UART TX) during serial bootloader execution
+# * GPIO0(D3): IO0 (must be floating/NC at boot!)
+# * GPIO4(D2): SDA
+# * GPIO5(D1): SCL
+# * U0RXD(RX)
+# * U0TXD(TX)
+
+# NOTE: Bootloader configuration (important!)
+# https://docs.espressif.com/projects/esptool/en/latest/esp8266/advanced-topics/boot-mode-selection.html
+# Otherwise the ESP8266 will be locked out of entering the serial bootloader.
+
 substitutions:
   platform: esp8266
   board: d1_mini

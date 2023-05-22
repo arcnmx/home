@@ -1,3 +1,10 @@
+# NOTE: Bootloader configuration (important!)
+# https://docs.espressif.com/projects/esptool/en/latest/esp32/advanced-topics/boot-mode-selection.html
+# Otherwise the ESP32 will be locked out of entering the serial bootloader.
+# * GPIO12 (MTDI): must be floating/NC, configures flash voltage
+# * GPIO2: must be low or floating/NC at boot
+# * GPIO0: must be floating/NC at boot
+
 substitutions:
   platform: esp32
 
