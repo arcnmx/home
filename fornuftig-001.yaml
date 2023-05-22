@@ -1,5 +1,6 @@
 substitutions:
   id: "001"
+  friendly_name_fan: $friendly_name Fan
   # incorrectly wired
   gpio_rotary_off: D7
   gpio_rotary_low: D6

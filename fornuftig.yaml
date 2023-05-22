@@ -3,6 +3,7 @@
 substitutions:
   node_name: fornuftig-${id}
   friendly_name: FORNÜFTIG
+  friendly_name_fan: $friendly_name
   gpio_rotary_off: D1
   gpio_rotary_low: D5
   gpio_rotary_med: D6
@@ -39,7 +40,7 @@ sensor:
 binary_sensor:
   - platform: template
     id: led_sensor
-    name: ${friendly_name} Filter
+    name: $friendly_name Filter
     device_class: problem
   - platform: gpio
     internal: true
@@ -135,5 +136,5 @@ fan:
 - platform: speed
   output: fan_speed
   id: fan_entity
-  name: ${friendly_name} Fan
+  name: $friendly_name_fan
   speed_count: 3
