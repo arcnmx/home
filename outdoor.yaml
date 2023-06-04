@@ -1,5 +1,5 @@
 substitutions:
-  node_name: outdoor
+  node_name: outdoor-friend
   friendly_name: Outdoor
 
 packages:

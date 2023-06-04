@@ -1,5 +1,5 @@
 substitutions:
-  node_name: dirty
+  node_name: dirty-friend
   friendly_name: Dirty
 
 packages:

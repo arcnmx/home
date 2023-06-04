@@ -1,5 +1,5 @@
 substitutions:
-  node_name: bedroom
+  node_name: bedroom-friend
   friendly_name: Bedroom
   scd41_suffix: " 2"
 
