@@ -2,7 +2,7 @@
 
 substitutions:
   node_name: fornuftig-${id}
-  friendly_name: FORNÜFTIG
+  friendly_name: FÖRNUFTIG
   friendly_name_fan: $friendly_name
   gpio_rotary_off: D1
   gpio_rotary_low: D5
@@ -59,6 +59,9 @@ binary_sensor:
       number: $gpio_rotary_low
       mode: INPUT_PULLUP
       inverted: True
+    filters:
+    # work around wiring issues and shorts in fornuftig-002
+    - delayed_off: 100ms
     on_press:
       - fan.turn_on:
           id: fan_entity
@@ -70,6 +73,8 @@ binary_sensor:
       number: $gpio_rotary_med
       mode: INPUT_PULLUP
       inverted: True
+    filters:
+    - delayed_off: 100ms
     on_press:
       - fan.turn_on:
           id: fan_entity
@@ -81,6 +86,8 @@ binary_sensor:
       number: $gpio_rotary_high
       mode: INPUT_PULLUP
       inverted: true
+    filters:
+    - delayed_off: 100ms
     on_press:
       - fan.turn_on:
           id: fan_entity

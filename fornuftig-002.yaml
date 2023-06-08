@@ -1,6 +1,8 @@
 substitutions:
   id: "002"
-  friendly_name: Bedroom Air Purifier
+  friendly_name: Kitchen Air Purifier
+  kitchen_wifi_prio: "5"
+  bedroom_wifi_prio: "3"
 
 packages:
   fornuftig: !include fornuftig.yaml
