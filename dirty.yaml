@@ -2,6 +2,38 @@ substitutions:
   node_name: dirty-friend
   friendly_name: Dirty
 
+sensor:
+- platform: adc
+  pin: GPIO35
+  name: $friendly_name Moisture 1
+  unit_of_measurement: "%"
+  accuracy_decimals: 1
+  update_interval: &update-interval 30s
+  filters: &moisture-filters
+  - median:
+      window_size: 7
+      send_every: 4
+      send_first_at: 1
+  - calibrate_linear:
+    # voltage to percentage
+    - 0.00 -> 0.00
+    - 3.0 -> 100.00
+  - lambda: if (x < 1) return 0; else return (x);
+- platform: adc
+  pin: GPIO34
+  name: $friendly_name Moisture 2
+  unit_of_measurement: "%"
+  accuracy_decimals: 1
+  update_interval: *update-interval
+  filters: *moisture-filters
+- platform: adc
+  pin: GPIO33
+  name: $friendly_name Moisture 3
+  unit_of_measurement: "%"
+  accuracy_decimals: 1
+  update_interval: *update-interval
+  filters: *moisture-filters
+
 packages:
   esp32_wroom32c4: !include esp32-wroom32-devkitc-v4.yaml
   sen55: !include sen55.yaml
