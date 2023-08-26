@@ -36,6 +36,10 @@ sensor:
           - binary_sensor.template.publish:
               id: led_sensor
               state: ON
+  - platform: template
+    id: knob_position
+    name: "Knob Position"
+    #force_update: true
 
 binary_sensor:
   - platform: template
@@ -50,6 +54,9 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_press:
+      - sensor.template.publish:
+          id: knob_position
+          state: 0
       - fan.turn_off:
           id: fan_entity
   - platform: gpio
@@ -63,6 +70,9 @@ binary_sensor:
     # work around wiring issues and shorts in fornuftig-002
     - delayed_off: 100ms
     on_press:
+      - sensor.template.publish:
+          id: knob_position
+          state: 1
       - fan.turn_on:
           id: fan_entity
           speed: 1
@@ -76,6 +86,9 @@ binary_sensor:
     filters:
     - delayed_off: 100ms
     on_press:
+      - sensor.template.publish:
+          id: knob_position
+          state: 2
       - fan.turn_on:
           id: fan_entity
           speed: 2
@@ -89,6 +102,9 @@ binary_sensor:
     filters:
     - delayed_off: 100ms
     on_press:
+      - sensor.template.publish:
+          id: knob_position
+          state: 3
       - fan.turn_on:
           id: fan_entity
           speed: 3
