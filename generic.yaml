@@ -1,7 +1,7 @@
 substitutions:
   log_level: DEBUG
-  bedroom_wifi_prio: "5"
-  kitchen_wifi_prio: "3"
+  kitchen_wifi_prio: "5"
+  closet_wifi_prio: "2"
 
 esphome:
   name: ${node_name}
@@ -10,17 +10,14 @@ esphome:
 wifi:
   fast_connect: false
   networks:
-    - ssid: !secret bedroom_wifi_ssid
-      password: !secret bedroom_wifi_password
-      bssid: !secret bedroom_wifi_bssid
-      priority: ${bedroom_wifi_prio}
+    - ssid: !secret closet_wifi_ssid
+      password: !secret closet_wifi_password
+      bssid: !secret closet_wifi_bssid
+      priority: ${closet_wifi_prio}
     - ssid: !secret kitchen_wifi_ssid
       password: !secret kitchen_wifi_password
-      bssid: !secret kitchen_wifi_bssid
+      #bssid: !secret kitchen_wifi_bssid
       priority: ${kitchen_wifi_prio}
-    - ssid: !secret bedroom_wifi_ssid
-      password: !secret bedroom_wifi_password
-      priority: 0
 
 ota:
   password: !secret ota_password

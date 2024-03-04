@@ -24,7 +24,6 @@ binary_sensor:
 
 sensor:
   - platform: cse7766
-    update_interval: 15s
     current:
       name: "${friendly_name} Current"
       accuracy_decimals: 2
